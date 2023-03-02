@@ -1,12 +1,27 @@
+/**
+ * @todo Add Radix's tab components to make this even more accessible.
+ */
+import { cva } from "class-variance-authority";
+
+const liStyles = cva("flex-grow border-b-2 p-2 font-bold", {
+  variants: {
+    selected: {
+      true: "bg-teal-800 text-white rounded-t-md border-teal-800",
+      false:
+        "border-teal-800 text-teal-900 hover:bg-teal-800 hover:text-white hover:rounded-t-md",
+    },
+  },
+});
+
 type Props<OptionValue extends string = string> = {
   options: readonly OptionValue[];
-  activeOption: OptionValue;
+  selected: OptionValue;
   onTabChange: (tabOption: OptionValue) => void;
 };
 
 export default function TabGroup<Opt extends string = string>({
   options,
-  activeOption,
+  selected,
   onTabChange,
 }: Props<Opt>) {
   return (
@@ -15,11 +30,7 @@ export default function TabGroup<Opt extends string = string>({
         {options.map((option, index) => (
           <li
             key={index}
-            className={`flex-grow border-b-2 p-2 font-bold  ${
-              option === activeOption
-                ? "bg-teal-800 text-white"
-                : "border-teal-800 text-teal-900 hover:bg-teal-800"
-            }`}
+            className={liStyles({ selected: option === selected })}
           >
             <button
               className="w-full uppercase tracking-wide"
