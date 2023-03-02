@@ -19,9 +19,8 @@ export default function HairPicker({
       <section>
         <ColorBubble
           color={defaultColor}
-          active={defaultColor === activeColor}
-          labelText="Default:"
-          labelStyle="inline"
+          selected={defaultColor === activeColor}
+          labelText="Select default skin color"
           onClick={() => onColorChange(defaultColor)}
         />
       </section>
@@ -36,9 +35,8 @@ export default function HairPicker({
             <li key={index} className="flex basis-1/4 justify-center">
               <ColorBubble
                 color={option}
-                active={option === activeColor}
-                labelText={`Select hair color ${index + 1}`}
-                labelStyle="tooltip"
+                selected={option === activeColor}
+                labelText={`Select skin color ${index + 1}`}
                 onClick={() => onColorChange(option)}
               />
             </li>

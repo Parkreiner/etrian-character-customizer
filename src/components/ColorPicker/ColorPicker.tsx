@@ -21,6 +21,10 @@ export default function ColorPicker({}: Props) {
   const [activeColor, setActiveColor] =
     useState<SkinColorOption>(defaultSkinColor);
 
+  const resetState = () => {
+    setActiveColor(defaultSkinColor);
+  };
+
   return (
     <section className="mx-auto mt-12 w-1/4 bg-teal-600">
       <TabGroup
@@ -41,6 +45,15 @@ export default function ColorPicker({}: Props) {
 
         {activeTab === "hair" && <div>Hair!</div>}
         {activeTab === "eyes" && <div>Eyes!</div>}
+      </section>
+
+      <section className="grid flex-row place-items-center bg-teal-700 px-6 py-4">
+        <button
+          className="rounded-full bg-teal-200 px-4 py-2"
+          onClick={resetState}
+        >
+          Default colors
+        </button>
       </section>
     </section>
   );

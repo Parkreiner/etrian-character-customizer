@@ -12,26 +12,23 @@ export default function TabGroup<Opt extends string = string>({
   return (
     <nav>
       <ul className="flex w-full flex-row flex-nowrap">
-        {options.map((option, index) => {
-          const activeClasses =
-            option === activeOption
-              ? "bg-teal-800"
-              : "hover:bg-teal-800 border-teal-800";
-
-          return (
-            <li
-              key={index}
-              className={`flex-grow border-b-2 p-2 font-bold text-white ${activeClasses}`}
+        {options.map((option, index) => (
+          <li
+            key={index}
+            className={`flex-grow border-b-2 p-2 font-bold  ${
+              option === activeOption
+                ? "bg-teal-800 text-white"
+                : "border-teal-800 text-teal-900 hover:bg-teal-800"
+            }`}
+          >
+            <button
+              className="w-full uppercase tracking-wide"
+              onClick={() => onTabChange(option)}
             >
-              <button
-                className="w-full uppercase tracking-wide"
-                onClick={() => onTabChange(option)}
-              >
-                {option}
-              </button>
-            </li>
-          );
-        })}
+              {option}
+            </button>
+          </li>
+        ))}
       </ul>
     </nav>
   );
