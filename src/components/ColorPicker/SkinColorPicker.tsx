@@ -2,13 +2,13 @@ import { SkinColorOption } from "../../typesConstants/colors";
 import ColorBubble from "../ColorButton";
 
 type Props = {
-  defaultColor: SkinColorOption;
   activeColor: SkinColorOption;
+  defaultColor: SkinColorOption;
   colorOptions: readonly SkinColorOption[];
   onColorChange: (color: SkinColorOption) => void;
 };
 
-export default function HairPicker({
+export default function SkinColorPicker({
   defaultColor,
   activeColor,
   colorOptions,
@@ -18,7 +18,8 @@ export default function HairPicker({
     <section className="p-6 pb-12">
       <section>
         <ColorBubble
-          color={defaultColor}
+          color1={defaultColor[0]}
+          color2={defaultColor[1]}
           selected={defaultColor === activeColor}
           labelText="Select default skin color"
           onClick={() => onColorChange(defaultColor)}
@@ -34,7 +35,8 @@ export default function HairPicker({
           {colorOptions.map((option, index) => (
             <li key={index} className="flex basis-1/4 justify-center">
               <ColorBubble
-                color={option}
+                color1={option[0]}
+                color2={option[1]}
                 selected={option === activeColor}
                 labelText={`Select skin color ${index + 1}`}
                 onClick={() => onColorChange(option)}
