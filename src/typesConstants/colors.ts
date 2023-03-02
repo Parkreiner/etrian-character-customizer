@@ -1,8 +1,74 @@
+/**
+ * @file Defines all types and constants for working with colors in the client
+ * app.
+ */
+
+/** A color in the RGB colorspace */
 export type RgbColor = Readonly<{ red: number; green: number; blue: number }>;
+
+/**
+ * The color of a character's skin. Values are always fixed and cannot be
+ * updated via sliders.
+ */
 export type SkinColorOption = readonly [color1: RgbColor, color2: RgbColor];
 
-// Colors get darker as you go down - just defined as runtime constant because
-// these values will never change
+/**
+ * Defines all color presets for hair and eyes. Every two colors are of the same
+ * shade and are designed to work with each other.
+ */
+export const COLOR_PRESETS = [
+  // Pinks
+  { red: 246, green: 141, blue: 180 },
+  { red: 167, green: 56, blue: 113 },
+
+  // Reds
+  { red: 202, green: 57, blue: 75 },
+  { red: 141, green: 7, blue: 26 },
+
+  // Browns
+  { red: 170, green: 101, blue: 96 },
+  { red: 110, green: 67, blue: 73 },
+
+  // Oranges
+  { red: 250, green: 180, blue: 123 },
+  { red: 199, green: 98, blue: 69 },
+
+  // Yellows
+  { red: 252, green: 232, blue: 126 },
+  { red: 227, green: 137, blue: 80 },
+
+  // Greens
+  { red: 73, green: 182, blue: 121 },
+  { red: 45, green: 91, blue: 68 },
+
+  // Blues
+  { red: 104, green: 161, blue: 231 },
+  { red: 52, green: 110, blue: 169 },
+
+  // Plums
+  { red: 105, green: 109, blue: 177 },
+  { red: 55, green: 58, blue: 101 },
+
+  // Magentas
+  { red: 164, green: 79, blue: 164 },
+  { red: 99, green: 38, blue: 98 },
+
+  // Lavenders
+  { red: 216, green: 172, blue: 254 },
+  { red: 113, green: 86, blue: 151 },
+
+  // Whites
+  { red: 239, green: 229, blue: 227 },
+  { red: 170, green: 140, blue: 151 },
+
+  // Blacks
+  { red: 78, green: 67, blue: 85 },
+  { red: 43, green: 27, blue: 34 },
+] as const satisfies readonly RgbColor[];
+
+/**
+ * All skin colors. Color pairs get darker as you go through the array.
+ */
 export const SKIN_COLOR_PRESETS = [
   [
     { red: 255, green: 241, blue: 215 },
