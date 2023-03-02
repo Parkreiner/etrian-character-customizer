@@ -1,3 +1,11 @@
+/**
+ * @file Defines a clickable "bubble" button for selecting a specific color in
+ * the UI.
+ *
+ * @todo Figure out how to fix the secondary colors not fully covering all of
+ * their half of their bubbles. There's usually a few pixels of the primary
+ * color visible still, even when everything should be covered.
+ */
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { RgbColor } from "@/typesConstants/colors";
 import { toRgba } from "@/helpers/colors";
