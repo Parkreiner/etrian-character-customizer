@@ -18,8 +18,8 @@ export default function SkinColorPicker({
     <section className="p-6 pb-12">
       <section>
         <ColorBubble
-          color1={defaultColor[0]}
-          color2={defaultColor[1]}
+          primaryColor={defaultColor[0]}
+          secondaryColor={defaultColor[1]}
           selected={defaultColor === activeColor}
           labelText="Select default skin color"
           onClick={() => onColorChange(defaultColor)}
@@ -35,8 +35,8 @@ export default function SkinColorPicker({
           {colorOptions.map((option, index) => (
             <li key={index} className="flex basis-1/4 justify-center">
               <ColorBubble
-                color1={option[0]}
-                color2={option[1]}
+                primaryColor={option[0]}
+                secondaryColor={option[1]}
                 selected={option === activeColor}
                 labelText={`Select skin color ${index + 1}`}
                 onClick={() => onColorChange(option)}
