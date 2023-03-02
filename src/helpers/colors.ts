@@ -1,6 +1,12 @@
-import { RgbColor } from "../typesConstants/colors";
+type RgbInput = {
+  red: number;
+  green: number;
+  blue: number;
+  alpha?: number;
+};
 
-export function toRgbString(color: RgbColor) {
+export function toRgba(color: RgbInput) {
   const { red, green, blue } = color;
-  return `rgb(${red}, ${green}, ${blue})`;
+  const alpha = color.alpha ?? 1;
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
