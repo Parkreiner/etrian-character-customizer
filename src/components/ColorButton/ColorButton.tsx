@@ -10,31 +10,64 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { RgbColor } from "@/typesConstants/colors";
 import { toRgba } from "@/helpers/colors";
 import { clsx } from "clsx";
+import { useId } from "react";
 
 type Props = {
   primaryColor: RgbColor;
-  secondaryColor?: RgbColor;
-  selected: boolean;
   labelText: string;
   onClick: () => void;
+
+  secondaryColor?: RgbColor;
+  selected?: boolean;
+  default?: boolean;
 };
+
+/**
+ * @todo Finish this implementation.
+ */
+function DefaultTextLabel() {
+  const hookId = useId();
+  const circleId = `${hookId}-circle`;
+
+  return (
+    <svg
+      className="absolute z-10"
+      viewBox="0 0 100 100"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle id={circleId} cx="50" cy="50" r="50" fill="none" />
+      <text width="500">
+        <textPath color="white" alignment-baseline="top" href={circleId}>
+          Default
+        </textPath>
+      </text>
+    </svg>
+  );
+}
 
 export default function ColorBubble({
   primaryColor,
-  secondaryColor,
-  selected,
-  labelText,
   onClick,
+  labelText,
+
+  secondaryColor,
+  selected = false,
+  default: isDefault = false,
 }: Props) {
+  const hookId = useId();
+  const circleId = `${hookId}-circle`;
+
   return (
     <Tooltip.Root defaultOpen={false}>
-      <Tooltip.Content className="rounded-md bg-black py-2 px-4 text-white">
-        <p>{labelText}</p>
+      <Tooltip.Content>
+        <p className="rounded-md bg-black py-2 px-4 text-white">{labelText}</p>
         <Tooltip.Arrow />
       </Tooltip.Content>
 
       <Tooltip.Trigger asChild>
-        <button onClick={onClick}>
+        <button className="relative" onClick={onClick}>
+          {isDefault && <DefaultTextLabel />}
+
           <div
             className={clsx(
               "rounded-full bg-teal-700 p-[4px]",
@@ -42,12 +75,12 @@ export default function ColorBubble({
             )}
           >
             <div
-              className="relative h-16 w-16 overflow-hidden rounded-full"
+              className="relative h-14 w-14 overflow-hidden rounded-full"
               style={{ backgroundColor: toRgba(primaryColor) }}
             >
               {secondaryColor !== undefined && (
                 <div
-                  className="absolute right-[-1.4rem] bottom-0 h-8 w-24 rotate-[-45deg]"
+                  className="absolute right-[-1.9rem] bottom-0 h-8 w-24 rotate-[-45deg]"
                   style={{ backgroundColor: toRgba(secondaryColor) }}
                 ></div>
               )}

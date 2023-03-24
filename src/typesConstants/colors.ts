@@ -67,20 +67,39 @@ export const COLOR_PRESETS = [
 ] as const satisfies readonly RgbColor[];
 
 /**
- * All skin colors. Color pairs get darker as you go through the array.
+ * This is a curated list of all the skin tones from Etrian V. All races had
+ * their own skin color palettes, but the full list was trimmed down to avoid
+ * overwhelming the user with options.
+ *
+ * @todo Add colors for the potatoes and dog people, curate the list further,
+ * and reorganize the colors so that they feel chromatic. Always leave at least
+ * one space for the default color.
  */
 export const SKIN_COLOR_PRESETS = [
   [
-    { red: 255, green: 241, blue: 215 },
-    { red: 187, green: 157, blue: 190 },
+    { red: 233, green: 235, blue: 249 },
+    { red: 134, green: 142, blue: 170 },
+  ],
+  [
+    { red: 249, green: 245, blue: 242 },
+    { red: 177, green: 178, blue: 161 },
   ],
   [
     { red: 247, green: 233, blue: 221 },
     { red: 185, green: 150, blue: 145 },
   ],
   [
+    { red: 255, green: 241, blue: 215 },
+    { red: 187, green: 157, blue: 190 },
+  ],
+
+  [
     { red: 255, green: 233, blue: 207 },
     { red: 221, green: 148, blue: 146 },
+  ],
+  [
+    { red: 255, green: 238, blue: 214 },
+    { red: 206, green: 139, blue: 157 },
   ],
   [
     { red: 254, green: 222, blue: 175 },
@@ -117,5 +136,39 @@ export const SKIN_COLOR_PRESETS = [
   [
     { red: 116, green: 85, blue: 77 },
     { red: 62, green: 39, blue: 40 },
+  ],
+  [
+    { red: 141, green: 122, blue: 122 },
+    { red: 73, green: 59, blue: 61 },
+  ],
+
+  [
+    { red: 255, green: 228, blue: 199 },
+    { red: 201, green: 128, blue: 143 },
+  ],
+
+  [
+    { red: 246, green: 207, blue: 161 },
+    { red: 194, green: 129, blue: 127 },
+  ],
+  [
+    { red: 248, green: 228, blue: 199 },
+    { red: 201, green: 128, blue: 143 },
+  ],
+  [
+    { red: 188, green: 186, blue: 162 },
+    { red: 111, green: 103, blue: 124 },
+  ],
+  [
+    { red: 185, green: 216, blue: 216 },
+    { red: 111, green: 127, blue: 178 },
+  ],
+  [
+    { red: 136, green: 179, blue: 107 },
+    { red: 70, green: 104, blue: 94 },
+  ],
+  [
+    { red: 166, green: 134, blue: 177 },
+    { red: 91, green: 69, blue: 89 },
   ],
 ] as const satisfies readonly SkinColorOption[];

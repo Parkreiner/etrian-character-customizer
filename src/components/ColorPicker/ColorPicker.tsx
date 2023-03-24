@@ -1,66 +1,52 @@
-import { useState } from "react";
-import { SkinColorOption, SKIN_COLOR_PRESETS } from "@/typesConstants/colors";
-import SkinColorPicker from "./SkinColorPicker";
-import TabGroup from "@/components/TabGroup";
-import { Character } from "@/typesConstants/characters";
-
-const tabs = ["skin", "hair", "eyes"] as const;
-type Tab = (typeof tabs)[number];
-
-const defaultSkinColor = [
-  { red: 155, green: 118, blue: 85 },
-  { red: 94, green: 74, blue: 64 },
-] as const satisfies SkinColorOption;
+import SaturationBrightnessInputs from "./SatBrightnessInputs";
+import { HSBColor, RGBColor } from "./localTypes";
+import { hexToRgb, rgbToHsb, hsbToHex, rgbToHex } from "./colorHelpers";
+import RgbInputs from "./RgbInputs";
+import HueWheel from "./HueWheel";
 
 type Props = {
-  character: Character;
+  hexColor: string;
+  onColorChange: (newHexColor: string) => void;
 };
 
-function ColorPicker({}: Omit<Props, "character">) {
-  const [activeTab, setActiveTab] = useState<Tab>("skin");
-  const [activeColor, setActiveColor] =
-    useState<SkinColorOption>(defaultSkinColor);
+export default function ColorPicker({ hexColor, onColorChange }: Props) {
+  const rgb = hexToRgb(hexColor);
+  const hsb = rgbToHsb(rgb);
 
-  const resetColors = () => {
-    setActiveColor(defaultSkinColor);
+  const onRgbChannelChange = (channel: keyof RGBColor, newValue: number) => {
+    const inputInvalid =
+      !Number.isInteger(newValue) || newValue < 0 || newValue > 255;
+
+    if (inputInvalid) return;
+    const newHex = rgbToHex({ ...rgb, [channel]: newValue });
+    onColorChange(newHex);
+  };
+
+  const onHsbChannelChange = (channel: keyof HSBColor, newValue: number) => {
+    const inputInvalid =
+      !Number.isInteger(newValue) ||
+      newValue < 0 ||
+      (channel === "hue" && newValue > 360) ||
+      ((channel === "bri" || channel === "sat") && newValue > 100);
+
+    if (inputInvalid) return;
+    const newHex = hsbToHex({ ...hsb, [channel]: newValue });
+    onColorChange(newHex);
   };
 
   return (
-    <>
-      <section className="w-1/4 flex-grow-[2]">
-        <div>
-          <TabGroup
-            options={tabs}
-            selected={activeTab}
-            onTabChange={setActiveTab}
-          />
+    <section>
+      <HueWheel
+        hue={hsb.hue}
+        onHueChange={(newValue) => onHsbChannelChange("hue", newValue)}
+      />
 
-          <section className="bg-teal-600">
-            {activeTab === "skin" && (
-              <SkinColorPicker
-                activeColor={activeColor}
-                defaultColor={defaultSkinColor}
-                colorOptions={SKIN_COLOR_PRESETS}
-                onColorChange={setActiveColor}
-              />
-            )}
+      <SaturationBrightnessInputs
+        hsb={hsb}
+        onChannelChange={onHsbChannelChange}
+      />
 
-            {activeTab === "hair" && <div>Hair!</div>}
-            {activeTab === "eyes" && <div>Eyes!</div>}
-          </section>
-        </div>
-
-        <button
-          className="m-auto block rounded-full bg-teal-200 px-4 py-2"
-          onClick={resetColors}
-        >
-          Reset all colors
-        </button>
-      </section>
-    </>
+      <RgbInputs rgb={rgb} onChannelChange={onRgbChannelChange} />
+    </section>
   );
-}
-
-export default function ColorPickerWrapper({ character, ...delegated }: Props) {
-  return <ColorPicker key={character.id} {...delegated} />;
 }

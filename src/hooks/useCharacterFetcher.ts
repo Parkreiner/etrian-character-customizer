@@ -1,6 +1,6 @@
 import useSwr from "swr";
 
-const endpoint = "/api/character";
+const endpoint = "/api/characters";
 
 async function fetchCharacters(url: string) {
   const response = await fetch(url);
