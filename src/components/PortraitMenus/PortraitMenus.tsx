@@ -2,11 +2,11 @@ import { useState } from "react";
 import OverflowContainer from "../OverflowContainer";
 import TabGroup from "../TabGroup";
 
-const gameOptions = ["Etrian I", "Etrian II", "Etrian III"] as const;
+const gameOptions = ["EO1", "EO2", "EO3"] as const;
 type GameTab = (typeof gameOptions)[number];
 
-export default function PortraitPicker() {
-  const [selectedGame, setSelectedGame] = useState<GameTab>("Etrian I");
+export default function PortraitMenus() {
+  const [selectedGame, setSelectedGame] = useState<GameTab>("EO1");
 
   return (
     <section className="flex-grow-[2]">

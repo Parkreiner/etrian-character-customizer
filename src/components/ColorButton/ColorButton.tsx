@@ -54,9 +54,6 @@ export default function ColorBubble({
   selected = false,
   default: isDefault = false,
 }: Props) {
-  const hookId = useId();
-  const circleId = `${hookId}-circle`;
-
   return (
     <Tooltip.Root defaultOpen={false}>
       <Tooltip.Content>

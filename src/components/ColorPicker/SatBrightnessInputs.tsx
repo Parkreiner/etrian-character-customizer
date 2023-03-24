@@ -1,5 +1,6 @@
 import { ComponentPropsWithoutRef, useId } from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import * as Slider from "@radix-ui/react-slider";
 import { HSBColor } from "./localTypes";
 
 type ChannelWithoutHue = Exclude<keyof HSBColor, "hue">;
@@ -29,12 +30,12 @@ export default function SaturationBrightnessInput({
     <section>
       {inputInfo.map(({ type, displayText, labelText }) => {
         const numberInputId = `${hookId}-${labelText}-number`;
+        const inputValue = hsb[type];
+
         const sharedInputProps = {
           min: 0,
           max: 100,
           step: 1,
-          value: hsb[type],
-          onChange: (e) => onChannelChange(type, e.target.valueAsNumber),
         } as const satisfies ComponentPropsWithoutRef<"input">;
 
         return (
@@ -47,10 +48,30 @@ export default function SaturationBrightnessInput({
 
             <label>
               <VisuallyHidden.Root>Slider for {labelText}</VisuallyHidden.Root>
-              <input {...sharedInputProps} type="range" />
+
+              <Slider.Root
+                {...sharedInputProps}
+                value={[inputValue]}
+                onValueChange={(newSliderValues) => {
+                  if (newSliderValues[0] !== undefined) {
+                    onChannelChange(type, newSliderValues[0]);
+                  }
+                }}
+              >
+                <Slider.Track>
+                  <Slider.Range />
+                </Slider.Track>
+                <Slider.Thumb />
+              </Slider.Root>
             </label>
 
-            <input {...sharedInputProps} id={numberInputId} type="number" />
+            <input
+              {...sharedInputProps}
+              id={numberInputId}
+              type="number"
+              value={inputValue}
+              onChange={(e) => onChannelChange(type, e.target.valueAsNumber)}
+            />
           </div>
         );
       })}

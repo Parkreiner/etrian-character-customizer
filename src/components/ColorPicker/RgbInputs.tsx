@@ -22,6 +22,7 @@ export default function RgbInputs({ rgb, onChannelChange }: Props) {
             min={0}
             max={255}
             onChange={(e) => {
+              console.log(e.target.valueAsNumber);
               onChannelChange(channel, e.target.valueAsNumber);
             }}
           />

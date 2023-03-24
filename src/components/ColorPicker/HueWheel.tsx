@@ -31,14 +31,19 @@ export default function HueWheel({ hue, onHueChange }: Props) {
     <div ref={containerRef} style={{ position: "relative" }}>
       <div>
         <label htmlFor={textId}>Hue</label>
+        {/* Ranges aren't 0-360 to make it easy to do hue wrap-arounds */}
         <input
           id={textId}
           type="number"
-          min="0"
-          max="360"
+          min="-1"
+          max="361"
           step="1"
           value={hue}
-          onChange={(e) => onHueChange(e.target.valueAsNumber)}
+          onChange={(e) => {
+            const eventHue = e.target.valueAsNumber;
+            const dispatchedHue = eventHue < 0 ? 360 : eventHue % 361;
+            onHueChange(dispatchedHue);
+          }}
         />
         °
       </div>
