@@ -1,10 +1,13 @@
 /**
  * @file A lot of color conversion functions. Most of the app does not need to
  * be aware of these conversions; they should just use the hex colors directly.
- *
  * All HSB calculations translated directly from the HSL/HSV Wikipedia article.
- * Note: HSB and HSV are the same thing.
+ *
+ * Note: HSB and HSV are the same thing, but are different from HSL.
+ *
  * {@link https://en.wikipedia.org/wiki/HSL_and_HSV}
+ * {@link https://www.quora.com/Is-there-any-way-to-convert-HSV-to-RGB-and-vice-versa-without-data-loss}
+ * {@link https://community.adobe.com/t5/illustrator-discussions/how-does-illustrator-s-color-picker-compute-hsb-and-cmyk-values/m-p/11991771}
  */
 import { RGBColor, HSBColor } from "./localTypes";
 
@@ -39,11 +42,14 @@ export function rgbToHsb(rgb: RGBColor): HSBColor {
   let hue: number;
   if (chroma < epsilon) {
     hue = 0;
-  } else if (brightness === adjustedRed) {
-    hue = 60 * (((adjustedGreen - adjustedBlue) / chroma) % 6);
-  } else if (brightness === adjustedGreen) {
+  } else if (brightness - adjustedRed < epsilon) {
+    const hueOffset = 60 * (((adjustedGreen - adjustedBlue) / chroma) % 6);
+    hue = hueOffset < 0 ? 360 + hueOffset : hueOffset;
+  } else if (brightness - adjustedGreen < epsilon) {
     hue = 60 * ((adjustedBlue - adjustedRed) / chroma + 2);
   } else {
+    // Handles brightness matching adjustedBlue; implemented as an else block
+    // for type-safety
     hue = 60 * ((adjustedRed - adjustedGreen) / chroma + 4);
   }
 
@@ -55,13 +61,18 @@ export function rgbToHsb(rgb: RGBColor): HSBColor {
 }
 
 export function rgbToHex(color: RGBColor): string {
+  const toClampedHex = (channel: number) => {
+    if (Number.isNaN(channel) || !Number.isFinite(channel)) {
+      return "00";
+    }
+
+    const base = !Number.isInteger(channel) ? Math.trunc(channel) : channel;
+    const clamped = Math.min(255, Math.max(0, base));
+    return clamped.toString(16).padStart(2, "0");
+  };
+
   const { red, green, blue } = color;
-
-  const hexRed = red.toString(16).padStart(2, "0");
-  const hexGreen = green.toString(16).padStart(2, "0");
-  const hexBlue = blue.toString(16).padStart(2, "0");
-
-  return `#${hexRed}${hexGreen}${hexBlue}`;
+  return `#${toClampedHex(red)}${toClampedHex(green)}${toClampedHex(blue)}`;
 }
 
 export function hsbToRgb(color: HSBColor): RGBColor {
@@ -75,42 +86,35 @@ export function hsbToRgb(color: HSBColor): RGBColor {
   const xFactor = chroma * (1 - Math.abs((clampedHue % 2) - 1));
   const mOffset = adjustedBri - chroma;
 
-  let redRatio: number;
-  let greenRatio: number;
-  let blueRatio: number;
+  let r1 = 0;
+  let g1 = 0;
+  let b1 = 0;
 
-  // For all branches, one channel gets chroma, one gets xFactor, one gets 0
   if (clampedHue >= 5) {
-    redRatio = chroma;
-    greenRatio = 0;
-    blueRatio = xFactor;
-  } else if (clampedHue >= 4) {
-    redRatio = xFactor;
-    greenRatio = 0;
-    blueRatio = chroma;
-  } else if (clampedHue >= 3) {
-    redRatio = 0;
-    greenRatio = xFactor;
-    blueRatio = chroma;
-  } else if (clampedHue >= 2) {
-    redRatio = 0;
-    greenRatio = chroma;
-    blueRatio = xFactor;
-  } else if (clampedHue >= 1) {
-    redRatio = xFactor;
-    greenRatio = chroma;
-    blueRatio = 0;
+    r1 = chroma;
+    b1 = xFactor;
+  } else if (clampedHue > 4) {
+    r1 = xFactor;
+    b1 = chroma;
+  } else if (clampedHue > 3) {
+    g1 = xFactor;
+    b1 = chroma;
+  } else if (clampedHue > 2) {
+    g1 = chroma;
+    b1 = xFactor;
+  } else if (clampedHue > 1) {
+    r1 = xFactor;
+    g1 = chroma;
   } else {
-    redRatio = chroma;
-    greenRatio = xFactor;
-    blueRatio = 0;
+    r1 = chroma;
+    g1 = xFactor;
   }
 
   return {
-    red: Math.round(255 * (redRatio + mOffset)),
-    green: Math.round(255 * (greenRatio + mOffset)),
-    blue: Math.round(255 * (blueRatio + mOffset)),
-  } as const;
+    red: Math.round(255 * (r1 + mOffset)),
+    green: Math.round(255 * (g1 + mOffset)),
+    blue: Math.round(255 * (b1 + mOffset)),
+  };
 }
 
 export function hsbToHex(color: HSBColor): string {
