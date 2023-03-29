@@ -36,7 +36,7 @@ export default function TabGroup<Opt extends string = string>({
               className="w-full uppercase tracking-wide"
               onClick={() => onTabChange(option)}
             >
-              {option}
+              {option.toUpperCase()}
             </button>
           </li>
         ))}
