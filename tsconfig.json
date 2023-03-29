@@ -22,7 +22,8 @@
       "@/contexts/*": ["./src/contexts/*"],
       "@/helpers/*": ["./src/helpers/*"],
       "@/hooks/*": ["./src/hooks/*"],
-      "@/typesConstants/*": ["./src/typesConstants/*"]
+      "@/typesConstants/*": ["./src/typesConstants/*"],
+      "@/utils/*": ["./src/utils/*"]
     }
   },
 

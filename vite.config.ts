@@ -12,6 +12,7 @@ export default defineConfig({
       "@/helpers": resolve(__dirname, "./src/helpers/"),
       "@/hooks": resolve(__dirname, "./src/hooks/"),
       "@/typesConstants": resolve(__dirname, "./src/typesConstants/"),
+      "@/utils": resolve(__dirname, "./src/utils/"),
     },
   },
 });
