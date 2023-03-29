@@ -4,13 +4,10 @@ A character portrait generator for the PC releases of Etrian Odyssey Origins, pu
 
 ## Tech Stack
 
-This project was [will be] built with:
+This project will be built with:
 
 - TypeScript
-- Node.js + Fastify
-- PostgreSQL (plus Prisma)
-- Rust
-- React
-- RadixUI
+- Node.js + Express + tRPC + Vite
+- PostgreSQL + Prisma
+- React + RadixUI
 - TailwindCSS
-- Vite
