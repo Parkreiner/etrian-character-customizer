@@ -7,17 +7,15 @@
  * color visible still, even when everything should be covered.
  */
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { RgbColor } from "@/typesConstants/colors";
-import { toRgba } from "@/helpers/colors";
 import { clsx } from "clsx";
 import { useId } from "react";
 
 type Props = {
-  primaryColor: RgbColor;
+  primaryHex: string;
   labelText: string;
   onClick: () => void;
 
-  secondaryColor?: RgbColor;
+  secondaryHex?: string;
   selected?: boolean;
   default?: boolean;
 };
@@ -46,11 +44,11 @@ function DefaultTextLabel() {
 }
 
 export default function ColorBubble({
-  primaryColor,
+  primaryHex,
   onClick,
   labelText,
 
-  secondaryColor,
+  secondaryHex,
   selected = false,
   default: isDefault = false,
 }: Props) {
@@ -73,13 +71,13 @@ export default function ColorBubble({
           >
             <div
               className="relative h-14 w-14 overflow-hidden rounded-full"
-              style={{ backgroundColor: toRgba(primaryColor) }}
+              style={{ backgroundColor: primaryHex }}
             >
-              {secondaryColor !== undefined && (
+              {secondaryHex !== undefined && (
                 <div
                   className="absolute right-[-1.9rem] bottom-0 h-8 w-24 rotate-[-45deg]"
-                  style={{ backgroundColor: toRgba(secondaryColor) }}
-                ></div>
+                  style={{ backgroundColor: secondaryHex }}
+                />
               )}
             </div>
           </div>
