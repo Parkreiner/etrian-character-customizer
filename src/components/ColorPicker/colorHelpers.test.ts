@@ -1,10 +1,10 @@
 import { expect, it, describe, test } from "vitest";
-import { HSBColor, RGBColor } from "./localTypes";
+import { HSVColor, RGBColor } from "./localTypes";
 
-// Skipping hsbToHex; right now it's just composed of hsbToRgb and rgbToHex
-import { hexToRgb, rgbToHsb, rgbToHex, hsbToRgb } from "./colorHelpers";
+// Skipping hsvToHex; right now it's just composed of hsvToRgb and rgbToHex
+import { hexToRgb, rgbToHsv, rgbToHex, hsvToRgb } from "./colorHelpers";
 
-describe("hexToRgb", () => {
+describe(hexToRgb.name, () => {
   it("Should convert any seven-character hex string into a valid RGB object", () => {
     const samples = [
       ["#000000", { red: 0, green: 0, blue: 0 }],
@@ -45,70 +45,70 @@ describe("hexToRgb", () => {
   });
 });
 
-describe("rgbToHsb", () => {
+describe(rgbToHsv.name, () => {
   it("Should be able to translate RGB values to any major segment on the hue wheel (segments each span 60 degrees)", () => {
     const samples = [
       [
         // Pure black
         { red: 0, green: 0, blue: 0 },
-        { hue: 0, sat: 0, bri: 0 },
+        { hue: 0, sat: 0, val: 0 },
       ],
       [
         // Pure red
         { red: 255, green: 0, blue: 0 },
-        { hue: 0, sat: 100, bri: 100 },
+        { hue: 0, sat: 100, val: 100 },
       ],
       [
         // Pure yellow
         { red: 255, green: 255, blue: 0 },
-        { hue: 60, sat: 100, bri: 100 },
+        { hue: 60, sat: 100, val: 100 },
       ],
       [
         // Pure green
         { red: 0, green: 255, blue: 0 },
-        { hue: 120, sat: 100, bri: 100 },
+        { hue: 120, sat: 100, val: 100 },
       ],
       [
         // Pure cyan
         { red: 0, green: 255, blue: 255 },
-        { hue: 180, sat: 100, bri: 100 },
+        { hue: 180, sat: 100, val: 100 },
       ],
       [
         // Pure blue
         { red: 0, green: 0, blue: 255 },
-        { hue: 240, sat: 100, bri: 100 },
+        { hue: 240, sat: 100, val: 100 },
       ],
       [
         // Pure magenta
         { red: 255, green: 0, blue: 255 },
-        { hue: 300, sat: 100, bri: 100 },
+        { hue: 300, sat: 100, val: 100 },
       ],
       [
         // Pure white
         { red: 255, green: 255, blue: 255 },
-        { hue: 0, sat: 0, bri: 100 },
+        { hue: 0, sat: 0, val: 100 },
       ],
-    ] as const satisfies readonly (readonly [RGBColor, HSBColor])[];
+    ] as const satisfies readonly (readonly [RGBColor, HSVColor])[];
 
-    for (const [rgb, hsb] of samples) {
-      expect(rgbToHsb(rgb)).toEqual(hsb);
+    for (const [rgb, hsv] of samples) {
+      expect(rgbToHsv(rgb)).toEqual(hsv);
     }
 
     expect.hasAssertions();
   });
 
-  test("Process should be lossy (different RGB values can produce the same HSB value)", () => {
+  test("Process should be lossy (different RGB values can produce the same HSV value)", () => {
     const rgb1: RGBColor = { red: 250, green: 250, blue: 250 };
     const rgb2: RGBColor = { red: 251, green: 250, blue: 250 };
 
-    expect(rgbToHsb(rgb1)).toEqual(rgbToHsb(rgb2));
+    expect(rgbToHsv(rgb1)).toEqual(rgbToHsv(rgb2));
   });
 
   test("Whenever R, G, and B values are the same, hue and saturation should both be 0", () => {
     const resultControl = { hue: 0, sat: 0 };
 
     for (let i = 0; i <= 255; i++) {
-      const result = rgbToHsb({ red: i, green: i, blue: i });
+      const result = rgbToHsv({ red: i, green: i, blue: i });
       expect(result).toMatchObject(resultControl);
     }
 
@@ -119,46 +119,46 @@ describe("rgbToHsb", () => {
     const samples = [
       [
         { red: 140, green: 130, blue: 15 },
-        { hue: 55, sat: 89, bri: 55 },
+        { hue: 55, sat: 89, val: 55 },
       ],
       [
         { red: 171, green: 155, blue: 145 },
-        { hue: 23, sat: 15, bri: 67 },
+        { hue: 23, sat: 15, val: 67 },
       ],
       [
-        // Adobe's tools say that the HSB should be (121, 43, 25), but I'm not
+        // Adobe's tools say that the HSV should be (121, 43, 25), but I'm not
         // sure if they're doing anything special with their floats to minimize
         // rounding issues. Other tools gave the below result, though
         { red: 36, green: 64, blue: 37 },
-        { hue: 122, sat: 44, bri: 25 },
+        { hue: 122, sat: 44, val: 25 },
       ],
       [
         { red: 28, green: 103, blue: 115 },
-        { hue: 188, sat: 76, bri: 45 },
+        { hue: 188, sat: 76, val: 45 },
       ],
       [
         { red: 245, green: 240, blue: 255 },
-        { hue: 260, sat: 6, bri: 100 },
+        { hue: 260, sat: 6, val: 100 },
       ],
       [
         { red: 235, green: 38, blue: 198 },
-        { hue: 311, sat: 84, bri: 92 },
+        { hue: 311, sat: 84, val: 92 },
       ],
       [
         { red: 252, green: 254, blue: 255 },
-        { hue: 200, sat: 1, bri: 100 },
+        { hue: 200, sat: 1, val: 100 },
       ],
-    ] as const satisfies readonly (readonly [RGBColor, HSBColor])[];
+    ] as const satisfies readonly (readonly [RGBColor, HSVColor])[];
 
-    for (const [rgb, hsb] of samples) {
-      expect(rgbToHsb(rgb)).toEqual(hsb);
+    for (const [rgb, hsv] of samples) {
+      expect(rgbToHsv(rgb)).toEqual(hsv);
     }
 
     expect.hasAssertions();
   });
 });
 
-describe("rgbToHex", () => {
+describe(rgbToHex.name, () => {
   it("Should produce strings of the pattern #hhhhhh, where each hex character is in the class [0-9a-f]", () => {
     const matcher = /^#[0-9a-f]{6}$/;
 
@@ -192,27 +192,27 @@ describe("rgbToHex", () => {
   });
 });
 
-describe("hsbToRgb", () => {
-  test("Process should be lossy (multiple HSB values can produce the same RGB value)", () => {
-    const hsb1: HSBColor = { hue: 217, sat: 89, bri: 5 };
-    const hsb2: HSBColor = { hue: 218, sat: 89, bri: 5 };
+describe(hsvToRgb.name, () => {
+  test("Process should be lossy (multiple HSV values can produce the same RGB value)", () => {
+    const hsv1: HSVColor = { hue: 217, sat: 89, val: 5 };
+    const hsv2: HSVColor = { hue: 218, sat: 89, val: 5 };
 
-    expect(hsbToRgb(hsb1)).toEqual(hsbToRgb(hsb2));
+    expect(hsvToRgb(hsv1)).toEqual(hsvToRgb(hsv2));
     expect.hasAssertions();
   });
 
   test("If saturation is 0, the value of hue has no effect on calculations", () => {
-    const baseRgb = hsbToRgb({ hue: 0, sat: 0, bri: 0 });
-    const hsbSamples = [
-      { hue: 60, sat: 0, bri: 0 },
-      { hue: 120, sat: 0, bri: 0 },
-      { hue: 180, sat: 0, bri: 0 },
-      { hue: 240, sat: 0, bri: 0 },
-      { hue: 300, sat: 0, bri: 0 },
-    ] as const satisfies readonly HSBColor[];
+    const baseRgb = hsvToRgb({ hue: 0, sat: 0, val: 0 });
+    const hsvSamples = [
+      { hue: 60, sat: 0, val: 0 },
+      { hue: 120, sat: 0, val: 0 },
+      { hue: 180, sat: 0, val: 0 },
+      { hue: 240, sat: 0, val: 0 },
+      { hue: 300, sat: 0, val: 0 },
+    ] as const satisfies readonly HSVColor[];
 
-    for (const sample of hsbSamples) {
-      expect(hsbToRgb(sample)).toEqual(baseRgb);
+    for (const sample of hsvSamples) {
+      expect(hsvToRgb(sample)).toEqual(baseRgb);
     }
 
     expect.hasAssertions();
@@ -221,37 +221,37 @@ describe("hsbToRgb", () => {
   it("Should work with a random sample of values", () => {
     const samples = [
       [
-        { hue: 96, sat: 89, bri: 27 },
+        { hue: 96, sat: 89, val: 27 },
         { red: 32, green: 69, blue: 8 },
       ],
       [
-        { hue: 146, sat: 75, bri: 83 },
+        { hue: 146, sat: 75, val: 83 },
         { red: 53, green: 212, blue: 122 },
       ],
       [
-        { hue: 244, sat: 29, bri: 89 },
+        { hue: 244, sat: 29, val: 89 },
         { red: 166, green: 161, blue: 227 },
       ],
       [
-        { hue: 34, sat: 100, bri: 82 },
+        { hue: 34, sat: 100, val: 82 },
         { red: 209, green: 118, blue: 0 },
       ],
       [
-        { hue: 0, sat: 100, bri: 100 },
+        { hue: 0, sat: 100, val: 100 },
         { red: 255, green: 0, blue: 0 },
       ],
       [
-        { hue: 55, sat: 0, bri: 0 },
+        { hue: 55, sat: 0, val: 0 },
         { red: 0, green: 0, blue: 0 },
       ],
       [
-        { hue: 309, sat: 93, bri: 98 },
+        { hue: 309, sat: 93, val: 98 },
         { red: 250, green: 17, blue: 215 },
       ],
-    ] as const satisfies readonly (readonly [HSBColor, RGBColor])[];
+    ] as const satisfies readonly (readonly [HSVColor, RGBColor])[];
 
-    for (const [hsb, rgb] of samples) {
-      expect(hsbToRgb(hsb)).toEqual(rgb);
+    for (const [hsv, rgb] of samples) {
+      expect(hsvToRgb(hsv)).toEqual(rgb);
     }
 
     expect.hasAssertions();

@@ -1,3 +1,4 @@
+/** A tuple of the strings "red", "green", and "blue", in that order. */
 export const rgbChannels = [
   "red",
   "green",
@@ -7,5 +8,5 @@ export const rgbChannels = [
 /** A color in the RGB (Red, Green, Blue) colorspace. */
 export type RGBColor = Readonly<{ red: number; green: number; blue: number }>;
 
-/** A color in the HSB (Hue, Saturation, Brightness) colorspace. */
-export type HSBColor = Readonly<{ hue: number; sat: number; bri: number }>;
+/** A color in the HSV (Hue, Saturation, Value/Brightness) colorspace. */
+export type HSVColor = Readonly<{ hue: number; sat: number; val: number }>;

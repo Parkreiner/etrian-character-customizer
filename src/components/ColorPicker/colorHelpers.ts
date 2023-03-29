@@ -1,7 +1,7 @@
 /**
  * @file A lot of color conversion functions. Most of the app does not need to
  * be aware of these conversions; they should just use the hex colors directly.
- * All HSB calculations translated directly from the HSL/HSV Wikipedia article.
+ * All HSV calculations translated directly from the HSL/HSV Wikipedia article.
  *
  * Note: HSB and HSV are the same thing, but are different from HSL.
  *
@@ -9,7 +9,7 @@
  * {@link https://www.quora.com/Is-there-any-way-to-convert-HSV-to-RGB-and-vice-versa-without-data-loss}
  * {@link https://community.adobe.com/t5/illustrator-discussions/how-does-illustrator-s-color-picker-compute-hsb-and-cmyk-values/m-p/11991771}
  */
-import { RGBColor, HSBColor } from "./localTypes";
+import { RGBColor, HSVColor } from "./localTypes";
 
 const hexExtractor = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/;
 
@@ -26,7 +26,7 @@ export function hexToRgb(hexColor: string): RGBColor {
   } as const;
 }
 
-export function rgbToHsb(rgb: RGBColor): HSBColor {
+export function rgbToHsv(rgb: RGBColor): HSVColor {
   const { red, green, blue } = rgb;
   const epsilon = 0.0001;
 
@@ -56,7 +56,7 @@ export function rgbToHsb(rgb: RGBColor): HSBColor {
   return {
     hue: Math.round(hue),
     sat: Math.round(saturation * 100),
-    bri: Math.round(brightness * 100),
+    val: Math.round(brightness * 100),
   };
 }
 
@@ -75,16 +75,16 @@ export function rgbToHex(color: RGBColor): string {
   return `#${toClampedHex(red)}${toClampedHex(green)}${toClampedHex(blue)}`;
 }
 
-export function hsbToRgb(color: HSBColor): RGBColor {
-  const { hue, sat, bri } = color;
+export function hsvToRgb(color: HSVColor): RGBColor {
+  const { hue, sat, val } = color;
 
   const adjustedSat = sat / 100;
-  const adjustedBri = bri / 100;
-  const chroma = adjustedSat * adjustedBri;
+  const adjustedVal = val / 100;
+  const chroma = adjustedSat * adjustedVal;
 
   const clampedHue = hue / 60;
   const xFactor = chroma * (1 - Math.abs((clampedHue % 2) - 1));
-  const mOffset = adjustedBri - chroma;
+  const mOffset = adjustedVal - chroma;
 
   let r1 = 0;
   let g1 = 0;
@@ -117,7 +117,6 @@ export function hsbToRgb(color: HSBColor): RGBColor {
   };
 }
 
-export function hsbToHex(color: HSBColor): string {
-  // Got lazy and didn't want to implement more math
-  return rgbToHex(hsbToRgb(color));
+export function hsvToHex(color: HSVColor): string {
+  return rgbToHex(hsvToRgb(color));
 }
