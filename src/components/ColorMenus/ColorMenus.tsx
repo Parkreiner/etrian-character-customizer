@@ -1,44 +1,73 @@
 import { useState } from "react";
-import { CharacterColors } from "@/typesConstants/colors";
-import ColorPicker from "../ColorPicker";
+import { clamp } from "@/utils/math";
+import { CharacterColors, ColorCategory } from "@/typesConstants/colors";
+import { CategoryIndices } from "./localTypes";
 
-type Props = {
+import PanelContent from "./PanelContent";
+import ColorMenuTabs from "./ColorMenuTabs";
+
+type ExternalProps = {
   syncKey: string;
   colors: CharacterColors;
-  changeCharacterColors: (replacementColors: CharacterColors) => void;
+  onColorChange: (newColors: CharacterColors) => void;
 };
 
-type CoreProps = Omit<Props, "syncKey">;
-type ColorCategory = keyof CharacterColors;
+const initialIndices: CategoryIndices = {
+  hair: 0,
+  eyes: 0,
+  skin: 0,
+  misc: 0,
+};
 
-function ColorMenus({ colors, changeCharacterColors }: CoreProps) {
-  const [colorCategory, setColorCategory] = useState<ColorCategory>("skin");
-  const [categoryIndex, setCategoryIndex] = useState(0);
-  const hexColor = colors[colorCategory][categoryIndex] ?? "#000000";
+type CoreProps = Omit<ExternalProps, "syncKey">;
 
-  const onColorChange = (newHexColor: string) => {
-    const newColors = {
-      ...colors,
-      [colorCategory]: colors[colorCategory].map((oldHex, index) => {
-        return index === categoryIndex ? newHexColor : oldHex;
-      }),
-    };
+function ColorMenusCore({ colors, onColorChange }: CoreProps) {
+  const [activeCategory, setActiveCategory] = useState<ColorCategory>("skin");
+  const [categoryIndices, setCategoryIndices] = useState(initialIndices);
 
-    changeCharacterColors(newColors);
+  const updateColors = (newHexColor: string) => {
+    const activeIndex = categoryIndices[activeCategory];
+    const newTuple = colors[activeCategory].map((oldHex, index) => {
+      return index === activeIndex ? newHexColor : oldHex;
+    });
+
+    onColorChange({ ...colors, [activeCategory]: newTuple });
+  };
+
+  const changeIndex = (newIndex: number) => {
+    if (activeCategory === "misc") {
+      const normalized = Number.isNaN(newIndex) ? 0 : newIndex;
+
+      return setCategoryIndices({
+        ...categoryIndices,
+        misc: clamp(normalized, 0, colors.misc.length),
+      });
+    }
+
+    if (newIndex === 0 || newIndex === 1) {
+      return setCategoryIndices({
+        ...categoryIndices,
+        [activeCategory]: newIndex,
+      });
+    }
   };
 
   return (
     <div className="flex w-[500px] flex-col items-center bg-teal-600 p-4">
-      <ColorPicker hexColor={hexColor} onHexChange={onColorChange} />
-
-      <div
-        className="mt-12 h-[250px] w-[250px]"
-        style={{ backgroundColor: hexColor }}
+      <ColorMenuTabs setActiveCategory={setActiveCategory} />
+      <PanelContent
+        activeCategory={activeCategory}
+        categoryIndices={categoryIndices}
+        onCategoryIndexChange={changeIndex}
+        onHexChange={updateColors}
       />
     </div>
   );
 }
 
-export default function RemountOnSyncChange({ syncKey, ...delegated }: Props) {
-  return <ColorMenus key={syncKey} {...delegated} />;
+export default function RemountOnKeyChange({
+  syncKey,
+  ...delegated
+}: ExternalProps) {
+  return <ColorMenusCore key={syncKey} {...delegated} />;
 }
