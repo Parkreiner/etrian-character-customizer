@@ -17,3 +17,11 @@ export function range(bound1: number, bound2?: number): number[] {
 
   return output;
 }
+
+/**
+ * Guarantees that a number is within the range defined by min and max.
+ * If any of the arguments are NaN, NaN will be returned.
+ */
+export function clamp(newValue: number, min: number, max: number): number {
+  return Math.max(min, Math.min(newValue, max));
+}
