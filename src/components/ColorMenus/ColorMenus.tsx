@@ -37,19 +37,18 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
   const changeIndex = (newIndex: number) => {
     if (activeCategory === "misc") {
       const normalized = Number.isNaN(newIndex) ? 0 : newIndex;
+      const clamped = clamp(normalized, 0, colors.misc.length);
 
-      return setCategoryIndices({
-        ...categoryIndices,
-        misc: clamp(normalized, 0, colors.misc.length),
-      });
+      if (clamped === categoryIndices.misc) return;
+      return setCategoryIndices({ ...categoryIndices, misc: clamped });
     }
 
-    if (newIndex === 0 || newIndex === 1) {
-      return setCategoryIndices({
-        ...categoryIndices,
-        [activeCategory]: newIndex,
-      });
-    }
+    const shouldUpdate =
+      (newIndex === 0 || newIndex === 1) &&
+      newIndex !== categoryIndices[activeCategory];
+
+    if (!shouldUpdate) return;
+    setCategoryIndices({ ...categoryIndices, [activeCategory]: newIndex });
   };
 
   return (
