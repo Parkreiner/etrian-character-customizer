@@ -1,29 +1,26 @@
 import { useState } from "react";
-import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
 import ColorPicker from "../ColorPicker";
 
 type Props = {
+  syncKey: string;
   colors: CharacterColors;
   changeCharacterColors: (replacementColors: CharacterColors) => void;
-  selectedCharacter: Character | null;
 };
 
+type CoreProps = Omit<Props, "syncKey">;
 type ColorCategory = keyof CharacterColors;
 
-function ColorMenus({
-  colors,
-  changeCharacterColors,
-}: Omit<Props, "selectedCharacter">) {
+function ColorMenus({ colors, changeCharacterColors }: CoreProps) {
   const [colorCategory, setColorCategory] = useState<ColorCategory>("skin");
-  const [categoryOption, setCategoryOption] = useState(0);
-  const hexColor = colors[colorCategory][categoryOption] ?? "#000000";
+  const [categoryIndex, setCategoryIndex] = useState(0);
+  const hexColor = colors[colorCategory][categoryIndex] ?? "#000000";
 
   const onColorChange = (newHexColor: string) => {
     const newColors = {
       ...colors,
       [colorCategory]: colors[colorCategory].map((oldHex, index) => {
-        return index === categoryOption ? newHexColor : oldHex;
+        return index === categoryIndex ? newHexColor : oldHex;
       }),
     };
 
@@ -42,10 +39,6 @@ function ColorMenus({
   );
 }
 
-export default function WithUnmountBehavior({
-  selectedCharacter,
-  ...delegated
-}: Props) {
-  const key = selectedCharacter?.id ?? "";
-  return <ColorMenus key={key} {...delegated} />;
+export default function RemountOnSyncChange({ syncKey, ...delegated }: Props) {
+  return <ColorMenus key={syncKey} {...delegated} />;
 }

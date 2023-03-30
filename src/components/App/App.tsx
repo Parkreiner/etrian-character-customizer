@@ -37,8 +37,8 @@ function MainContent({
         />
 
         <ColorMenus
+          syncKey={selectedCharacter?.id ?? ""}
           colors={colors}
-          selectedCharacter={selectedCharacter}
           changeCharacterColors={stateUpdaters.replaceColors}
         />
       </div>
