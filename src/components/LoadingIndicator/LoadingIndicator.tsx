@@ -2,7 +2,7 @@
  * @file A basic loading indicator for the top-level app.
  */
 import { useEffect, useState } from "react";
-import { range } from "@/utils/range";
+import { range } from "@/utils/math";
 
 const maxDots = 3;
 const dotRange = range(1, maxDots + 1);
