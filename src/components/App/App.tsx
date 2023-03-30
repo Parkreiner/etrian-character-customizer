@@ -39,7 +39,7 @@ function MainContent({
         <ColorMenus
           syncKey={selectedCharacter?.id ?? ""}
           colors={colors}
-          changeCharacterColors={stateUpdaters.replaceColors}
+          onColorChange={stateUpdaters.replaceColors}
         />
       </div>
     </div>
