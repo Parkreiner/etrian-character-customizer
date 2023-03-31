@@ -24,6 +24,13 @@ export type CharacterColors = {
 
 export type ColorCategory = keyof CharacterColors;
 
+export const categoryIterable = [
+  "hair",
+  "eyes",
+  "hair",
+  "misc",
+] as const satisfies readonly ColorCategory[];
+
 /**
  * Defines all color presets for hair and eyes. Every two colors are designed to
  * work with each other.
