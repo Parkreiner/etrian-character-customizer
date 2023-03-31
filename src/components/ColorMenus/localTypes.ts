@@ -11,4 +11,10 @@ export type NonMiscPanelProps = {
   onColorChange: (newHex: string) => void;
 };
 
+export type MiscProps = {
+  [key in keyof NonMiscPanelProps]: key extends "selectedIndex"
+    ? number
+    : NonMiscPanelProps[key];
+};
+
 export type NonMiscPanel = FunctionComponent<NonMiscPanelProps>;

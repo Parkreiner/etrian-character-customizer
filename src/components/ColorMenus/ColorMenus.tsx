@@ -3,8 +3,9 @@ import { clamp } from "@/utils/math";
 import { CharacterColors, ColorCategory } from "@/typesConstants/colors";
 import { CategoryIndices } from "./localTypes";
 
-import PanelContent from "./PanelContent";
-import ColorMenuTabs from "./ColorMenuTabs";
+import * as Tabs from "@/components/Tabs";
+import ColorPanels from "./ColorPanels";
+import ColorTab from "./ColorTab";
 
 type ExternalProps = {
   syncKey: string;
@@ -25,7 +26,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
   const [activeCategory, setActiveCategory] = useState<ColorCategory>("skin");
   const [categoryIndices, setCategoryIndices] = useState(initialIndices);
 
-  const updateColors = (newHexColor: string) => {
+  const onHexChange = (newHexColor: string) => {
     const activeIndex = categoryIndices[activeCategory];
     const newTuple = colors[activeCategory].map((oldHex, index) => {
       return index === activeIndex ? newHexColor : oldHex;
@@ -51,16 +52,28 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
     setCategoryIndices({ ...categoryIndices, [activeCategory]: newIndex });
   };
 
+  const hasMisc = colors.misc.length > 0;
+
   return (
-    <div className="flex w-[500px] flex-col items-center bg-teal-600 p-4">
-      <ColorMenuTabs setActiveCategory={setActiveCategory} />
-      <PanelContent
-        activeCategory={activeCategory}
+    <Tabs.Root
+      className="flex w-[500px] flex-col items-center bg-teal-600 p-4"
+      value={activeCategory}
+      defaultValue="skin"
+      onValueChange={(value) => setActiveCategory(value)}
+    >
+      <Tabs.List aria-label="Change color categories">
+        <ColorTab tabType="skin">S</ColorTab>
+        <ColorTab tabType="eyes">E</ColorTab>
+        <ColorTab tabType="hair">H</ColorTab>
+        {hasMisc && <ColorTab tabType="misc">M</ColorTab>}
+      </Tabs.List>
+
+      <ColorPanels
         categoryIndices={categoryIndices}
         onCategoryIndexChange={changeIndex}
-        onHexChange={updateColors}
+        onHexChange={onHexChange}
       />
-    </div>
+    </Tabs.Root>
   );
 }
 
