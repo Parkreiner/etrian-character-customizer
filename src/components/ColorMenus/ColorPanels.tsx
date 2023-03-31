@@ -7,7 +7,11 @@
  * have to do *something* to separate everything dealing with misc from
  * everything else.
  */
-import { ColorCategory, categoryIterable } from "@/typesConstants/colors";
+import {
+  ColorCategory,
+  categoryIterable,
+  CharacterColors,
+} from "@/typesConstants/colors";
 import { NonMiscPanel, CategoryIndices } from "./localTypes";
 
 import { Content as TabsContent } from "@/components/Tabs";
@@ -22,12 +26,14 @@ const nonMiscPanels = {
 } as const satisfies Record<NonMiscCategory, NonMiscPanel>;
 
 type Props = {
+  colors: CharacterColors;
   categoryIndices: CategoryIndices;
   onCategoryIndexChange: (newIndex: number) => void;
   onHexChange: (newHex: string) => void;
 };
 
 export default function PanelContent({
+  colors,
   categoryIndices,
   onCategoryIndexChange,
   onHexChange,
@@ -37,18 +43,20 @@ export default function PanelContent({
     if (category === "misc") {
       content = (
         <MiscPanel
+          colors={colors.misc}
           selectedIndex={categoryIndices.misc}
           onIndexChange={onCategoryIndexChange}
-          onColorChange={onHexChange}
+          onHexChange={onHexChange}
         />
       );
     } else {
       const Polymorphic = nonMiscPanels[category];
       content = (
         <Polymorphic
+          colors={colors[category]}
           selectedIndex={categoryIndices[category]}
           onIndexChange={onCategoryIndexChange}
-          onColorChange={onHexChange}
+          onHexChange={onHexChange}
         />
       );
     }

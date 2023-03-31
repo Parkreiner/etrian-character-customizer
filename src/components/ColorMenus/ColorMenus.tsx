@@ -69,6 +69,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       </Tabs.List>
 
       <ColorPanels
+        colors={colors}
         categoryIndices={categoryIndices}
         onCategoryIndexChange={changeIndex}
         onHexChange={onHexChange}
