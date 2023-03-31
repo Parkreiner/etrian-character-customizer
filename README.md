@@ -14,7 +14,10 @@ Modders are inevitably going to hack the game to let players use custom portrait
 
 ## Current plan/roadmap
 
-1.
+1. Get the core client code done by the end of the end of April. Sometime during this period, get automated testing set up.
+2. Spend May fine-tuning the client code and also taking care of servers/databases/deployment.
+3. When the came comes out and people inevitably get the portraits ripped on day 1, start converting them into SVG vectors + transparent PNGs via Photoshop and Illustrator. The PNGS will be the portraits with all skin/eye/hair color made transparent, while the SVGS will be stored in the database, and rendered on the client via plain HTML. The image editing will be the most time-consuming part, by far
+4. Getting every single portrait converted is going to take a long time, but I'm hoping to get the more popular characters ready to go by the end of June, and then keep adding more in over time.
 
 ## Tech Stack
 
