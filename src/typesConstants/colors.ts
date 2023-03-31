@@ -25,7 +25,7 @@ export type CharacterColors = {
 export type ColorCategory = keyof CharacterColors;
 
 export const categoryIterable = [
-  "hair",
+  "skin",
   "eyes",
   "hair",
   "misc",
