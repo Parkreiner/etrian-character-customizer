@@ -17,19 +17,13 @@ export type ColorTuple = readonly [hex1: string, hex2: string];
  */
 export type CharacterColors = {
   hair: ColorTuple;
-  eyes: ColorTuple;
+  leftEyes: ColorTuple;
+  rightEyes: ColorTuple;
   skin: ColorTuple;
   misc: string[];
 };
 
 export type ColorCategory = keyof CharacterColors;
-
-export const categoryIterable = [
-  "skin",
-  "eyes",
-  "hair",
-  "misc",
-] as const satisfies readonly ColorCategory[];
 
 /**
  * Defines all color presets for hair and eyes. Every two colors are designed to

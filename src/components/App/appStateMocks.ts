@@ -8,14 +8,16 @@ export async function mockFetchCharacters(url: string) {
     imgUrl: "http://jank.com",
 
     colors: {
-      eyes: ["#ff0000", "#ff0000"],
+      leftEyes: ["#ff0000", "#ff0000"],
+      rightEyes: ["#ff0000", "#ff0000"],
       hair: ["#ff0000", "#ff0000"],
       skin: ["#ff0000", "#ff0000"],
       misc: [],
     },
 
     svgs: {
-      eyes: ["", ""],
+      leftEyes: ["", ""],
+      rightEyes: ["", ""],
       hair: ["", ""],
       skin: ["", ""],
       misc: [],

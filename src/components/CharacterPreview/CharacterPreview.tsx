@@ -41,8 +41,11 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
         <DebugSquare color={colors.hair[0]}>Hair 1</DebugSquare>
         <DebugSquare color={colors.hair[1]}>Hair 2</DebugSquare>
 
-        <DebugSquare color={colors.eyes[0]}>Eyes 1</DebugSquare>
-        <DebugSquare color={colors.eyes[1]}>Eyes 2</DebugSquare>
+        <DebugSquare color={colors.leftEyes[0]}>L. Eyes 1</DebugSquare>
+        <DebugSquare color={colors.leftEyes[1]}>L. Eyes 2</DebugSquare>
+
+        <DebugSquare color={colors.rightEyes[0]}>R. Eyes 1</DebugSquare>
+        <DebugSquare color={colors.rightEyes[1]}>R. Eyes 2</DebugSquare>
 
         {colors.misc.map((color, index) => (
           <DebugSquare key={index} color={color}>
