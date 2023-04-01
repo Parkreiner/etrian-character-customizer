@@ -17,8 +17,8 @@ export type ColorTuple = readonly [hex1: string, hex2: string];
  */
 export type CharacterColors = {
   hair: ColorTuple;
-  leftEyes: ColorTuple;
-  rightEyes: ColorTuple;
+  leftEye: ColorTuple;
+  rightEye: ColorTuple;
   skin: ColorTuple;
   misc: string[];
 };
