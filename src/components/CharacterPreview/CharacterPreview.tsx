@@ -27,7 +27,7 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
   const id = selectedCharacter?.id ?? "Unknown";
 
   return (
-    <div className="min-w-[500px] flex-grow self-stretch rounded-md bg-white p-6">
+    <div className="flex-grow self-stretch rounded-md bg-white p-6">
       <p>
         Class: {characterClass}
         <br />
