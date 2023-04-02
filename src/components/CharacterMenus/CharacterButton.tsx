@@ -1,19 +1,32 @@
-import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useId } from "react";
+import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { cva } from "class-variance-authority";
 
-type CharacterButtonProps = {
+type Props = {
   selected: boolean;
   displayNumber: number;
   labelText: string;
   onClick: () => void;
 };
 
+const buttonStyles = cva(
+  "h-full w-full rounded-md text-center font-bold bg-teal-700 text-teal-50",
+  {
+    variants: {
+      selected: {
+        true: "cursor-not-allowed bg-teal-200 text-teal-800",
+        false: "hover:bg-teal-200 hover:text-teal-800",
+      },
+    },
+  }
+);
+
 export default function CharacterButton({
   selected,
   displayNumber,
   labelText,
   onClick,
-}: CharacterButtonProps) {
+}: Props) {
   const hookId = useId();
   const labelId = `${hookId}-label`;
 
@@ -25,6 +38,7 @@ export default function CharacterButton({
 
       <button
         type="button"
+        className={buttonStyles({ selected })}
         onClick={onClick}
         disabled={selected}
         aria-labelledby={labelId}

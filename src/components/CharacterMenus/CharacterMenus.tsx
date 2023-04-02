@@ -47,30 +47,37 @@ function CharacterMenus({
     );
   }
 
-  const currentGameUi = Array.from(gameGroup, (mapEntry, groupIndex) => {
-    const [className, charactersList] = mapEntry;
-    const classLabelName =
-      className.slice(0, 1).toUpperCase() + className.slice(1).toLowerCase();
+  const currentGameUi = (
+    <div className="grid w-full min-w-[400px] grid-cols-2 gap-3 text-white">
+      {Array.from(gameGroup, (mapEntry, groupIndex) => {
+        const [className, charactersList] = mapEntry;
+        const classLabelName =
+          className.slice(0, 1).toUpperCase() +
+          className.slice(1).toLowerCase();
 
-    return (
-      <section key={groupIndex}>
-        <h2>{className.toUpperCase()}</h2>
+        return (
+          <section key={groupIndex} className="rounded-md bg-teal-900 p-3">
+            <h2 className="text-xs font-semibold tracking-wider text-teal-50">
+              {className.toUpperCase()}
+            </h2>
 
-        <ol className="flex flex-row">
-          {charactersList.map((char, charIndex) => (
-            <li key={charIndex}>
-              <CharacterButton
-                selected={char.id === selectedCharacterId}
-                displayNumber={charIndex + 1}
-                labelText={`Select ${classLabelName} ${charIndex + 1}`}
-                onClick={() => onCharacterChange(char)}
-              />
-            </li>
-          ))}
-        </ol>
-      </section>
-    );
-  });
+            <ol className="mt-2 flex w-full flex-row gap-x-2">
+              {charactersList.map((char, charIndex) => (
+                <li key={charIndex} className="flex-grow">
+                  <CharacterButton
+                    selected={char.id === selectedCharacterId}
+                    displayNumber={charIndex + 1}
+                    labelText={`Select ${classLabelName} ${charIndex + 1}`}
+                    onClick={() => onCharacterChange(char)}
+                  />
+                </li>
+              ))}
+            </ol>
+          </section>
+        );
+      })}
+    </div>
+  );
 
   /**
    * Not the biggest fan of how the content is defined for each item, but
