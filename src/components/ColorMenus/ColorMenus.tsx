@@ -103,9 +103,9 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       return setActiveIndices({ ...activeIndices, misc: clamped });
     }
 
+    const activeIndex = activeIndices[activeCategory];
     const skipUpdate =
-      newIndex === activeIndices[activeCategory] ||
-      (newIndex !== 0 && newIndex !== 1);
+      newIndex === activeIndex || (newIndex !== 0 && newIndex !== 1);
 
     if (skipUpdate) return;
     setActiveIndices({ ...activeIndices, [activeCategory]: newIndex });
