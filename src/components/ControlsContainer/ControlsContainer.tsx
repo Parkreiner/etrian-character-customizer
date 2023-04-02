@@ -83,7 +83,7 @@ export default function ControlsContainer<T extends string>({
     <Tabs.Root<T>
       value={selectedValue}
       onValueChange={onValueChange}
-      className="min-w-[400px]"
+      className="min-w-[400px] self-stretch"
     >
       <Tabs.List<T>
         className="flex gap-x-1 leading-none"
@@ -92,7 +92,7 @@ export default function ControlsContainer<T extends string>({
         {tabInfo.map(toTabsTrigger)}
       </Tabs.List>
 
-      <div className="mt-[-2px] border-t-[3px] border-teal-900 bg-teal-600 p-4 pb-6">
+      <div className="mt-[-2px] h-full border-t-[3px] border-teal-900 bg-teal-600 p-4">
         {tabContent.map((infoItem, index) => (
           <Tabs.Content<T> key={index} value={infoItem.value}>
             {infoItem.content}
