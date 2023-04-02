@@ -1,7 +1,18 @@
-import { useState, Fragment } from "react";
+/**
+ * @file Contains all the core logic for managing colors for a character.
+ *
+ * This is a complicated component, and while I tried to split it up, all those
+ * attempts seemed to make things worse, not just for performance, but also for
+ * readability. If you're using VSCode, consider collapsing the function
+ * and array/object definitions to make things a bit more navigable.
+ *
+ * At the very least, *using* the component should be simple. You only have to
+ * worry about what you're passing in to satisfy ExternalProps.
+ */
+import { useState } from "react";
 import { clamp } from "@/utils/math";
 import { UiTab } from "./localTypes";
-import { baseTabInfo } from "./constants";
+import { baseTabInfo } from "./localConstants";
 import {
   CharacterColors,
   ColorCategory,
@@ -14,7 +25,15 @@ import ControlsContainer, {
 } from "@/components/ControlsContainer";
 
 type ExternalProps = {
-  syncKey: string;
+  /**
+   * A key for linking a character to the ColorsMenu component.
+   *
+   * Whenever the key changes, the entire ColorsMenu component will reset to its
+   * default state, using the current character's starting colors as the
+   * component's new starting colors.
+   */
+  characterKey: string;
+
   colors: CharacterColors;
   onColorChange: (newColors: CharacterColors) => void;
 };
@@ -31,7 +50,7 @@ const initialIndices: CategoryIndices = {
   misc: 0,
 };
 
-type CoreProps = Omit<ExternalProps, "syncKey">;
+type CoreProps = Omit<ExternalProps, "characterKey">;
 
 function ColorMenusCore({ colors, onColorChange }: CoreProps) {
   const [activeCategory, setActiveCategory] = useState<ColorCategory>("skin");
@@ -42,15 +61,22 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
 
   const onHexChange = (newHexColor: string) => {
     const activeIndex = activeIndices[activeCategory];
+    const updateBothEyes =
+      eyesLinked &&
+      (activeCategory === "leftEye" || activeCategory === "rightEye");
+
+    const skipUpdate =
+      (updateBothEyes &&
+        newHexColor === colors.leftEye[activeIndex] &&
+        newHexColor === colors.rightEye[activeIndex]) ||
+      newHexColor === colors[activeCategory][activeIndex];
+
+    if (skipUpdate) return;
     const newTuple = colors[activeCategory].map((oldHex, index) => {
       return index === activeIndex ? newHexColor : oldHex;
     });
 
-    const bothEyesNeedUpdate =
-      eyesLinked &&
-      (activeCategory === "leftEye" || activeCategory === "rightEye");
-
-    if (bothEyesNeedUpdate) {
+    if (updateBothEyes) {
       // This is really ugly, but it's just a limitation of the built-in
       // Array.map method typing. It can't preserve tuple lengths
       onColorChange({
@@ -67,15 +93,14 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
 
   const onCategoryIndexChange = (newIndex: number) => {
     if (activeCategory === "misc") {
-      const normalized = Number.isNaN(newIndex) ? 0 : newIndex;
+      const normalized =
+        Number.isInteger(newIndex) && newIndex >= 0 ? newIndex : 0;
+
       const clamped = clamp(normalized, 0, colors.misc.length);
+      const skipUpdate = clamped === activeIndices.misc;
 
-      const needUpdate = clamped !== activeIndices.misc;
-      if (needUpdate) {
-        setActiveIndices({ ...activeIndices, misc: clamped });
-      }
-
-      return;
+      if (skipUpdate) return;
+      return setActiveIndices({ ...activeIndices, misc: clamped });
     }
 
     const skipUpdate =
@@ -101,7 +126,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
     return { ...info, display: colors.misc.length > 0 };
   });
 
-  const content: TabContentInfo<UiTab>[] = [
+  const contentInfo: TabContentInfo<UiTab>[] = [
     {
       value: "skin",
       content: (
@@ -122,9 +147,13 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       ),
     },
     {
+      value: "hair",
+      content: <p>Here's some hair!</p>,
+    },
+    {
       value: "eyes",
       content: (
-        <Fragment>
+        <fieldset>
           <button
             type="button"
             onClick={() => {
@@ -188,7 +217,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
               onHexChange={onHexChange}
             />
           )}
-        </Fragment>
+        </fieldset>
       ),
     },
   ];
@@ -199,14 +228,14 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       onValueChange={onTabChange}
       ariaLabel="Select which part you want to customize"
       tabInfo={fullTabInfo}
-      tabContent={content}
+      tabContent={contentInfo}
     />
   );
 }
 
 export default function RemountOnKeyChange({
-  syncKey,
+  characterKey,
   ...delegated
 }: ExternalProps) {
-  return <ColorMenusCore key={syncKey} {...delegated} />;
+  return <ColorMenusCore key={characterKey} {...delegated} />;
 }

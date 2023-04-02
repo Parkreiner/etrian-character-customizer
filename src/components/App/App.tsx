@@ -37,7 +37,7 @@ function MainContent({
         />
 
         <ColorMenus
-          syncKey={selectedCharacter?.id ?? ""}
+          characterKey={selectedCharacter?.id ?? ""}
           colors={colors}
           onColorChange={stateUpdaters.replaceColors}
         />
