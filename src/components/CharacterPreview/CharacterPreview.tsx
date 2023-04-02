@@ -14,7 +14,7 @@ type DebugSquareProps = PropsWithChildren<{
 function DebugSquare({ color, children }: DebugSquareProps) {
   return (
     <div
-      className="flex h-[100px] w-[100px] items-center justify-center rounded-md border-2 border-black"
+      className="flex min-h-[100px] flex-grow basis-[100px] items-center justify-center rounded-md border-2 border-black"
       style={{ backgroundColor: color }}
     >
       <div className="rounded-md bg-black px-2 py-1 text-sm font-semibold text-white">
@@ -29,14 +29,14 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
   const displayedId = selectedCharacter?.id ?? "Unknown";
 
   return (
-    <div className="flex flex-grow flex-col flex-nowrap self-stretch rounded-md bg-white p-6">
+    <div className="flex flex-grow flex-col flex-nowrap justify-center self-stretch rounded-md border-2 border-black p-6">
       <p>
         Class: {characterClass}
         <br />
         ID: {displayedId}
       </p>
 
-      <div className="flex flex-row flex-wrap gap-2 justify-self-center">
+      <div className="my-4 flex flex-row flex-wrap gap-4 justify-self-center">
         <DebugSquare color={colors.skin[0]}>Skin 1</DebugSquare>
         <DebugSquare color={colors.skin[1]}>Skin 2</DebugSquare>
 
