@@ -3,9 +3,11 @@ import TooltipTemplate from "@/components/TooltipTemplate";
 import * as Tabs from "@/components/Tabs";
 
 /**
- * Information for rendering the tabs themselves in the ControlsContainer. Each
- * TabInfo object must have a corresponding TabContentInfo object, where they
- * both share a "value" key with the same value.
+ * Information for rendering the tabs themselves in the ControlsContainer.
+ *
+ * Each time you add a TabInfo object, you must also add a corresponding
+ * TabContentInfo object, where both objects share the same value for their
+ * "value" key.
  */
 export type TabInfo<T extends string> = {
   /** Defaults to true if not provided */
@@ -13,17 +15,19 @@ export type TabInfo<T extends string> = {
 
   value: T;
   labelText: string;
-  content: string | React.ReactNode;
+  content: React.ReactNode | string;
 };
 
 /**
- * Information for rendering the content associated with each tab. Each
- * TabContentInfo object must have a corresponding TabInfo object, where they
- * both share a "value" key with the same value.
+ * Information for rendering the content associated with each tab.
+ *
+ * Each time you add a TabContentInfo object, you must also add a corresponding
+ * TabInfo object, where both objects share the same value for their "value"
+ * key.
  */
 export type TabContentInfo<T extends string> = {
   value: T;
-  content: React.ReactNode;
+  content: React.ReactNode | null;
 };
 
 type Props<T extends string> = {
