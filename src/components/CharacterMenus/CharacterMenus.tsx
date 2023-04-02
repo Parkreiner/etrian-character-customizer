@@ -56,7 +56,7 @@ function CharacterMenus({
           className.slice(1).toLowerCase();
 
         return (
-          <section key={groupIndex} className="rounded-md bg-teal-900 p-3">
+          <section key={groupIndex} className="rounded-md bg-teal-900 p-4">
             <h2 className="text-xs font-semibold tracking-wider text-teal-50">
               {className.toUpperCase()}
             </h2>
