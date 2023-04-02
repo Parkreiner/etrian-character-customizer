@@ -6,6 +6,7 @@
  * their half of their bubbles. There's usually a few pixels of the primary
  * color visible still, even when everything should be covered.
  */
+import TooltipTemplate from "@/components/TooltipTemplate";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
 import { useId } from "react";
@@ -53,36 +54,29 @@ export default function ColorBubble({
   default: isDefault = false,
 }: Props) {
   return (
-    <Tooltip.Root defaultOpen={false}>
-      <Tooltip.Content>
-        <p className="rounded-md bg-black py-2 px-4 text-white">{labelText}</p>
-        <Tooltip.Arrow />
-      </Tooltip.Content>
+    <TooltipTemplate labelText={labelText}>
+      <button className="relative" onClick={onClick}>
+        {isDefault && <DefaultTextLabel />}
 
-      <Tooltip.Trigger asChild>
-        <button className="relative" onClick={onClick}>
-          {isDefault && <DefaultTextLabel />}
-
+        <div
+          className={clsx(
+            "rounded-full bg-teal-700 p-[4px]",
+            selected && "bg-gradient-to-br from-orange-400 to-yellow-300"
+          )}
+        >
           <div
-            className={clsx(
-              "rounded-full bg-teal-700 p-[4px]",
-              selected && "bg-gradient-to-br from-orange-400 to-yellow-300"
-            )}
+            className="relative h-14 w-14 overflow-hidden rounded-full"
+            style={{ backgroundColor: primaryHex }}
           >
-            <div
-              className="relative h-14 w-14 overflow-hidden rounded-full"
-              style={{ backgroundColor: primaryHex }}
-            >
-              {secondaryHex !== undefined && (
-                <div
-                  className="absolute right-[-1.9rem] bottom-0 h-8 w-24 rotate-[-45deg]"
-                  style={{ backgroundColor: secondaryHex }}
-                />
-              )}
-            </div>
+            {secondaryHex !== undefined && (
+              <div
+                className="absolute right-[-1.9rem] bottom-0 h-8 w-24 rotate-[-45deg]"
+                style={{ backgroundColor: secondaryHex }}
+              />
+            )}
           </div>
-        </button>
-      </Tooltip.Trigger>
-    </Tooltip.Root>
+        </div>
+      </button>
+    </TooltipTemplate>
   );
 }

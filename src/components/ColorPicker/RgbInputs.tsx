@@ -1,6 +1,6 @@
 import { rgbChannels, RGBColor } from "./localTypes";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import * as Tooltip from "@radix-ui/react-tooltip";
+import TooltipTemplate from "@/components/TooltipTemplate";
 
 type Props = {
   rgb: RGBColor;
@@ -16,23 +16,12 @@ export default function RgbInputs({ rgb, onChannelChange }: Props) {
 
         return (
           <label key={channel} className="rounded-md bg-teal-900 p-1">
-            <Tooltip.Root defaultOpen={false}>
-              <Tooltip.Content className="fill-black">
-                <p className="rounded-md bg-black py-2 px-4 text-white">
-                  {formattedChannel}
-                </p>
-                <Tooltip.Arrow />
-              </Tooltip.Content>
-
-              <Tooltip.Trigger className="cursor-default">
-                <span className="pl-2 font-bold text-teal-50">
-                  {firstLetter}
-                  <VisuallyHidden.Root>
-                    ({formattedChannel})
-                  </VisuallyHidden.Root>
-                </span>
-              </Tooltip.Trigger>
-            </Tooltip.Root>
+            <TooltipTemplate labelText={formattedChannel}>
+              <span className="pl-2 font-bold text-teal-50">
+                {firstLetter}
+                <VisuallyHidden.Root>({formattedChannel})</VisuallyHidden.Root>
+              </span>
+            </TooltipTemplate>
 
             <input
               className="ml-3 flex-grow rounded-tr-sm rounded-br-sm bg-teal-50 pl-4 text-center"

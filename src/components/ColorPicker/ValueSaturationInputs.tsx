@@ -1,7 +1,8 @@
 import { ComponentPropsWithoutRef, useId } from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import * as Slider from "@radix-ui/react-slider";
-import * as Tooltip from "@radix-ui/react-tooltip";
+import TooltipTemplate from "@/components/TooltipTemplate";
+
 import { HSVColor } from "./localTypes";
 
 type ChannelWithoutHue = Exclude<keyof HSVColor, "hue">;
@@ -41,24 +42,16 @@ export default function SaturationValueInputs({ hsv, onChannelChange }: Props) {
             key={labelText}
             className="flex w-full p-1 align-bottom first:mb-1"
           >
-            <Tooltip.Root>
-              <Tooltip.Content>
-                <p className="rounded-md bg-black py-2 px-4 text-white">
-                  {labelText}
-                </p>
-                <Tooltip.Arrow className="fill-black" />
-              </Tooltip.Content>
-              <Tooltip.Trigger className="cursor-default">
-                <label
-                  htmlFor={numberInputId}
-                  className="mr-4 block basis-6 font-bold text-teal-50"
-                >
-                  <VisuallyHidden.Root>Number input for </VisuallyHidden.Root>
-                  {displayText}
-                  <VisuallyHidden.Root> ({labelText})</VisuallyHidden.Root>
-                </label>
-              </Tooltip.Trigger>
-            </Tooltip.Root>
+            <TooltipTemplate labelText={labelText}>
+              <label
+                htmlFor={numberInputId}
+                className="mr-4 block basis-6 font-bold text-teal-50"
+              >
+                <VisuallyHidden.Root>Number input for </VisuallyHidden.Root>
+                {displayText}
+                <VisuallyHidden.Root> ({labelText})</VisuallyHidden.Root>
+              </label>
+            </TooltipTemplate>
 
             <Slider.Root
               {...sharedInputProps}
