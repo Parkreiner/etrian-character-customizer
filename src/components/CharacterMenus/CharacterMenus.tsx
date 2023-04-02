@@ -1,30 +1,17 @@
 import { memo, useState } from "react";
-
 import {
   Character,
   CharsGroupedByGame,
   GameOrigin,
 } from "@/typesConstants/gameData";
+
+import CharacterButton from "./CharacterButton";
 import ControlsContainer, {
   TabInfo,
   TabContentInfo,
 } from "../ControlsContainer";
 
-type CharacterButtonProps = {
-  displayNumber: number;
-  highlighted: boolean;
-  onClick: () => void;
-};
-
-function CharacterButton({
-  displayNumber,
-  highlighted,
-  onClick,
-}: CharacterButtonProps) {
-  return <button onClick={onClick}>{displayNumber}</button>;
-}
-
-type CharacterMenusProps = {
+type Props = {
   groupedCharacters: CharsGroupedByGame;
   selectedCharacterId: string;
   onCharacterChange: (newCharacter: Character) => void;
@@ -48,7 +35,7 @@ function CharacterMenus({
   groupedCharacters,
   selectedCharacterId,
   onCharacterChange,
-}: CharacterMenusProps) {
+}: Props) {
   const [selectedGame, setSelectedGame] = useState<GameOrigin>("eo1");
   const gameGroup = groupedCharacters.get(selectedGame);
 
@@ -60,26 +47,30 @@ function CharacterMenus({
     );
   }
 
-  const currentGameUi = Array.from(
-    gameGroup,
-    ([className, characters], groupIndex) => (
+  const currentGameUi = Array.from(gameGroup, (mapEntry, groupIndex) => {
+    const [className, charactersList] = mapEntry;
+    const classLabelName =
+      className.slice(0, 1).toUpperCase() + className.slice(1).toLowerCase();
+
+    return (
       <section key={groupIndex}>
         <h2>{className.toUpperCase()}</h2>
 
-        <ol>
-          {characters.map((char, charIndex) => (
+        <ol className="flex flex-row">
+          {charactersList.map((char, charIndex) => (
             <li key={charIndex}>
               <CharacterButton
+                selected={char.id === selectedCharacterId}
                 displayNumber={charIndex + 1}
-                highlighted={char.id === selectedCharacterId}
+                labelText={`Select ${classLabelName} ${charIndex + 1}`}
                 onClick={() => onCharacterChange(char)}
               />
             </li>
           ))}
         </ol>
       </section>
-    )
-  );
+    );
+  });
 
   /**
    * Not the biggest fan of how the content is defined for each item, but
@@ -108,7 +99,7 @@ function CharacterMenus({
   return (
     <ControlsContainer<GameOrigin>
       value={selectedGame}
-      onValueChange={(newGame) => setSelectedGame(newGame)}
+      onValueChange={(newSelection) => setSelectedGame(newSelection)}
       ariaLabel="Select a game"
       tabInfo={tabInfo}
       tabContent={tabContent}
