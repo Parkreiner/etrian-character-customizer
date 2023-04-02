@@ -16,10 +16,10 @@ export type ColorTuple = readonly [hex1: string, hex2: string];
  * the most common option for most characters).
  */
 export type CharacterColors = {
+  skin: ColorTuple;
   hair: ColorTuple;
   leftEye: ColorTuple;
   rightEye: ColorTuple;
-  skin: ColorTuple;
   misc: string[];
 };
 
