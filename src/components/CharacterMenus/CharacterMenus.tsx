@@ -84,21 +84,21 @@ function CharacterMenus({
   /**
    * I'm not the biggest fan of this pattern, but I'm kind of hamstrung by the
    * API of Radix's Tabs components. It handles the conditional rendering for
-   * you, but as part of that, it expects you to provide it with versions of the
-   * content UI that are NOT conditionally-calculated.
+   * you, but as part of that, it expects you to provide it content for each tab
+   * you add, no matter what.
    */
   const tabContent: TabContentInfo<GameOrigin>[] = [
     {
       value: "eo1",
-      content: <>{selectedGame === "eo1" && currentGameUi}</>,
+      content: selectedGame === "eo1" ? currentGameUi : null,
     },
     {
       value: "eo2",
-      content: <>{selectedGame === "eo2" && currentGameUi}</>,
+      content: selectedGame === "eo2" ? currentGameUi : null,
     },
     {
       value: "eo3",
-      content: <>{selectedGame === "eo3" && currentGameUi}</>,
+      content: selectedGame === "eo3" ? currentGameUi : null,
     },
   ];
 
