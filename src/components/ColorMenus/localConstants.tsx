@@ -1,6 +1,10 @@
 import { UiTab } from "./localTypes";
 import { TabInfo } from "../ControlsContainer";
 
+/**
+ * All tab icons courtesy of Heroicons (part of Tailwind Labs).
+ * {@link https://heroicons.com/}
+ */
 export const tabIcons = {
   skin: (
     <svg
