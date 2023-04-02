@@ -13,7 +13,7 @@ export type TabInfo<T extends string> = {
 
   value: T;
   labelText: string;
-  content: React.ReactNode;
+  content: string | React.ReactNode;
 };
 
 /**
@@ -30,8 +30,8 @@ type Props<T extends string> = {
   value: T;
   onValueChange: (newValue: T) => void;
   ariaLabel: string;
-  tabInfo: TabInfo<T>[];
-  tabContent: TabContentInfo<T>[];
+  tabInfo: readonly TabInfo<T>[];
+  tabContent: readonly TabContentInfo<T>[];
 };
 
 export default function ControlsContainer<T extends string>({

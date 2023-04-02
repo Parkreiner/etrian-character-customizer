@@ -1,8 +1,8 @@
 /**
  * @todo Figure out how to get the component working with Suspense.
  */
-import * as Tooltip from "@radix-ui/react-tooltip";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { Provider as TooltipProvider } from "@radix-ui/react-tooltip";
+import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 import useAppState from "./useAppState";
 import CharacterPreview from "@/components/CharacterPreview";
@@ -22,12 +22,14 @@ function MainContent({
   stateUpdaters,
   selectedCharacter,
 }: MainProps) {
+  const characterId = selectedCharacter?.id ?? "";
+
   return (
     <div className="mx-auto flex h-full max-w-[1400px] items-center justify-center">
       <div className="flex max-h-[800px] flex-row items-center justify-center gap-x-10">
         <PortraitMenus
+          selectedCharacterId={characterId}
           groupedCharacters={groupedCharacters}
-          selectedCharacter={selectedCharacter}
           onCharacterChange={stateUpdaters.changeCharacter}
         />
 
@@ -37,7 +39,7 @@ function MainContent({
         />
 
         <ColorMenus
-          characterKey={selectedCharacter?.id ?? ""}
+          characterKey={characterId}
           colors={colors}
           onColorChange={stateUpdaters.replaceColors}
         />
@@ -52,10 +54,10 @@ export default function App() {
   return (
     <div className="h-full w-full">
       <ErrorBoundary>
-        <Tooltip.Provider delayDuration={500}>
-          <VisuallyHidden.Root>
+        <TooltipProvider delayDuration={500}>
+          <VisuallyHidden>
             <h1>Etrian Character Customizer</h1>
-          </VisuallyHidden.Root>
+          </VisuallyHidden>
 
           {appState.initialized ? (
             <MainContent
@@ -67,7 +69,7 @@ export default function App() {
           ) : (
             <LoadingIndicator />
           )}
-        </Tooltip.Provider>
+        </TooltipProvider>
       </ErrorBoundary>
     </div>
   );
