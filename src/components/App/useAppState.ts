@@ -122,7 +122,10 @@ export default function useAppState() {
     {
       errorRetryCount: 3,
       onSuccess: (data) => {
-        const startingCharacter = data.characters[0];
+        const startingCharacter =
+          data.characters.find((char) => char.class === "protector") ??
+          data.characters[0];
+
         if (!startingCharacter) {
           return;
         }

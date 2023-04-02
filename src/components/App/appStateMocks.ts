@@ -53,6 +53,7 @@ export async function mockFetchCharacters(url: string) {
         "ronin",
         "hexer",
         "gunner",
+        "war magus",
         "beast",
       ],
 
