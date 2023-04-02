@@ -82,10 +82,13 @@ function CharacterMenus({
   );
 
   /**
-   * I'm not the biggest fan of this pattern, but I'm kind of hamstrung by the
-   * API of Radix's Tabs components. It handles the conditional rendering for
-   * you, but as part of that, it expects you to provide it content for each tab
-   * you add, no matter what.
+   * Not the biggest fan of how the content is defined for each item, but
+   * there's only so much you can do when working with the API of Radix's Tabs.
+   *
+   * Radix handles the conditional rendering for you, but as part of that, it
+   * expects you to provide it some kind of content value for each tab you add,
+   * for every single render, no matter what. Doesn't matter that only one of
+   * these pieces of content will be displayed at a time.
    */
   const tabContent: TabContentInfo<GameOrigin>[] = [
     {
