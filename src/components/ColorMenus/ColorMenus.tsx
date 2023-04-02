@@ -224,7 +224,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
 
   return (
     <ControlsContainer<UiTab>
-      value={activeTab}
+      selectedValue={activeTab}
       onValueChange={onTabChange}
       ariaLabel="Select which part you want to customize"
       tabInfo={fullTabInfo}

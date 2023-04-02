@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import TooltipTemplate from "@/components/TooltipTemplate";
 import * as Tabs from "@/components/Tabs";
+import { cva } from "class-variance-authority";
 
 /**
  * Information for rendering the tabs themselves in the ControlsContainer.
@@ -31,15 +32,24 @@ export type TabContentInfo<T extends string> = {
 };
 
 type Props<T extends string> = {
-  value: T;
+  selectedValue: T;
   onValueChange: (newValue: T) => void;
   ariaLabel: string;
   tabInfo: readonly TabInfo<T>[];
   tabContent: readonly TabContentInfo<T>[];
 };
 
+const tabStyles = cva("font-bold p-4 pb-3 rounded-t-md", {
+  variants: {
+    selected: {
+      true: "bg-teal-900 text-white",
+      false: "hover:bg-teal-900 hover:text-white",
+    },
+  },
+});
+
 export default function ControlsContainer<T extends string>({
-  value,
+  selectedValue,
   onValueChange,
   ariaLabel,
   tabInfo,
@@ -47,13 +57,21 @@ export default function ControlsContainer<T extends string>({
 }: Props<T>) {
   const toTabsTrigger = (infoItem: TabInfo<T>, index: number) => {
     const { value, labelText, content, display = true } = infoItem;
+    const styles = tabStyles({ selected: value === selectedValue });
+
+    const fillContent =
+      typeof content === "string" ? (
+        <div className="min-h-[24px]">{content}</div>
+      ) : (
+        content
+      );
 
     return (
       <Fragment key={index}>
         {display && (
           <Tabs.Trigger<T> value={value}>
             <TooltipTemplate labelText={labelText}>
-              <div className="bg-teal-900 text-white">{content}</div>
+              <div className={styles}>{fillContent}</div>
             </TooltipTemplate>
           </Tabs.Trigger>
         )}
@@ -62,18 +80,21 @@ export default function ControlsContainer<T extends string>({
   };
 
   return (
-    <Tabs.Root<T> value={value} onValueChange={onValueChange}>
-      <Tabs.List<T> className="leading-none" aria-label={ariaLabel}>
+    <Tabs.Root<T>
+      value={selectedValue}
+      onValueChange={onValueChange}
+      className="min-w-[400px]"
+    >
+      <Tabs.List<T>
+        className="flex gap-x-1 leading-none"
+        aria-label={ariaLabel}
+      >
         {tabInfo.map(toTabsTrigger)}
       </Tabs.List>
 
-      <div className="border-t-2 border-teal-900">
+      <div className="mt-[-2px] border-t-[3px] border-teal-900 bg-teal-600 p-4 pb-6">
         {tabContent.map((infoItem, index) => (
-          <Tabs.Content<T>
-            key={index}
-            value={infoItem.value}
-            className="bg-teal-600 p-4"
-          >
+          <Tabs.Content<T> key={index} value={infoItem.value}>
             {infoItem.content}
           </Tabs.Content>
         ))}

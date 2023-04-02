@@ -48,7 +48,7 @@ function CharacterMenus({
   }
 
   const currentGameUi = (
-    <div className="grid w-full min-w-[400px] grid-cols-2 gap-3 text-white">
+    <div className="grid w-full grid-cols-2 gap-3 text-white">
       {Array.from(gameGroup, (mapEntry, groupIndex) => {
         const [className, charactersList] = mapEntry;
         const classLabelName =
@@ -105,7 +105,7 @@ function CharacterMenus({
 
   return (
     <ControlsContainer<GameOrigin>
-      value={selectedGame}
+      selectedValue={selectedGame}
       onValueChange={(newSelection) => setSelectedGame(newSelection)}
       ariaLabel="Select a game"
       tabInfo={tabInfo}
