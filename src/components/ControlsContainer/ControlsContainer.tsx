@@ -1,7 +1,13 @@
 import { Fragment } from "react";
+import TooltipTemplate from "@/components/TooltipTemplate";
 import * as Tabs from "@/components/Tabs";
 
-export type TabItemInfo<T extends string> = {
+/**
+ * Information for rendering the tabs themselves in the ControlsContainer. Each
+ * TabInfo object must have a corresponding TabContentInfo object, where they
+ * both share a "value" key with the same value.
+ */
+export type TabInfo<T extends string> = {
   /** Defaults to true if not provided */
   display?: boolean;
 
@@ -10,6 +16,11 @@ export type TabItemInfo<T extends string> = {
   content: React.ReactNode;
 };
 
+/**
+ * Information for rendering the content associated with each tab. Each
+ * TabContentInfo object must have a corresponding TabInfo object, where they
+ * both share a "value" key with the same value.
+ */
 export type TabContentInfo<T extends string> = {
   value: T;
   content: React.ReactNode;
@@ -19,7 +30,7 @@ type Props<T extends string> = {
   value: T;
   onValueChange: (newValue: T) => void;
   ariaLabel: string;
-  tabInfo: TabItemInfo<T>[];
+  tabInfo: TabInfo<T>[];
   tabContent: TabContentInfo<T>[];
 };
 
@@ -30,27 +41,19 @@ export default function ControlsContainer<T extends string>({
   tabInfo,
   tabContent,
 }: Props<T>) {
-  const toTabsTrigger = (infoItem: TabItemInfo<T>, index: number) => {
+  const toTabsTrigger = (infoItem: TabInfo<T>, index: number) => {
     const { value, labelText, content, display = true } = infoItem;
 
     return (
       <Fragment key={index}>
         {display && (
           <Tabs.Trigger<T> value={value}>
-            <div className="bg-teal-900 text-white">{content}</div>
+            <TooltipTemplate labelText={labelText}>
+              <div className="bg-teal-900 text-white">{content}</div>
+            </TooltipTemplate>
           </Tabs.Trigger>
         )}
       </Fragment>
-    );
-  };
-
-  const toTabsContent = (info: TabContentInfo<T>, index: number) => {
-    const { value, content } = info;
-
-    return (
-      <Tabs.Content<T> key={index} value={value} className="bg-teal-600 p-4">
-        {content}
-      </Tabs.Content>
     );
   };
 
@@ -61,7 +64,15 @@ export default function ControlsContainer<T extends string>({
       </Tabs.List>
 
       <div className="border-t-2 border-teal-900">
-        {tabContent.map(toTabsContent)}
+        {tabContent.map((infoItem, index) => (
+          <Tabs.Content<T>
+            key={index}
+            value={infoItem.value}
+            className="bg-teal-600 p-4"
+          >
+            {infoItem.content}
+          </Tabs.Content>
+        ))}
       </div>
     </Tabs.Root>
   );
