@@ -39,11 +39,11 @@ type Props<T extends string> = {
   tabContent: readonly TabContentInfo<T>[];
 };
 
-const tabStyles = cva("font-bold p-4 pb-3 rounded-t-md", {
+const tabStyles = cva("font-bold p-4 pb-3 rounded-md min-h-[50px]", {
   variants: {
     selected: {
       true: "bg-teal-900 text-white",
-      false: "hover:bg-teal-900 hover:text-white",
+      false: "text-teal-900 hover:bg-teal-900 hover:text-white",
     },
   },
 });
@@ -61,7 +61,9 @@ export default function ControlsContainer<T extends string>({
 
     const fillContent =
       typeof content === "string" ? (
-        <div className="min-h-[24px]">{content}</div>
+        <div className="flex min-h-[24px] flex-col">
+          <span className="justify-self-center">{content}</span>
+        </div>
       ) : (
         content
       );
@@ -86,13 +88,13 @@ export default function ControlsContainer<T extends string>({
       className="min-w-[400px] self-stretch"
     >
       <Tabs.List<T>
-        className="flex gap-x-1 leading-none"
+        className="flex gap-x-1 px-4 leading-none"
         aria-label={ariaLabel}
       >
         {tabInfo.map(toTabsTrigger)}
       </Tabs.List>
 
-      <div className="mt-[-2px] h-full border-t-[3px] border-teal-900 bg-teal-600 p-4">
+      <div className="mt-2 h-full rounded-md bg-teal-600 p-4">
         {tabContent.map((infoItem, index) => (
           <Tabs.Content<T> key={index} value={infoItem.value}>
             {infoItem.content}
