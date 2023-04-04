@@ -1,11 +1,12 @@
 import { memo, useState } from "react";
 import {
   Character,
+  CharacterGroup,
   CharsGroupedByGame,
   GameOrigin,
 } from "@/typesConstants/gameData";
 
-import CharacterButton from "./CharacterButton";
+import CharacterPanel from "./CharacterPanel";
 import ControlsContainer, {
   TabInfo,
   TabContentInfo,
@@ -31,51 +32,33 @@ const tabInfo = [
   },
 ] as const satisfies readonly TabInfo<GameOrigin>[];
 
+function NoCharactersDisplay() {
+  return <div>No characters to display</div>;
+}
+
 function CharacterMenus({
   groupedCharacters,
   selectedCharacterId,
   onCharacterChange,
 }: Props) {
   const [selectedGame, setSelectedGame] = useState<GameOrigin>("eo1");
-  const gameGroup = groupedCharacters.get(selectedGame);
+  const selectedGroup = groupedCharacters.get(selectedGame);
 
-  // If there are no portraits to display by the time this component mounts, the
-  // entire app is basically useless; have to treat this case as show-stopping
-  if (!gameGroup) {
-    throw new Error(
-      `${CharacterMenus.name} - groupedCharacter prop had no value for key ${selectedGame}`
-    );
-  }
-
-  const currentGameUi = (
-    <div className="grid w-full grid-cols-2 gap-3 text-white">
-      {Array.from(gameGroup, (mapEntry, groupIndex) => {
-        const [className, charactersList] = mapEntry;
-        const classLabelName =
-          className.slice(0, 1).toUpperCase() +
-          className.slice(1).toLowerCase();
-
-        return (
-          <section key={groupIndex} className="rounded-md bg-teal-900 p-4">
-            <h2 className="text-xs font-semibold tracking-wider text-teal-50">
-              {className.toUpperCase()}
-            </h2>
-
-            <ol className="mt-2 flex w-full flex-row gap-x-2">
-              {charactersList.map((char, charIndex) => (
-                <li key={charIndex} className="flex-grow">
-                  <CharacterButton
-                    selected={char.id === selectedCharacterId}
-                    displayNumber={charIndex + 1}
-                    labelText={`Select ${classLabelName} ${charIndex + 1}`}
-                    onClick={() => onCharacterChange(char)}
-                  />
-                </li>
-              ))}
-            </ol>
-          </section>
-        );
-      })}
+  const selectedGameContent = (
+    <div className="grid w-full grid-cols-2 gap-3">
+      {selectedGroup === undefined || selectedGroup.size === 0 ? (
+        <NoCharactersDisplay />
+      ) : (
+        Array.from(selectedGroup, ([gameClass, characterList], groupIndex) => (
+          <CharacterPanel
+            key={groupIndex}
+            gameClass={gameClass}
+            characterList={characterList}
+            selectedCharacterId={selectedCharacterId}
+            onCharacterChange={onCharacterChange}
+          />
+        ))
+      )}
     </div>
   );
 
@@ -88,18 +71,18 @@ function CharacterMenus({
    * for every single render, no matter what. Doesn't matter that only one of
    * these pieces of content will be displayed at a time.
    */
-  const tabContent: TabContentInfo<GameOrigin>[] = [
+  const tabContent: readonly TabContentInfo<GameOrigin>[] = [
     {
       value: "eo1",
-      content: selectedGame === "eo1" ? currentGameUi : null,
+      content: selectedGame === "eo1" ? selectedGameContent : null,
     },
     {
       value: "eo2",
-      content: selectedGame === "eo2" ? currentGameUi : null,
+      content: selectedGame === "eo2" ? selectedGameContent : null,
     },
     {
       value: "eo3",
-      content: selectedGame === "eo3" ? currentGameUi : null,
+      content: selectedGame === "eo3" ? selectedGameContent : null,
     },
   ];
 
