@@ -3,7 +3,8 @@ import { ColorTuple, CharacterColors } from "./colors";
 export const gameOrigins = ["eo1", "eo2", "eo3"] as const;
 export type GameOrigin = (typeof gameOrigins)[number];
 
-export type CharsGroupedByGame = Map<GameOrigin, Map<string, Character[]>>;
+export type CharacterGroup = Map<string, Character[]>;
+export type CharsGroupedByGame = Map<GameOrigin, CharacterGroup>;
 
 export type SvgTuple = [svg1: string, svg2: string];
 
