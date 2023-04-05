@@ -66,31 +66,3 @@ export const tabIcons = {
     </svg>
   ),
 } as const satisfies Record<UiTab, JSX.Element>;
-
-/**
- * Information necessary for rendering all tabs via the ControlsContainer
- * component. By default, all of these will render unconditionally. To change
- * this, each item will need a "display" property added with a value of false.
- */
-export const baseTabInfo = [
-  {
-    value: "skin",
-    labelText: "Change skin color",
-    content: tabIcons.skin,
-  },
-  {
-    value: "hair",
-    labelText: "Change hair color",
-    content: tabIcons.hair,
-  },
-  {
-    value: "eyes",
-    labelText: "Change eye colors",
-    content: tabIcons.eyes,
-  },
-  {
-    value: "misc",
-    labelText: "Change colors for miscellaneous items",
-    content: tabIcons.misc,
-  },
-] as const satisfies readonly TabInfo<UiTab>[];

@@ -12,7 +12,7 @@
 import { useState } from "react";
 import { clamp } from "@/utils/math";
 import { UiTab } from "./localTypes";
-import { baseTabInfo } from "./localConstants";
+import { tabIcons } from "./localConstants";
 import {
   CharacterColors,
   ColorCategory,
@@ -21,7 +21,7 @@ import {
 
 import ColorPicker from "@/components/ColorPicker";
 import ControlsContainer, {
-  TabContentInfo,
+  TabInfoArray,
 } from "@/components/ControlsContainer";
 
 type ExternalProps = {
@@ -121,15 +121,12 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       ? "eyes"
       : activeCategory;
 
-  const fullTabInfo = baseTabInfo.map((info) => {
-    if (info.value !== "misc") return info;
-    return { ...info, display: colors.misc.length > 0 };
-  });
-
-  const contentInfo: TabContentInfo<UiTab>[] = [
+  const tabs: TabInfoArray<UiTab> = [
     {
       value: "skin",
-      content: (
+      tabText: "Skin",
+      tabIcon: tabIcons.skin,
+      tabView: (
         <fieldset>
           <button type="button" onClick={() => onCategoryIndexChange(0)}>
             Skin 1
@@ -148,11 +145,15 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
     },
     {
       value: "hair",
-      content: <p>Here's some hair!</p>,
+      tabText: "Hair",
+      tabIcon: tabIcons.hair,
+      tabView: <p>Here's some hair!</p>,
     },
     {
       value: "eyes",
-      content: (
+      tabText: "Eyes",
+      tabIcon: tabIcons.eyes,
+      tabView: (
         <fieldset>
           <button
             type="button"
@@ -220,15 +221,21 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
         </fieldset>
       ),
     },
+    {
+      visible: colors.misc.length > 0,
+      value: "misc",
+      tabText: "Misc",
+      accessibleTabLabel: "Miscellaneous Categories",
+      tabView: <p>You shouldn't be able to see this yet!</p>,
+    },
   ];
 
   return (
     <ControlsContainer<UiTab>
-      selectedValue={activeTab}
-      onValueChange={onTabChange}
-      ariaLabel="Select which part you want to customize"
-      tabInfo={fullTabInfo}
-      tabContent={contentInfo}
+      tabs={tabs}
+      selectedTabValue={activeTab}
+      onTabChange={onTabChange}
+      tabGroupLabel="Select which part you want to customize"
     />
   );
 }
