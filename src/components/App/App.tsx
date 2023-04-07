@@ -17,10 +17,10 @@ type MainProps = Omit<
 >;
 
 function MainContent({
+  selectedCharacter,
   colors,
   groupedCharacters,
   stateUpdaters,
-  selectedCharacter,
 }: MainProps) {
   const characterId = selectedCharacter?.id ?? "";
 
