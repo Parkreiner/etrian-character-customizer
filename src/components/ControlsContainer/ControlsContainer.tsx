@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import * as Tabs from "@/components/Tabs";
 import { cva } from "class-variance-authority";
+import TooltipTemplate from "../TooltipTemplate/TooltipTemplate";
 
 /**
  * An object describing one "tab" in the ControlsContainer component.
@@ -10,7 +11,7 @@ import { cva } from "class-variance-authority";
  * view.
  */
 export type TabInfo<T extends string> = {
-  /** Defaults to true if not specified */
+  /** If this is not specified, ControlsContainer defaults this to true */
   visible?: boolean;
 
   value: T;
@@ -23,11 +24,11 @@ export type TabInfo<T extends string> = {
 export type TabInfoArray<T extends string> = readonly TabInfo<T>[];
 
 const tabTriggerStyles = cva(
-  "font-bold p-4 pb-3 rounded-md min-h-[50px] flex items-center gap-x-1.5",
+  "font-bold p-4 pb-3 rounded-md min-h-[50px] flex items-center gap-x-1.5 text-sm",
   {
     variants: {
       selected: {
-        true: "bg-teal-900 text-white",
+        true: "bg-teal-900 text-teal-50",
         false: "text-teal-900 hover:bg-teal-900 hover:text-white",
       },
     },
@@ -48,15 +49,30 @@ export default function ControlsContainer<T extends string>({
   tabGroupLabel,
 }: Props<T>) {
   const toTabsTrigger = (tab: TabInfo<T>, index: number) => {
-    const { value, tabText, tabIcon, visible = true } = tab;
+    const { value, tabText, tabIcon, accessibleTabLabel, visible = true } = tab;
     const styles = tabTriggerStyles({ selected: selectedTabValue === value });
+
+    const tabContent = (
+      <div className={styles}>
+        {tabIcon !== undefined && <div>{tabIcon}</div>}
+        <div>{tabText}</div>
+      </div>
+    );
+
+    const labelUsable =
+      accessibleTabLabel !== undefined && accessibleTabLabel.length > 0;
 
     return (
       <Fragment key={index}>
         {visible && (
-          <Tabs.Trigger<T> value={value} className={styles}>
-            {tabIcon !== undefined && <div>{tabIcon}</div>}
-            <div>{tabText}</div>
+          <Tabs.Trigger<T> value={value}>
+            {labelUsable ? (
+              <TooltipTemplate labelText={accessibleTabLabel}>
+                {tabContent}
+              </TooltipTemplate>
+            ) : (
+              tabContent
+            )}
           </Tabs.Trigger>
         )}
       </Fragment>
