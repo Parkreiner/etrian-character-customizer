@@ -2,6 +2,8 @@ import { Character } from "@/typesConstants/gameData";
 import { ApiResponse } from "./useAppState";
 
 export async function mockFetchCharacters(url: string) {
+  console.log(`Provided URL: ${url}`);
+
   const baseCharacter: Omit<Character, "id"> = {
     game: "eo1",
     class: "protector",

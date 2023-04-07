@@ -7,7 +7,6 @@
  * color visible still, even when everything should be covered.
  */
 import TooltipTemplate from "@/components/TooltipTemplate";
-import * as Tooltip from "@radix-ui/react-tooltip";
 import { clsx } from "clsx";
 import { useId } from "react";
 
@@ -36,7 +35,7 @@ function DefaultTextLabel() {
     >
       <circle id={circleId} cx="50" cy="50" r="50" fill="none" />
       <text width="500">
-        <textPath color="white" alignment-baseline="top" href={circleId}>
+        <textPath color="white" alignmentBaseline="alphabetic" href={circleId}>
           Default
         </textPath>
       </text>

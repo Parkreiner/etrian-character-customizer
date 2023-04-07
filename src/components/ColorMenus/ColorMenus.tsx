@@ -147,7 +147,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       value: "hair",
       tabText: "Hair",
       tabIcon: tabIcons.hair,
-      tabView: <p>Here's some hair!</p>,
+      tabView: <p>Here&apos;s some hair!</p>,
     },
     {
       value: "eyes",
@@ -227,7 +227,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       tabText: "Misc.",
       tabIcon: tabIcons.misc,
       accessibleTabLabel: "Miscellaneous Categories",
-      tabView: <p>You shouldn't be able to see this yet!</p>,
+      tabView: <p>You shouldn&apos;t be able to see this yet!</p>,
     },
   ];
 

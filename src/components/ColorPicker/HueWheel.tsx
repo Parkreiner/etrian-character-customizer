@@ -20,6 +20,8 @@ export default function HueWheel({ hue, onHueChange }: Props) {
     const yVector = radius * Math.sin(hue);
     const xVector = radius * Math.cos(hue);
 
+    console.log({ xVector, yVector });
+
     const topOffset = NaN;
     const leftOffset = NaN;
 

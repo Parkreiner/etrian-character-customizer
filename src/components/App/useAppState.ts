@@ -118,7 +118,7 @@ export default function useAppState() {
 
   const { data } = useSwr<ApiResponse, Error>(
     CHARACTERS_ENDPOINT,
-    mockFetchCharacters,
+    mockFetchCharacters ?? fetchCharacters,
     {
       errorRetryCount: 3,
       onSuccess: (data) => {

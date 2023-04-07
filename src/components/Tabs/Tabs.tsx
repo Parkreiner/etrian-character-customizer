@@ -21,7 +21,7 @@ import type {
   TabsTriggerProps as RadixTriggerProps,
 } from "@radix-ui/react-tabs";
 
-type PatchProps<T extends string, Props extends {}> = {
+type PatchProps<T extends string, Props extends object> = {
   [key in keyof Props]: key extends "value"
     ? T
     : key extends "defaultValue"
