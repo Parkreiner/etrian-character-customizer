@@ -4,6 +4,10 @@ type Props = PropsWithChildren<{
   fallback?: JSX.Element;
 }>;
 
+type State = {
+  errored: boolean;
+};
+
 function DefaultFallback() {
   return (
     <section className="flex h-full w-full flex-col items-center justify-center">
@@ -19,10 +23,10 @@ function DefaultFallback() {
   );
 }
 
-export default class ErrorBoundary extends Component<Props> {
+export default class ErrorBoundary extends Component<Props, State> {
   state = { errored: false };
 
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(): Partial<State> {
     return { errored: true };
   }
 
@@ -35,7 +39,7 @@ export default class ErrorBoundary extends Component<Props> {
     const { errored } = this.state;
 
     if (!errored) {
-      return <>{children}</>;
+      return children;
     }
 
     return fallback ?? <DefaultFallback />;
