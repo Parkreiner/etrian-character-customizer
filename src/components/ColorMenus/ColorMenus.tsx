@@ -224,7 +224,8 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
     {
       visible: colors.misc.length > 0,
       value: "misc",
-      tabText: "Misc",
+      tabText: "Misc.",
+      tabIcon: tabIcons.misc,
       accessibleTabLabel: "Miscellaneous Categories",
       tabView: <p>You shouldn't be able to see this yet!</p>,
     },
