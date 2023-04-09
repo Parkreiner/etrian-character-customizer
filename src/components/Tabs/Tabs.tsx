@@ -13,13 +13,13 @@
  * JSX syntax. Even though the wrappers are needed for TypeScript, they should
  * still be as lightweight as possible. All forms of JSX would require
  * destructuring and cloning the props objects for every single render. But the
- * wrappers can safely for
- * these wrappers, they can safely let their  safely be passed along with no changes. Sadly, the
- * only way to do that is by wiring things up manually.
+ * wrappers can safely reuse the exact same props references without any
+ * changes. Sadly, the only way to do that is by wiring things up manually.
  *
- * @todo Still need to figure out how to pass a type parameter from a parent
- * Tabs component to a child Tabs component. From the docs, Root leads to either
- * List or Content, and List leads to Trigger
+ * @todo Still need to see if it's possible to make a type parameter from Root
+ * cascade down to any children. From the docs, Root's direct children will
+ * either be List or Content, while List's will only ever be Trigger. No other
+ * Radix children to worry about.
  */
 import { createElement } from "react";
 import * as RadixTabs from "@radix-ui/react-tabs";
