@@ -1,4 +1,3 @@
-import { useId } from "react";
 import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { cva } from "class-variance-authority";
 
@@ -28,24 +27,17 @@ export default function CharacterButton({
   labelText,
   onClick,
 }: Props) {
-  const hookId = useId();
-  const labelId = `${hookId}-label`;
-
   return (
-    <>
+    <button
+      type="button"
+      className={buttonStyles({ selected })}
+      onClick={onClick}
+      disabled={selected}
+    >
+      {displayNumber}
       <VisuallyHidden>
-        <span id={labelId}>{labelText}</span>
+        <span>({labelText})</span>
       </VisuallyHidden>
-
-      <button
-        type="button"
-        className={buttonStyles({ selected })}
-        onClick={onClick}
-        disabled={selected}
-        aria-labelledby={labelId}
-      >
-        {displayNumber}
-      </button>
-    </>
+    </button>
   );
 }
