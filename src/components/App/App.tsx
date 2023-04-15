@@ -25,7 +25,7 @@ function MainContent({
   const characterId = selectedCharacter?.id ?? "";
 
   return (
-    <div className="mx-auto flex h-full max-w-[1400px] items-center justify-center">
+    <div className="font-cool mx-auto flex h-full max-w-[1400px] items-center justify-center">
       <div className="flex max-h-[800px] flex-row items-center justify-center gap-x-10">
         <PortraitMenus
           selectedCharacterId={characterId}
