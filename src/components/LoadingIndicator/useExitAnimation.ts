@@ -30,7 +30,7 @@ export default function useExitAnimation(
     );
 
     return () => window.clearTimeout(animationCompletionId);
-  }, [appLoaded]);
+  }, [appLoaded, onAnimationCompletion]);
 
   return styles;
 }
