@@ -7,7 +7,7 @@
  * color visible still, even when everything should be covered.
  */
 import TooltipTemplate from "@/components/TooltipTemplate";
-import { clsx } from "clsx";
+import { cva } from "class-variance-authority";
 import { useId } from "react";
 
 type Props = {
@@ -21,7 +21,8 @@ type Props = {
 };
 
 /**
- * @todo Finish this implementation.
+ * @todo Finish this implementation. Need to figure out how to handle curving
+ * text via SVGs.
  */
 function DefaultTextLabel() {
   const hookId = useId();
@@ -43,6 +44,15 @@ function DefaultTextLabel() {
   );
 }
 
+const outerButtonOutlineStyles = cva("rounded-full bg-teal-700 p-[4px]", {
+  variants: {
+    selected: {
+      true: "bg-gradient-to-br from-orange-400 to-yellow-300",
+      false: "",
+    },
+  },
+});
+
 export default function ColorBubble({
   primaryHex,
   onClick,
@@ -57,12 +67,7 @@ export default function ColorBubble({
       <button className="relative" onClick={onClick}>
         {isDefault && <DefaultTextLabel />}
 
-        <div
-          className={clsx(
-            "rounded-full bg-teal-700 p-[4px]",
-            selected && "bg-gradient-to-br from-orange-400 to-yellow-300"
-          )}
-        >
+        <div className={outerButtonOutlineStyles({ selected })}>
           <div
             className="relative h-14 w-14 overflow-hidden rounded-full"
             style={{ backgroundColor: primaryHex }}
