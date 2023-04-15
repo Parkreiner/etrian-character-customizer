@@ -1,30 +1,41 @@
 /**
- * @file A basic loading indicator for the top-level app.
+ * @file The loading indicator for the top-level app.
+ *
+ * This component will play a special animation after the app loads its data,
+ * but before LoadingIndicator is unmounted.
+ *
+ * @todo The eventual plan is that, in the exit animation, the indicator will
+ * get covered with vines and vegetation right before it
  */
-import { useEffect, useState } from "react";
+
 import { range } from "@/utils/math";
+import { maxLoadingDots } from "./localConstants";
+import useDotCount from "./useDotCount";
+import useExitAnimation from "./useExitAnimation";
 
-const maxDots = 3;
-const dotRange = range(1, maxDots + 1);
+type Props = {
+  appLoaded: boolean;
+  onAnimationCompletion: () => void;
+};
 
-export default function LoadingIndicator() {
-  const [visibleDots, setVisibleDots] = useState(0);
+const dotRange = range(1, maxLoadingDots + 1);
 
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setVisibleDots((currentDots) => (currentDots + 1) % (maxDots + 1));
-    }, 500);
-
-    return () => window.clearInterval(intervalId);
-  }, []);
+export default function LoadingIndicator({
+  appLoaded,
+  onAnimationCompletion,
+}: Props) {
+  const animationStyles = useExitAnimation(appLoaded, onAnimationCompletion);
+  const visibleDots = useDotCount();
 
   return (
-    <div className="flex h-full flex-col items-center justify-center text-lg text-neutral-900">
-      <div className="mb-4 h-[200px] w-[200px] rounded-full bg-teal-700">
-        {/**
-         * @todo Add tree-like SVG here once I make one.
-         */}
-      </div>
+    <div
+      className="absolute z-50 flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-teal-100 to-teal-50 text-lg text-neutral-900"
+      style={animationStyles}
+    >
+      {/**
+       * @todo Replace div with tree-like SVG here once I design it.
+       */}
+      <div className="mb-4 h-[200px] w-[200px] rounded-full bg-teal-700" />
 
       <p className="pl-4">
         Loading
