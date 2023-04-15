@@ -5,7 +5,7 @@
  * but before LoadingIndicator is unmounted.
  *
  * @todo The eventual plan is that, in the exit animation, the indicator will
- * get covered with vines and vegetation right before it
+ * get covered with vines and vegetation right before it leaves the screen.
  */
 
 import { range } from "@/utils/math";
