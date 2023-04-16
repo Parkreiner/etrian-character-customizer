@@ -1,4 +1,4 @@
-import { useMemo, useReducer } from "react";
+import { useCallback, useMemo, useReducer } from "react";
 import useSwr from "swr";
 import { mockFetchCharacters } from "./appStateMocks";
 import { CharacterColors } from "@/typesConstants/colors";
@@ -145,22 +145,20 @@ export default function useAppState() {
     return groupCharacters(characters, classOrderings);
   }, [characters, classOrderings]);
 
-  const stateUpdaters = useMemo(() => {
-    return {
-      changeCharacter: (newCharacter: Character) => {
-        dispatch({
-          type: "characterChanged",
-          payload: { newCharacter },
-        });
-      },
+  const changeCharacter = useCallback((newCharacter: Character) => {
+    dispatch({ type: "characterChanged", payload: { newCharacter } });
+  }, []);
 
-      replaceColors: (newColors: CharacterColors) => {
-        dispatch({
-          type: "colorsReplaced",
-          payload: { newColors },
-        });
-      },
-    } as const;
+  const selectRandomCharacter = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * (characters?.length ?? 0));
+    const newCharacter = characters?.[randomIndex];
+
+    if (newCharacter === undefined) return;
+    dispatch({ type: "characterChanged", payload: { newCharacter } });
+  }, [characters]);
+
+  const replaceColors = useCallback((newColors: CharacterColors) => {
+    dispatch({ type: "colorsReplaced", payload: { newColors } });
   }, []);
 
   if (!state.initialized) {
@@ -181,6 +179,10 @@ export default function useAppState() {
     groupedCharacters,
     selectedCharacter,
     colors,
-    stateUpdaters,
+    stateUpdaters: {
+      changeCharacter,
+      selectRandomCharacter,
+      replaceColors,
+    },
   } as const;
 }
