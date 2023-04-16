@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 import { exitAnimationDurationMs } from "./localConstants";
 
 const initialStyles = {
-  transition: `all ${exitAnimationDurationMs}ms`,
+  transition: `all ${exitAnimationDurationMs}ms ease-in-out`,
   bottom: "0",
 } as const satisfies React.CSSProperties;
 
