@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-
-const maxLoadingDots = 3;
+import { maxLoadingDots } from "./localConstants";
 
 export default function useDotCount() {
   const [visibleDots, setVisibleDots] = useState(0);

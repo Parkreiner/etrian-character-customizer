@@ -24,12 +24,12 @@ export default function useExitAnimation(
     if (!appLoaded) return;
     setStyles((current) => ({ ...current, bottom: "100%" }));
 
-    const animationCompletionId = window.setTimeout(
+    const timeoutId = window.setTimeout(
       onAnimationCompletion,
       exitAnimationDurationMs
     );
 
-    return () => window.clearTimeout(animationCompletionId);
+    return () => window.clearTimeout(timeoutId);
   }, [appLoaded, onAnimationCompletion]);
 
   return styles;
