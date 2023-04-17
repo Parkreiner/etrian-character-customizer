@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Provider as TooltipProvider } from "@radix-ui/react-tooltip";
 import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
-import useAppState from "./useAppState";
+import useEditor from "./useEditor";
 import CharacterPreview from "@/components/CharacterPreview";
 import LoadingIndicator from "@/components/LoadingIndicator";
 import PortraitMenus from "@/components/CharacterMenus";
@@ -14,8 +14,8 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 
 function Main() {
   const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
-  const appState = useAppState();
-  const characterId = appState.selectedCharacter?.id ?? "";
+  const editorState = useEditor();
+  const characterId = editorState.selectedCharacter?.id ?? "";
 
   return (
     <div className="relative h-full bg-gradient-to-br from-teal-100 to-teal-50">
@@ -25,29 +25,29 @@ function Main() {
 
       {!introAnimationFinished && (
         <LoadingIndicator
-          appLoaded={appState.initialized}
+          appLoaded={editorState.initialized}
           onAnimationCompletion={() => setIntroAnimationFinished(true)}
         />
       )}
 
-      {appState.initialized && (
+      {editorState.initialized && (
         <div className="mx-auto flex h-full max-w-[1400px] items-center justify-center">
           <div className="flex max-h-[800px] flex-row items-center justify-center gap-x-10">
             <PortraitMenus
               selectedCharacterId={characterId}
-              groupedCharacters={appState.groupedCharacters}
-              onCharacterChange={appState.stateUpdaters.changeCharacter}
+              groupedCharacters={editorState.groupedCharacters}
+              onCharacterChange={editorState.stateUpdaters.changeCharacter}
             />
 
             <CharacterPreview
-              selectedCharacter={appState.selectedCharacter}
-              colors={appState.colors}
+              selectedCharacter={editorState.selectedCharacter}
+              colors={editorState.colors}
             />
 
             <ColorMenus
               characterKey={characterId}
-              colors={appState.colors}
-              onColorChange={appState.stateUpdaters.replaceColors}
+              colors={editorState.colors}
+              onColorChange={editorState.stateUpdaters.replaceColors}
             />
           </div>
         </div>

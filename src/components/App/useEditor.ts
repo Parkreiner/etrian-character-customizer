@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useReducer } from "react";
 import useSwr from "swr";
-import { mockFetchCharacters } from "./appStateMocks";
+import { mockFetchCharacters } from "./editorStateMocks";
 import { CharacterColors } from "@/typesConstants/colors";
 import {
   Character,
@@ -113,7 +113,7 @@ const initialClientState = {
   initialized: false,
 } as const satisfies ClientState;
 
-export default function useAppState() {
+export default function useEditor() {
   const [state, dispatch] = useReducer(reduceClientState, initialClientState);
 
   const { data } = useSwr<ApiResponse, Error>(

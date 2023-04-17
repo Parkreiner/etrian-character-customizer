@@ -1,5 +1,5 @@
 import { Character } from "@/typesConstants/gameData";
-import { ApiResponse } from "./useAppState";
+import { ApiResponse } from "./useEditor";
 
 export async function mockFetchCharacters(url: string) {
   console.log(`Provided URL: ${url}`);
