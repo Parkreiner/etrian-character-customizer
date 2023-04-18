@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import useEditor from "./useEditor";
 
 import CharacterPreview from "@/components/CharacterPreview";
 import LoadingIndicator from "@/components/LoadingIndicator";
 import CharacterMenus from "@/components/CharacterMenus";
 import ColorMenus from "@/components/ColorMenus";
+import EditorHeader from "./EditorHeader";
 
 export default function Editor() {
   const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
@@ -19,10 +19,6 @@ export default function Editor() {
 
   return (
     <div className="relative h-full">
-      <VisuallyHidden>
-        <h1>Etrian Odyssey Character Customizer</h1>
-      </VisuallyHidden>
-
       {!introAnimationFinished && (
         <LoadingIndicator
           appLoaded={editorController.initialized}
@@ -31,27 +27,33 @@ export default function Editor() {
       )}
 
       {editorController.initialized && (
-        <div className="mx-auto flex h-full max-w-[1400px] items-center justify-center">
-          <div className="flex max-h-[800px] flex-row items-center justify-center gap-x-10">
-            <CharacterMenus
-              selectedCharacterId={editorController.characters.selectedId}
-              groupedCharacters={editorController.characters.grouped}
-              onCharacterChange={editorController.stateUpdaters.changeCharacter}
-              randomizeCharacter={
-                editorController.stateUpdaters.selectRandomCharacter
-              }
-            />
+        <div className="flex h-full w-full flex-col gap-y-6">
+          <EditorHeader />
 
-            <CharacterPreview
-              selectedCharacter={selectedCharacter}
-              colors={editorController.colors}
-            />
+          <div className="mx-auto flex w-full max-w-[1400px] flex-grow items-center justify-center">
+            <div className="flex max-h-[800px] flex-row items-center justify-center gap-x-10">
+              <CharacterMenus
+                selectedCharacterId={editorController.characters.selectedId}
+                groupedCharacters={editorController.characters.grouped}
+                onCharacterChange={
+                  editorController.stateUpdaters.changeCharacter
+                }
+                randomizeCharacter={
+                  editorController.stateUpdaters.selectRandomCharacter
+                }
+              />
 
-            <ColorMenus
-              characterKey={editorController.characters.selectedId}
-              colors={editorController.colors}
-              onColorChange={editorController.stateUpdaters.replaceColors}
-            />
+              <CharacterPreview
+                selectedCharacter={selectedCharacter}
+                colors={editorController.colors}
+              />
+
+              <ColorMenus
+                characterKey={editorController.characters.selectedId}
+                colors={editorController.colors}
+                onColorChange={editorController.stateUpdaters.replaceColors}
+              />
+            </div>
           </div>
         </div>
       )}

@@ -6,9 +6,10 @@ type ButtonIntent = "primary" | "secondary";
 type ButtonSize = "small" | "medium" | "large";
 type OmittedBaseProps = "className" | "children";
 
+// Can't make onClick required because of RadixUI - it patches the onClick in
+// as part of its implementation
 type Props = Omit<ComponentPropsWithRef<"button">, OmittedBaseProps> & {
   children: string | number | React.ReactFragment;
-  onClick: () => void;
   intent: ButtonIntent;
   size?: ButtonSize;
 };
@@ -23,7 +24,7 @@ const buttonStyles = cva("flex flex-row", {
 
     size: {
       small: "gap-x-1 text-sm font-medium opacity-80",
-      medium: "gap-x-1.5 text-lg font-base",
+      medium: "gap-x-1.5 text-lg font-base font-medium opacity-80",
       large: "gap-x-3 text-xl font-medium",
     } satisfies Record<ButtonSize, string>,
   },
