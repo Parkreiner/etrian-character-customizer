@@ -29,13 +29,13 @@ export default function LoadingIndicator({
 
   return (
     <div
-      className="absolute z-50 flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-teal-100 to-teal-50 text-lg text-neutral-900"
+      className="absolute z-50 flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-teal-800 to-teal-900 text-lg text-teal-50"
       style={animationStyles}
     >
       {/**
        * @todo Replace div with tree-like SVG here once I design it.
        */}
-      <div className="mb-4 h-[200px] w-[200px] rounded-full bg-teal-700" />
+      <div className="mb-4 h-[200px] w-[200px] rounded-full bg-teal-100" />
 
       <p className="pl-4">
         Loading
