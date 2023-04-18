@@ -18,7 +18,7 @@ function Main() {
   const characterId = editor.selectedCharacter?.id ?? "";
 
   return (
-    <div className="relative h-full bg-gradient-to-br from-teal-100 to-teal-50">
+    <div className="relative h-full">
       <VisuallyHidden>
         <h1>Etrian Odyssey Character Customizer</h1>
       </VisuallyHidden>
@@ -58,7 +58,7 @@ function Main() {
 
 export default function App() {
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full bg-gradient-to-br from-teal-100 to-teal-50">
       <ErrorBoundary>
         <TooltipProvider delayDuration={500}>
           <Main />
