@@ -14,8 +14,8 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 
 function Main() {
   const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
-  const editorState = useEditor();
-  const characterId = editorState.selectedCharacter?.id ?? "";
+  const editor = useEditor();
+  const characterId = editor.selectedCharacter?.id ?? "";
 
   return (
     <div className="relative h-full bg-gradient-to-br from-teal-100 to-teal-50">
@@ -25,29 +25,29 @@ function Main() {
 
       {!introAnimationFinished && (
         <LoadingIndicator
-          appLoaded={editorState.initialized}
+          appLoaded={editor.initialized}
           onAnimationCompletion={() => setIntroAnimationFinished(true)}
         />
       )}
 
-      {editorState.initialized && (
+      {editor.initialized && (
         <div className="mx-auto flex h-full max-w-[1400px] items-center justify-center">
           <div className="flex max-h-[800px] flex-row items-center justify-center gap-x-10">
             <PortraitMenus
               selectedCharacterId={characterId}
-              groupedCharacters={editorState.groupedCharacters}
-              onCharacterChange={editorState.stateUpdaters.changeCharacter}
+              groupedCharacters={editor.groupedCharacters}
+              onCharacterChange={editor.stateUpdaters.changeCharacter}
             />
 
             <CharacterPreview
-              selectedCharacter={editorState.selectedCharacter}
-              colors={editorState.colors}
+              selectedCharacter={editor.selectedCharacter}
+              colors={editor.colors}
             />
 
             <ColorMenus
               characterKey={characterId}
-              colors={editorState.colors}
-              onColorChange={editorState.stateUpdaters.replaceColors}
+              colors={editor.colors}
+              onColorChange={editor.stateUpdaters.replaceColors}
             />
           </div>
         </div>
