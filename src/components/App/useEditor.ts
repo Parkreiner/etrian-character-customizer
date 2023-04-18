@@ -62,17 +62,21 @@ export default function useEditor() {
 
   const changeCharacter = useCallback(
     (newCharacter: Character) => {
-      dispatch({ type: "characterChanged", payload: { newCharacter } });
+      dispatch({ type: "characterPicked", payload: { newCharacter } });
     },
     [dispatch]
   );
 
   const selectRandomCharacter = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * (characters?.length ?? 0));
-    const newCharacter = characters?.[randomIndex];
+    if (characters === undefined) return;
+    const preferredIndex = Math.floor(
+      Math.random() * (characters?.length ?? 0)
+    );
 
-    if (newCharacter === undefined) return;
-    dispatch({ type: "characterChanged", payload: { newCharacter } });
+    dispatch({
+      type: "randomCharacterPicked",
+      payload: { characters, preferredIndex },
+    });
   }, [characters, dispatch]);
 
   const replaceColors = useCallback(

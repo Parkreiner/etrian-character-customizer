@@ -22,7 +22,7 @@ const buttonStyles = cva("flex flex-row", {
     } satisfies Record<ButtonIntent, string>,
 
     size: {
-      small: "gap-x-1 text-xs font-medium opacity-90",
+      small: "gap-x-1 text-sm font-medium opacity-80",
       medium: "gap-x-1.5 text-lg font-base",
       large: "gap-x-3 text-xl font-medium",
     } satisfies Record<ButtonSize, string>,

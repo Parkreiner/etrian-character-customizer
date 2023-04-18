@@ -37,6 +37,7 @@ function Main() {
               selectedCharacterId={characterId}
               groupedCharacters={editor.groupedCharacters}
               onCharacterChange={editor.stateUpdaters.changeCharacter}
+              randomizeCharacter={editor.stateUpdaters.selectRandomCharacter}
             />
 
             <CharacterPreview

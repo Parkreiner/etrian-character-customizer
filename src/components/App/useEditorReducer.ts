@@ -12,8 +12,12 @@ type EditorState =
 
 type EditorAction =
   | { type: "initialized"; payload: { startingCharacter: Character } }
-  | { type: "characterChanged"; payload: { newCharacter: Character } }
-  | { type: "colorsReplaced"; payload: { newColors: CharacterColors } };
+  | { type: "colorsReplaced"; payload: { newColors: CharacterColors } }
+  | { type: "characterPicked"; payload: { newCharacter: Character } }
+  | {
+      type: "randomCharacterPicked";
+      payload: { characters: readonly Character[]; preferredIndex: number };
+    };
 
 const initialEditorState = {
   initialized: false,
@@ -37,12 +41,37 @@ export function reduceEditorState(
   }
 
   switch (action.type) {
-    case "characterChanged": {
+    case "characterPicked": {
       const { newCharacter } = action.payload;
+      if (newCharacter.id === state.selectedCharacterId) return state;
+
       return {
         ...state,
         selectedCharacterId: newCharacter.id,
         colors: newCharacter.colors,
+      };
+    }
+
+    case "randomCharacterPicked": {
+      const { characters, preferredIndex } = action.payload;
+      if (characters.length < 2) return state;
+
+      let currentIndex = preferredIndex;
+      let currentCharacter = characters[currentIndex];
+
+      while (currentCharacter?.id === state.selectedCharacterId) {
+        currentIndex = (currentIndex + 1) % characters.length;
+        currentCharacter = characters[currentIndex];
+      }
+
+      if (currentCharacter === undefined) {
+        return state;
+      }
+
+      return {
+        ...state,
+        selectedCharacterId: currentCharacter.id,
+        colors: currentCharacter.colors,
       };
     }
 

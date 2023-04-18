@@ -9,11 +9,13 @@ import CharacterPanel from "./CharacterPanel";
 import ControlsContainer, {
   TabInfoArray,
 } from "@/components/ControlsContainer";
+import Button from "../Button/Button";
 
 type Props = {
   groupedCharacters: CharsGroupedByGame;
   selectedCharacterId: string;
   onCharacterChange: (newCharacter: Character) => void;
+  randomizeCharacter: () => void;
 };
 
 function NoCharactersDisplay() {
@@ -24,6 +26,7 @@ function CharacterMenus({
   groupedCharacters,
   selectedCharacterId,
   onCharacterChange,
+  randomizeCharacter,
 }: Props) {
   const [selectedGame, setSelectedGame] = useState<GameOrigin>("eo1");
   const selectedGroup = groupedCharacters.get(selectedGame);
@@ -77,12 +80,20 @@ function CharacterMenus({
   ];
 
   return (
-    <ControlsContainer<GameOrigin>
-      tabs={tabInfo}
-      selectedTabValue={selectedGame}
-      onTabChange={(newSelection) => setSelectedGame(newSelection)}
-      tabGroupLabel="Select a game"
-    />
+    <div>
+      <ControlsContainer<GameOrigin>
+        tabs={tabInfo}
+        selectedTabValue={selectedGame}
+        onTabChange={(newSelection) => setSelectedGame(newSelection)}
+        tabGroupLabel="Select a game"
+      />
+
+      <div className="mx-auto mt-2 max-w-fit">
+        <Button intent="secondary" size="small" onClick={randomizeCharacter}>
+          Click to randomize
+        </Button>
+      </div>
+    </div>
   );
 }
 
