@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useEditor from "./useEditor";
+import useEditorController from "./useEditorController";
 
 import CharacterPreview from "@/components/CharacterPreview";
 import LoadingIndicator from "@/components/LoadingIndicator";
@@ -9,11 +9,11 @@ import EditorHeader from "./EditorHeader";
 
 export default function Editor() {
   const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
-  const editorController = useEditor();
+  const editorController = useEditorController();
 
   const selectedCharacter = editorController.initialized
     ? editorController.characters.list.find(
-        (char) => char.id === editorController.characters.selectedId
+        (char) => char.id === editorController.editor.selectedId
       ) ?? null
     : null;
 
@@ -33,25 +33,23 @@ export default function Editor() {
           <div className="mx-auto flex w-full max-w-[1400px] flex-grow items-center justify-center">
             <div className="flex max-h-[800px] flex-row items-center justify-center gap-x-10">
               <CharacterMenus
-                selectedCharacterId={editorController.characters.selectedId}
+                selectedCharacterId={editorController.editor.selectedId}
                 groupedCharacters={editorController.characters.grouped}
-                onCharacterChange={
-                  editorController.stateUpdaters.changeCharacter
-                }
+                onCharacterChange={editorController.updaters.changeCharacter}
                 randomizeCharacter={
-                  editorController.stateUpdaters.selectRandomCharacter
+                  editorController.updaters.selectRandomCharacter
                 }
               />
 
               <CharacterPreview
                 selectedCharacter={selectedCharacter}
-                colors={editorController.colors}
+                colors={editorController.editor.colors}
               />
 
               <ColorMenus
-                characterKey={editorController.characters.selectedId}
-                colors={editorController.colors}
-                onColorChange={editorController.stateUpdaters.replaceColors}
+                characterKey={editorController.editor.selectedId}
+                colors={editorController.editor.colors}
+                onColorChange={editorController.updaters.replaceColors}
               />
             </div>
           </div>

@@ -151,8 +151,8 @@ export default function useEditor() {
 
   const { characters, classOrderings } = data ?? {};
 
-  const groupedCharacters = useMemo(() => {
-    if (!characters || !classOrderings) return null;
+  const grouped: CharsGroupedByGame = useMemo(() => {
+    if (!characters || !classOrderings) return new Map();
     return groupCharacters(characters, classOrderings);
   }, [characters, classOrderings]);
 
@@ -186,21 +186,20 @@ export default function useEditor() {
     return { initialized: false } as const;
   }
 
-  if (groupedCharacters === null) {
-    throw new Error("Grouped characters null even after initialization");
-  }
-
   return {
     initialized: true,
-    colors: state.colors,
+
+    editor: {
+      colors: state.colors,
+      selectedId: state.selectedCharacterId,
+    },
 
     characters: {
       list: data?.characters ?? [],
-      selectedId: state.selectedCharacterId,
-      grouped: groupedCharacters,
+      grouped: grouped,
     },
 
-    stateUpdaters: {
+    updaters: {
       changeCharacter,
       selectRandomCharacter,
       replaceColors,
