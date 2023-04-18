@@ -22,3 +22,8 @@ export type Character = {
   svgs: CharacterSvgs;
   colors: CharacterColors;
 };
+
+/**
+ * Organizes all classes for the editor by the order they're listed in-game.
+ */
+export type ClassOrderings = Record<GameOrigin, string[]>;

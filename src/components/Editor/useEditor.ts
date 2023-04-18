@@ -1,12 +1,23 @@
+/**
+ * @file Defines all logic for working with the character editor, which is
+ * effectively the entire app.
+ *
+ * This is a long custom hook, but it felt better to put all the related values
+ * and types in one file, rather than arbitrarily split them.
+ *
+ * The value returned is a discriminated union, which prevents you from
+ * accessing any of the properties until you prove to TypeScript that the editor
+ * has been initalized.
+ */
 import { useCallback, useMemo, useReducer } from "react";
-import useGameInfoFetch from "./useGameInfoFetch";
+import useGameInfoFetch from "@/hooks/useGameInfoFetch";
 
-import { ClassOrderings } from "./localTypes";
 import { CharacterColors } from "@/typesConstants/colors";
 import {
   Character,
   CharsGroupedByGame,
   gameOrigins,
+  ClassOrderings,
 } from "@/typesConstants/gameData";
 
 type EditorState =
@@ -179,16 +190,16 @@ export default function useEditor() {
     throw new Error("Grouped characters null even after initialization");
   }
 
-  const { selectedCharacterId, colors } = state;
-
-  const selectedCharacter =
-    characters?.find((char) => char.id === selectedCharacterId) ?? null;
-
   return {
     initialized: true,
-    groupedCharacters,
-    selectedCharacter,
-    colors,
+    colors: state.colors,
+
+    characters: {
+      list: data?.characters ?? [],
+      selectedId: state.selectedCharacterId,
+      grouped: groupedCharacters,
+    },
+
     stateUpdaters: {
       changeCharacter,
       selectRandomCharacter,

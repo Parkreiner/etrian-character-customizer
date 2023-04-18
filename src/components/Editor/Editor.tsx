@@ -10,7 +10,12 @@ import ColorMenus from "@/components/ColorMenus";
 export default function Editor() {
   const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
   const editorController = useEditor();
-  const characterId = editorController.selectedCharacter?.id ?? "";
+
+  const selectedCharacter = editorController.initialized
+    ? editorController.characters.list.find(
+        (char) => char.id === editorController.characters.selectedId
+      ) ?? null
+    : null;
 
   return (
     <div className="relative h-full">
@@ -29,8 +34,8 @@ export default function Editor() {
         <div className="mx-auto flex h-full max-w-[1400px] items-center justify-center">
           <div className="flex max-h-[800px] flex-row items-center justify-center gap-x-10">
             <CharacterMenus
-              selectedCharacterId={characterId}
-              groupedCharacters={editorController.groupedCharacters}
+              selectedCharacterId={editorController.characters.selectedId}
+              groupedCharacters={editorController.characters.grouped}
               onCharacterChange={editorController.stateUpdaters.changeCharacter}
               randomizeCharacter={
                 editorController.stateUpdaters.selectRandomCharacter
@@ -38,12 +43,12 @@ export default function Editor() {
             />
 
             <CharacterPreview
-              selectedCharacter={editorController.selectedCharacter}
+              selectedCharacter={selectedCharacter}
               colors={editorController.colors}
             />
 
             <ColorMenus
-              characterKey={characterId}
+              characterKey={editorController.characters.selectedId}
               colors={editorController.colors}
               onColorChange={editorController.stateUpdaters.replaceColors}
             />
