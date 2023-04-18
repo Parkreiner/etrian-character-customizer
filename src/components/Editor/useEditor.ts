@@ -3,7 +3,6 @@ import useGameInfoFetch from "./useGameInfoFetch";
 
 import { ClassOrderings } from "./localTypes";
 import { CharacterColors } from "@/typesConstants/colors";
-
 import {
   Character,
   CharsGroupedByGame,
