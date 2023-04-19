@@ -1,6 +1,6 @@
 import { Fragment } from "react";
-import * as Tabs from "@/components/Tabs";
 import { cva } from "class-variance-authority";
+import * as Tabs from "@/components/Tabs";
 import TooltipTemplate from "@/components/TooltipTemplate";
 
 /**
@@ -92,12 +92,16 @@ export default function ControlsContainer<T extends string>({
         {tabs.map(toTabsTrigger)}
       </Tabs.List>
 
-      <div className="mt-2 h-full rounded-md bg-teal-600 p-4">
-        {tabs.map((tab, index) => (
-          <Tabs.Content<T> key={index} value={tab.value}>
-            {tab.tabView}
-          </Tabs.Content>
-        ))}
+      <div className="mt-2 h-96">
+        <div className="h-full overflow-y-hidden rounded-md bg-teal-600 p-4">
+          <div className="h-full overflow-y-auto">
+            {tabs.map((tab, index) => (
+              <Tabs.Content<T> key={index} value={tab.value}>
+                {tab.tabView}
+              </Tabs.Content>
+            ))}
+          </div>
+        </div>
       </div>
     </Tabs.Root>
   );
