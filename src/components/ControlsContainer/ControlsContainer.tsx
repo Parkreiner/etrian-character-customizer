@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import * as Tabs from "@/components/Tabs";
 import { cva } from "class-variance-authority";
-import TooltipTemplate from "../TooltipTemplate/TooltipTemplate";
+import TooltipTemplate from "@/components/TooltipTemplate";
 
 /**
  * An object describing one "tab" in the ControlsContainer component.

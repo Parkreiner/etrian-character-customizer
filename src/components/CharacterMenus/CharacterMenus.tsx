@@ -6,10 +6,10 @@ import {
 } from "@/typesConstants/gameData";
 
 import CharacterPanel from "./CharacterPanel";
+import Button from "@/components/Button";
 import ControlsContainer, {
   TabInfoArray,
 } from "@/components/ControlsContainer";
-import Button from "../Button/Button";
 
 type Props = {
   groupedCharacters: CharsGroupedByGame;

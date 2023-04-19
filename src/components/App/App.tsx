@@ -1,6 +1,6 @@
 import { Provider as TooltipProvider } from "@radix-ui/react-tooltip";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import Editor from "../Editor/Editor";
+import Editor from "@/components/Editor";
 
 export default function App() {
   return (
