@@ -8,8 +8,8 @@ import ColorMenus from "@/components/ColorMenus";
 import EditorHeader from "./EditorHeader";
 
 export default function Editor() {
-  const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
   const editorController = useEditorController();
+  const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
 
   const selectedCharacter = editorController.initialized
     ? editorController.characters.list.find(
@@ -34,10 +34,10 @@ export default function Editor() {
             <div className="flex max-h-[800px] flex-row items-center justify-center gap-x-10">
               <CharacterMenus
                 selectedCharacterId={editorController.editor.selectedId}
-                groupedCharacters={editorController.characters.grouped}
-                onCharacterChange={editorController.updaters.changeCharacter}
+                groupedCharacters={editorController.characters.groupedByGame}
+                onCharacterChange={editorController.editor.changeCharacter}
                 randomizeCharacter={
-                  editorController.updaters.selectRandomCharacter
+                  editorController.editor.selectRandomCharacter
                 }
               />
 
@@ -49,7 +49,7 @@ export default function Editor() {
               <ColorMenus
                 characterKey={editorController.editor.selectedId}
                 colors={editorController.editor.colors}
-                onColorChange={editorController.updaters.replaceColors}
+                onColorChange={editorController.editor.replaceColors}
               />
             </div>
           </div>

@@ -151,7 +151,7 @@ export default function useEditor() {
 
   const { characters, classOrderings } = data ?? {};
 
-  const grouped: CharsGroupedByGame = useMemo(() => {
+  const groupedByGame: CharsGroupedByGame = useMemo(() => {
     if (!characters || !classOrderings) return new Map();
     return groupCharacters(characters, classOrderings);
   }, [characters, classOrderings]);
@@ -187,19 +187,30 @@ export default function useEditor() {
   }
 
   return {
+    /**
+     * Inidicates whether the rest of the editor has been initialized.
+     *
+     * Set up as a discriminated union; if initialized is true, everything else
+     * will be guaranteed to exist at the type level.
+     */
     initialized: true,
 
+    /**
+     * Represents state for character data loaded from the server. Available in
+     * different formats, depending on your needs. Values are read-only.
+     */
+    characters: {
+      list: data?.characters ?? [],
+      groupedByGame,
+    },
+
+    /**
+     * State specific to the editor. Values are read/write, but values can only
+     * be updated in prescribed ways.
+     */
     editor: {
       colors: state.colors,
       selectedId: state.selectedCharacterId,
-    },
-
-    characters: {
-      list: data?.characters ?? [],
-      grouped: grouped,
-    },
-
-    updaters: {
       changeCharacter,
       selectRandomCharacter,
       replaceColors,
