@@ -29,7 +29,7 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
   const displayedId = selectedCharacter?.id ?? "Unknown";
 
   return (
-    <div className="flex flex-grow flex-col flex-nowrap justify-center self-stretch rounded-md border-2 border-black p-6">
+    <div className="flex flex-grow flex-col flex-nowrap justify-center self-stretch p-6">
       <p>
         Class: {characterClass}
         <br />

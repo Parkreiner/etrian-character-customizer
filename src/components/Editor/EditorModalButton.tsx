@@ -26,13 +26,18 @@ export default function EditorModalButton({
         <Dialog.Overlay className="fixed top-0 left-0 h-full w-full backdrop-blur-sm" />
 
         <div className="fixed top-0 left-0 flex h-full w-full items-center justify-center">
-          <Dialog.Content className="relative w-full max-w-prose rounded-md bg-white p-6 shadow-md">
-            <Dialog.Title>{modalTitle}</Dialog.Title>
-            <Dialog.Description>{modalDescription}</Dialog.Description>
+          <Dialog.Content className="relative min-h-[400px] w-full max-w-prose rounded-md bg-white p-10 shadow-md">
+            <Dialog.Title className="text-2xl font-bold">
+              {modalTitle}
+            </Dialog.Title>
+
+            <Dialog.Description className="mb-4 border-b-2 border-black pb-1 italic opacity-80">
+              {modalDescription}
+            </Dialog.Description>
 
             <div>{children}</div>
 
-            <Dialog.Close className="absolute right-6 top-6">
+            <Dialog.Close className="absolute right-10 top-10">
               <button type="button" aria-label="Close modal">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
