@@ -33,7 +33,7 @@ const colorsForProtectors: readonly CharacterColors[] = [
   },
   {
     skin: ["#fffde4", "#cf9280"],
-    hair: ["#fae4a3", "#f8d79a"],
+    hair: ["#fae4a3", "#dd6f56"],
     leftEye: ["#b5b6ee", "#5a57bd"],
     rightEye: ["#b5b6ee", "#5a57bd"],
     misc: [],
