@@ -11,12 +11,6 @@ export default function Editor() {
   const editorController = useEditorController();
   const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
 
-  const selectedCharacter = editorController.initialized
-    ? editorController.characters.list.find(
-        (char) => char.id === editorController.editor.selectedId
-      ) ?? null
-    : null;
-
   return (
     <div className="relative h-full">
       {!introAnimationFinished && (
@@ -42,7 +36,8 @@ export default function Editor() {
               />
 
               <CharacterPreview
-                selectedCharacter={selectedCharacter}
+                selectedCharacterId={editorController.editor.selectedId}
+                characters={editorController.characters.list}
                 colors={editorController.editor.colors}
               />
 

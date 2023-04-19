@@ -1,39 +1,40 @@
 import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
-import { PropsWithChildren } from "react";
+import Button from "@/components/Button";
+import DebugSquare from "./DebugSquare";
 
 type Props = {
-  selectedCharacter: Character | null;
+  selectedCharacterId: string;
   colors: CharacterColors;
+  characters: readonly Character[];
 };
 
-type DebugSquareProps = PropsWithChildren<{
-  color: string;
-}>;
+async function downloadCharacter(
+  characterId: string,
+  colors: Character["colors"]
+) {
+  const inputPreview =
+    `Character ID: ${characterId}\n\n` + JSON.stringify(colors, null, 2);
 
-function DebugSquare({ color, children }: DebugSquareProps) {
-  return (
-    <div
-      className="flex min-h-[100px] flex-grow basis-[100px] items-center justify-center rounded-md border-2 border-black"
-      style={{ backgroundColor: color }}
-    >
-      <div className="rounded-md bg-black px-2 py-1 text-sm font-semibold text-white">
-        {children}
-      </div>
-    </div>
-  );
+  window.alert(inputPreview);
 }
 
-export default function CharacterPreview({ selectedCharacter, colors }: Props) {
+export default function CharacterPreview({
+  selectedCharacterId,
+  colors,
+  characters,
+}: Props) {
+  const selectedCharacter =
+    characters.find((char) => char.id === selectedCharacterId) ?? null;
+
   const characterClass = selectedCharacter?.class ?? "Unknown";
-  const displayedId = selectedCharacter?.id ?? "Unknown";
 
   return (
     <div className="flex flex-grow flex-col flex-nowrap justify-center self-stretch p-6">
       <p>
         Class: {characterClass}
         <br />
-        ID: {displayedId}
+        ID: {selectedCharacterId}
       </p>
 
       <div className="my-4 flex flex-row flex-wrap gap-4 justify-self-center">
@@ -54,6 +55,21 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
             Misc {index + 1}
           </DebugSquare>
         ))}
+      </div>
+
+      <div className="mx-auto max-w-fit pt-6">
+        <Button
+          intent="primary"
+          size="large"
+          disabled={selectedCharacter === null}
+          onClick={() => {
+            if (selectedCharacter !== null) {
+              downloadCharacter(selectedCharacterId, colors);
+            }
+          }}
+        >
+          Download
+        </Button>
       </div>
     </div>
   );
