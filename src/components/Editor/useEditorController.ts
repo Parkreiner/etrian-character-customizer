@@ -25,7 +25,7 @@ type EditorState =
   | {
       initialized: true;
       selectedCharacterId: Character["id"];
-      colors: Character["colors"];
+      colors: CharacterColors;
     };
 
 type EditorAction =

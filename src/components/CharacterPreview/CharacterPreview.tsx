@@ -9,10 +9,7 @@ type Props = {
   characters: readonly Character[];
 };
 
-async function downloadCharacter(
-  characterId: string,
-  colors: Character["colors"]
-) {
+async function downloadCharacter(characterId: string, colors: CharacterColors) {
   const inputPreview =
     `Character ID: ${characterId}\n\n` + JSON.stringify(colors, null, 2);
 
@@ -27,16 +24,8 @@ export default function CharacterPreview({
   const selectedCharacter =
     characters.find((char) => char.id === selectedCharacterId) ?? null;
 
-  const characterClass = selectedCharacter?.class ?? "Unknown";
-
   return (
     <div className="flex flex-grow flex-col flex-nowrap justify-center self-stretch p-6">
-      <p>
-        Class: {characterClass}
-        <br />
-        ID: {selectedCharacterId}
-      </p>
-
       <div className="my-4 flex flex-row flex-wrap gap-4 justify-self-center">
         <DebugSquare color={colors.skin[0]}>Skin 1</DebugSquare>
         <DebugSquare color={colors.skin[1]}>Skin 2</DebugSquare>

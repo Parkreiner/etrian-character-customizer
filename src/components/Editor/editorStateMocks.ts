@@ -1,5 +1,6 @@
 import { Character, ClassOrderings } from "@/typesConstants/gameData";
 import { ApiResponse } from "@/hooks/useGameInfoFetch";
+import { CharacterColors } from "@/typesConstants/colors";
 
 const baseCharacter: Omit<Character, "id" | "colors"> = {
   game: "eo1",
@@ -15,7 +16,7 @@ const baseCharacter: Omit<Character, "id" | "colors"> = {
   },
 };
 
-const colorsForProtectors: readonly Character["colors"][] = [
+const colorsForProtectors: readonly CharacterColors[] = [
   {
     skin: ["#f4dac5", "#cb988f"],
     hair: ["#da7c48", "#814246"],
@@ -106,7 +107,7 @@ export async function mockFetchCharacters(url: string) {
       return {
         ...baseCharacter,
         id: String(num),
-        colors: colorsForProtectors[num - 1] as Character["colors"],
+        colors: colorsForProtectors[num - 1] as CharacterColors,
       };
     }),
   };
