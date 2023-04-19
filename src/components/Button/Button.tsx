@@ -18,16 +18,20 @@ const buttonStyles = cva("flex flex-row", {
   variants: {
     intent: {
       primary:
-        "text-white bg-teal-900 hover:bg-teal-700 px-7 py-3 rounded-full shadow-md transition-colors",
+        "text-teal-50 bg-teal-800 px-7 py-3 rounded-full shadow-md transition-colors font-bold",
       secondary: "text-black hover:underline",
     } satisfies Record<ButtonIntent, string>,
 
     size: {
-      small: "gap-x-1 text-sm font-medium opacity-80",
-      medium: "gap-x-1.5 text-lg font-base font-medium opacity-80",
+      small: "gap-x-1 text-sm font-medium",
+      medium: "gap-x-1.5 text-lg font-base font-medium",
       large: "gap-x-3 text-xl font-medium",
     } satisfies Record<ButtonSize, string>,
   },
+
+  compoundVariants: [
+    { intent: "secondary", size: ["medium", "small"], class: "opacity-80" },
+  ],
 });
 
 /** Defaults to medium size if size is not specified. */
