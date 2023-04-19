@@ -32,9 +32,10 @@
     // Vite adds React imports to TSX files automatically
     "react/react-in-jsx-scope": "off",
 
-    // Using pass-through index.ts files for all top-level components;
-    // TypeScript will be able to detect true failed imports
-    "import/export": "off"
+    // Using pass-through index.ts files for all top-level components; in many
+    // cases, the index.ts files will be exporting things that don't exist,
+    // which is intentional.
+    "import/export": "warn"
   },
 
   "settings": {
