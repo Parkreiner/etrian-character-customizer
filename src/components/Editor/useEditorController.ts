@@ -133,23 +133,23 @@ function groupCharacters(
 
 export default function useEditor() {
   const [state, dispatch] = useReducer(reduceEditorState, initialEditorState);
-
-  const { data } = useGameInfoFetch((response) => {
-    const startingCharacter =
-      response.characters.find((char) => char.class === "protector") ??
-      response.characters[0];
-
-    if (!startingCharacter) {
-      return;
-    }
-
-    dispatch({
-      type: "initialized",
-      payload: { startingCharacter },
-    });
-  });
-
+  const { data } = useGameInfoFetch();
   const { characters, classOrderings } = data ?? {};
+
+  // Nasty-looking state sync, but it's necessary to make sure Editor doesn't
+  // fall victim to singleton behavior. Do not replace with useEffect
+  if (!state.initialized && data !== undefined) {
+    const startingCharacter =
+      data.characters.find((char) => char.class === "protector") ??
+      data.characters[0];
+
+    if (startingCharacter) {
+      dispatch({
+        type: "initialized",
+        payload: { startingCharacter },
+      });
+    }
+  }
 
   const groupedByGame: CharsGroupedByGame = useMemo(() => {
     if (!characters || !classOrderings) return new Map();

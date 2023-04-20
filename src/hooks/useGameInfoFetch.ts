@@ -21,12 +21,10 @@ async function fetchCharacters(url: string) {
   return response.json() as Promise<ApiResponse>;
 }
 
-type OnSuccessCallback = (data: ApiResponse) => void;
-
-export default function useCharacterFetch(onSuccess?: OnSuccessCallback) {
+export default function useCharacterFetch() {
   return useSwr<ApiResponse, Error>(
     CHARACTERS_ENDPOINT,
     mockFetchCharacters ?? fetchCharacters,
-    { onSuccess, errorRetryCount: 3 }
+    { errorRetryCount: 3 }
   );
 }
