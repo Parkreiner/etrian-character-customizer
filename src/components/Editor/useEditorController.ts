@@ -156,31 +156,23 @@ export default function useEditor() {
     return groupCharacters(characters, classOrderings);
   }, [characters, classOrderings]);
 
-  const changeCharacter = useCallback(
-    (newCharacter: Character) => {
-      dispatch({ type: "characterPicked", payload: { newCharacter } });
-    },
-    [dispatch]
-  );
+  const changeCharacter = useCallback((newCharacter: Character) => {
+    dispatch({ type: "characterPicked", payload: { newCharacter } });
+  }, []);
 
   const selectRandomCharacter = useCallback(() => {
     if (characters === undefined) return;
-    const preferredIndex = Math.floor(
-      Math.random() * (characters?.length ?? 0)
-    );
+    const preferredIndex = Math.floor(Math.random() * characters.length);
 
     dispatch({
       type: "randomCharacterPicked",
       payload: { characters, preferredIndex },
     });
-  }, [characters, dispatch]);
+  }, [characters]);
 
-  const replaceColors = useCallback(
-    (newColors: CharacterColors) => {
-      dispatch({ type: "colorsReplaced", payload: { newColors } });
-    },
-    [dispatch]
-  );
+  const replaceColors = useCallback((newColors: CharacterColors) => {
+    dispatch({ type: "colorsReplaced", payload: { newColors } });
+  }, []);
 
   if (!state.initialized) {
     return { initialized: false } as const;
