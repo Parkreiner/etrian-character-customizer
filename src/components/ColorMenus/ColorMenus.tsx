@@ -243,9 +243,8 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
   );
 }
 
-export default function RemountOnKeyChange({
-  characterKey,
-  ...delegated
-}: ExternalProps) {
-  return <ColorMenusCore key={characterKey} {...delegated} />;
+export default function ColorMenus(props: ExternalProps) {
+  // All of ColorMenusCore will remount on key change; it's the fastest and
+  // most fool-proof way to get the state synced up after a character changes
+  return <ColorMenusCore key={props.characterKey} {...props} />;
 }
