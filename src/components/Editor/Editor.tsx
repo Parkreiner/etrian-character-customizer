@@ -12,7 +12,7 @@ export default function Editor() {
   const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
 
   return (
-    <div className="relative h-full">
+    <div className="h-full">
       {!introAnimationFinished && (
         <LoadingIndicator
           appLoaded={editorController.initialized}
