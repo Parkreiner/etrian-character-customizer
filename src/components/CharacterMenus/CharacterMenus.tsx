@@ -61,7 +61,7 @@ function CharacterMenus({
       value: game,
       tabText: (
         <abbr title={nameAliases[game]} className="no-underline">
-          {game}
+          {game.toUpperCase()}
         </abbr>
       ),
       tabView: selectedGame === game ? selectedGameContent : null,
