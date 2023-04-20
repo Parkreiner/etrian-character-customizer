@@ -3,6 +3,7 @@ import {
   Character,
   CharsGroupedByGame,
   GameOrigin,
+  gameOrigins,
 } from "@/typesConstants/gameData";
 
 import CharacterPanel from "./CharacterPanel";
@@ -55,47 +56,18 @@ function CharacterMenus({
     </div>
   );
 
-  /**
-   * Not the biggest fan of how the main content is defined for each item, but
-   * there's only so much you can do when working with the API of Radix's Tabs.
-   *
-   * Radix handles the conditional rendering for you, but as part of that, it
-   * expects you to provide it some kind of content value for each tab you add,
-   * for every single render, no matter what. Doesn't matter that only one of
-   * these pieces of content will be displayed at a time.
-   */
-  const tabInfo: TabInfoArray<GameOrigin> = [
-    {
-      value: "eo1",
+  const tabInfo: TabInfoArray<GameOrigin> = gameOrigins.map((game) => {
+    return {
+      value: game,
       tabText: (
-        <abbr title={nameAliases.eo1} className="no-underline">
-          EO1
+        <abbr title={nameAliases[game]} className="no-underline">
+          {game}
         </abbr>
       ),
-      tabView: selectedGame === "eo1" ? selectedGameContent : null,
-      accessibleTabLabel: nameAliases.eo1,
-    },
-    {
-      value: "eo2",
-      tabText: (
-        <abbr title={nameAliases.eo2} className="no-underline">
-          EO2
-        </abbr>
-      ),
-      tabView: selectedGame === "eo2" ? selectedGameContent : null,
-      accessibleTabLabel: nameAliases.eo2,
-    },
-    {
-      value: "eo3",
-      tabText: (
-        <abbr title={nameAliases.eo3} className="no-underline">
-          EO3
-        </abbr>
-      ),
-      tabView: selectedGame === "eo3" ? selectedGameContent : null,
-      accessibleTabLabel: nameAliases.eo3,
-    },
-  ];
+      tabView: selectedGame === game ? selectedGameContent : null,
+      accessibleTabLabel: nameAliases[game],
+    };
+  });
 
   return (
     <fieldset>
