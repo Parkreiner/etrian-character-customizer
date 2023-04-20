@@ -4,20 +4,46 @@ A character portrait generator for the PC releases of the first three Etrian Ody
 
 The games will be releasing in North America on June 1, 2023.
 
-## What is this really?
+## Why?
 
-Starting with 2016's Etrian Odyssey V and continuing with 2018's Etrian Odyssey Nexus, players have been able to customize their characters' appearances – their skin color, their eye color(s), and their hair color. This has been a welcome feature.
+Starting with 2016's Etrian Odyssey V and continuing with 2018's Etrian Odyssey Nexus, players have been able to customize their characters' appearances – their skin color, their eye color(s), and their hair color. The feature has been well-received by fans worldwide.
 
-However, the older games, while being remade for modern hardware, are not back-porting these features. This is a shame, because (1) people like customization, and (2) there's not a lot of racial diversity in the first few games' portraits.
+However, the games being remade for the new collection (which originally came out between 2007-2010 for the Nintendo DS) are not having this feature back-ported. That's a shame, because (1) people like customization options, and (2) there's not a lot of racial diversity in the first few games' portraits.
 
-Modders are inevitably going to hack the game to let players use custom portraits, so why not give people a tool that lets them customize their character portraits exactly how they want?
+Modders are inevitably going to hack the game to let players use any images they want, so why not give people a tool that lets them customize the official character portraits exactly how they want?
+
+I'm also using it as a way to get back to my roots and practice parts of software development I haven't had as many chances to practice professionally before now. I'm just building a production-ready full-stack application from scratch (or as close as I can get without being irresponsible).
 
 ## Current plan/roadmap
 
-1. Get the core client code done by the end of the end of April. Sometime during this period, get automated testing set up.
-2. Spend May fine-tuning the client code and also taking care of servers/databases/deployment.
-3. When the came comes out and people inevitably get the portraits ripped on day 1, start converting them into SVG vectors + transparent PNGs via Photoshop and Illustrator. The PNGS will be the portraits with all skin/eye/hair color made transparent, while the SVGS will be stored in the database, and rendered on the client via plain HTML. The image editing will be the most time-consuming part, by far
-4. Getting every single portrait converted is going to take a long time, but I'm hoping to get the more popular characters ready to go by the end of June, and then keep adding more in over time.
+Aiming for a mid-June release.
+
+1. Get a full, working prototype done by mid-May at the latest.
+2. Spend the rest of May fine-tuning the client code and also taking care of servers/databases/automated deployment.
+3. When the game comes out and people inevitably get the portraits ripped on day 1, start converting them into SVG vectors + transparent PNGs via Photoshop and Illustrator.
+4. Once all the portraits created specifically for the remake have been converted (42 total, including DLC), focus on polishing the project.
+
+Manually editing the images is going to be the most-time consuming part by far. There should be 222 portraits to edit:
+
+1. EO1
+
+   - 36 portraits from the original game
+   - 9 portraits created for the remake
+   - 2 DLC portraits
+
+2. EO2
+
+   - 48 portraits from the original game
+   - 3 portraits created for the remake (excluding portraits shared with EO1)
+   - 2 DLC portraits
+
+3. EO3
+
+   - 96 portraits from the original game (each character has two variants)
+   - 24 portraits created for the remake
+   - 2 DLC portraits
+
+I can't make a guarantee that I'll ever do all of them, but I'm also happy to accept any help with this process specifically.
 
 ## Tech Stack
 
@@ -30,6 +56,6 @@ This project will be built with:
 
 ## Other notes
 
-- Aside from Radix and useSWR, all the React code is being built from scratch. Accessibility is really hard to do right, and I don't trust myself to cover every use case, so some kind of accessibility library feels non-negotiable. useSWR could probably be removed in favor of manual data fetching, but it makes caching and retrying a lot easier. That will only be considered towards the end of the project.
-- Radix only works with React, so it'll be harder to switch off to other frameworks, including Preact (Radix makes no guarantees for compatibility). I'm trying to get the final app bundle size as small as possible, but hitting accessibility compliance might limit how much I can do that. Still going to see if I can get under 100kb, though.
-- I'm trying to see how far I can get without using stores or even context whatsoever. I'm just using useState and useReducer, along with super explicit component relationships and some rendering trickery. There's only one useEffect in the codebase so far (for the loading indicator), and I'm going to do my best to keep it that way.
+- Going to be doing my best to get well below 100kb for the client bundle size. The only problem is that accessibility is non-negotiable for me, and I don't trust myself to get it right out without a library. Radix only works with React, so it'll be harder to switch off to other frameworks, including Preact (Radix makes no guarantees for compatibility).
+- The prototype is currently using SWR, but that might need to be swapped for React Query, depending on how hard it is to get useSWR integrated with the raw tRPC client library. I don't need most of React Query's features, and prefer SWR's smaller size.
+- Deliberately trying to minimize the number of useEffect calls I have to write. As of 4/19/2023, there are only two, and they're both for handling animation in LoadingIndicator.
