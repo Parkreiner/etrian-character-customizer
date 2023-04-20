@@ -131,7 +131,7 @@ function groupCharacters(
   return grouped;
 }
 
-export default function useEditor() {
+export default function useEditorController() {
   const [state, dispatch] = useReducer(reduceEditorState, initialEditorState);
   const { data } = useGameInfoFetch();
   const { characters, classOrderings } = data ?? {};

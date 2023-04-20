@@ -22,6 +22,12 @@ function NoCharactersDisplay() {
   return <div>No characters to display</div>;
 }
 
+const nameAliases = {
+  eo1: "Etrian Odyssey",
+  eo2: "Etrian Odyssey II: Heroes of Lagaard",
+  eo3: "Etrian Odyssey III: The Drowned City",
+} as const satisfies Record<GameOrigin, string>;
+
 function CharacterMenus({
   groupedCharacters,
   selectedCharacterId,
@@ -61,26 +67,38 @@ function CharacterMenus({
   const tabInfo: TabInfoArray<GameOrigin> = [
     {
       value: "eo1",
-      tabText: "EO1",
+      tabText: (
+        <abbr title={nameAliases.eo1} className="no-underline">
+          EO1
+        </abbr>
+      ),
       tabView: selectedGame === "eo1" ? selectedGameContent : null,
-      accessibleTabLabel: "Etrian Odyssey",
+      accessibleTabLabel: nameAliases.eo1,
     },
     {
       value: "eo2",
-      tabText: "EO2",
+      tabText: (
+        <abbr title={nameAliases.eo2} className="no-underline">
+          EO2
+        </abbr>
+      ),
       tabView: selectedGame === "eo2" ? selectedGameContent : null,
-      accessibleTabLabel: "Etrian Odyssey II: Heroes of Lagaard",
+      accessibleTabLabel: nameAliases.eo2,
     },
     {
       value: "eo3",
-      tabText: "EO3",
+      tabText: (
+        <abbr title={nameAliases.eo3} className="no-underline">
+          EO3
+        </abbr>
+      ),
       tabView: selectedGame === "eo3" ? selectedGameContent : null,
-      accessibleTabLabel: "Etrian Odyssey III: The Drowned City",
+      accessibleTabLabel: nameAliases.eo3,
     },
   ];
 
   return (
-    <div>
+    <fieldset>
       <ControlsContainer<GameOrigin>
         tabs={tabInfo}
         selectedTabValue={selectedGame}
@@ -93,7 +111,7 @@ function CharacterMenus({
           Click to randomize
         </Button>
       </div>
-    </div>
+    </fieldset>
   );
 }
 

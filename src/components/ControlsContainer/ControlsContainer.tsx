@@ -15,7 +15,7 @@ export type TabInfo<T extends string> = {
   visible?: boolean;
 
   value: T;
-  tabText: string;
+  tabText: string | React.ReactNode;
   tabView: React.ReactNode | null;
   tabIcon?: React.ReactNode;
   accessibleTabLabel?: string;

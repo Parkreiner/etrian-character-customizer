@@ -232,12 +232,14 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
   ];
 
   return (
-    <ControlsContainer<UiTab>
-      tabs={tabs}
-      selectedTabValue={activeTab}
-      onTabChange={onTabChange}
-      tabGroupLabel="Select which part you want to customize"
-    />
+    <fieldset>
+      <ControlsContainer<UiTab>
+        tabs={tabs}
+        selectedTabValue={activeTab}
+        onTabChange={onTabChange}
+        tabGroupLabel="Select which part you want to customize"
+      />
+    </fieldset>
   );
 }
 
