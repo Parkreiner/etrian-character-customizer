@@ -62,13 +62,13 @@ function CharacterMenus({
   const tabInfo: TabInfoArray<GameOrigin> = gameOrigins.map((game) => {
     return {
       value: game,
+      accessibleTabLabel: nameAliases[game],
+      tabView: game === selectedGame ? selectedGameContent : null,
       tabText: (
         <abbr title={nameAliases[game]} className="no-underline">
           {game.toUpperCase()}
         </abbr>
       ),
-      tabView: selectedGame === game ? selectedGameContent : null,
-      accessibleTabLabel: nameAliases[game],
     };
   });
 
