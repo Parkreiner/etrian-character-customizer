@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { cva } from "class-variance-authority";
 import * as Tabs from "@/components/Tabs";
 import TooltipTemplate from "@/components/TooltipTemplate";
@@ -48,6 +48,14 @@ export default function ControlsContainer<T extends string>({
   onTabChange,
   tabGroupLabel,
 }: Props<T>) {
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [selectedTabValue]);
+
   const toTabsTrigger = (tab: TabInfo<T>, index: number) => {
     const { value, tabText, tabIcon, accessibleTabLabel, visible = true } = tab;
     const styles = tabTriggerStyles({ selected: selectedTabValue === value });
@@ -94,7 +102,7 @@ export default function ControlsContainer<T extends string>({
 
       <div className="mt-2 h-96">
         <div className="h-full overflow-y-hidden rounded-md bg-teal-600 p-4">
-          <div className="h-full overflow-y-auto">
+          <div ref={scrollContainerRef} className="h-full overflow-y-auto">
             {tabs.map((tab, index) => (
               <Tabs.Content<T> key={index} value={tab.value}>
                 {tab.tabView}
