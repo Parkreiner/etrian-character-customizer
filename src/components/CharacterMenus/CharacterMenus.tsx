@@ -47,13 +47,13 @@ function CharacterMenus({
 
   const selectedGameContent = (
     <div className="grid w-full grid-cols-2 gap-3">
-      {classOrderings[selectedGame].map((gameClass, index) => (
+      {classOrderings[selectedGame].map((gameClass) => (
         <CharacterClassPanel
-          key={index}
+          key={gameClass}
           gameClass={gameClass}
+          characters={charsByGame.filter((char) => char.class === gameClass)}
           selectedCharacterId={selectedCharacterId}
           onCharacterChange={onCharacterChange}
-          characters={charsByGame.filter((char) => char.class === gameClass)}
         />
       ))}
     </div>
