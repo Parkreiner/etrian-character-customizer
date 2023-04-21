@@ -13,7 +13,7 @@ import { useCallback, useReducer } from "react";
 import useGameInfoFetch from "@/hooks/useGameInfoFetch";
 
 import { CharacterColors } from "@/typesConstants/colors";
-import { Character } from "@/typesConstants/gameData";
+import { Character, ClassOrderings } from "@/typesConstants/gameData";
 
 type EditorState =
   | { initialized: false }
@@ -101,6 +101,13 @@ export function reduceEditorState(
   }
 }
 
+const defaultCharactersList = [] satisfies readonly Character[];
+const defaultClassOrderings = {
+  eo1: [],
+  eo2: [],
+  eo3: [],
+} satisfies ClassOrderings;
+
 export default function useEditorController() {
   const [state, dispatch] = useReducer(reduceEditorState, initialEditorState);
   const { data } = useGameInfoFetch();
@@ -120,14 +127,14 @@ export default function useEditorController() {
     }
   }
 
-  const { characters, classOrderings } = data ?? {};
+  const characters = data?.characters ?? defaultCharactersList;
+  const classOrderings = data?.classOrderings ?? defaultClassOrderings;
 
   const changeCharacter = useCallback((newCharacter: Character) => {
     dispatch({ type: "characterPicked", payload: { newCharacter } });
   }, []);
 
   const selectRandomCharacter = useCallback(() => {
-    if (characters === undefined) return;
     const preferredIndex = Math.floor(Math.random() * characters.length);
 
     dispatch({
@@ -155,15 +162,11 @@ export default function useEditorController() {
 
     /**
      * Represents state borrowed from the server. All values are read-only.
+     *
+     * As the app grows bigger, it might make sense to remove this in favor of
+     * having components consume useGameInfoFetch directly.
      */
-    gameData: {
-      characters: characters ?? [],
-      classOrderings: classOrderings ?? {
-        eo1: [],
-        eo2: [],
-        eo3: [],
-      },
-    },
+    gameData: { characters, classOrderings },
 
     /**
      * State specific to the editor. Values are read/write, but values can only
