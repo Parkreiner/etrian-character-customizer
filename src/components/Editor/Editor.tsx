@@ -29,7 +29,8 @@ export default function Editor() {
               <div className="flex max-h-[800px] flex-row items-center justify-center gap-x-10">
                 <CharacterMenus
                   selectedCharacterId={editorController.editor.selectedId}
-                  groupedCharacters={editorController.characters.groupedByGame}
+                  characters={editorController.gameData.characters}
+                  classOrderings={editorController.gameData.classOrderings}
                   onCharacterChange={editorController.editor.changeCharacter}
                   randomizeCharacter={
                     editorController.editor.selectRandomCharacter
@@ -38,7 +39,7 @@ export default function Editor() {
 
                 <CharacterPreview
                   selectedCharacterId={editorController.editor.selectedId}
-                  characters={editorController.characters.list}
+                  characters={editorController.gameData.characters}
                   colors={editorController.editor.colors}
                 />
 

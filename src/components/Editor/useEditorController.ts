@@ -9,16 +9,11 @@
  * accessing any of the properties until you prove to TypeScript that the editor
  * has been initalized.
  */
-import { useCallback, useMemo, useReducer } from "react";
+import { useCallback, useReducer } from "react";
 import useGameInfoFetch from "@/hooks/useGameInfoFetch";
 
 import { CharacterColors } from "@/typesConstants/colors";
-import {
-  Character,
-  CharsGroupedByGame,
-  gameOrigins,
-  ClassOrderings,
-} from "@/typesConstants/gameData";
+import { Character } from "@/typesConstants/gameData";
 
 type EditorState =
   | { initialized: false }
@@ -106,35 +101,9 @@ export function reduceEditorState(
   }
 }
 
-function groupCharacters(
-  characters: Character[],
-  orderings: ClassOrderings
-): CharsGroupedByGame {
-  const grouped: CharsGroupedByGame = new Map(
-    gameOrigins.map((game) => {
-      const charOrder = orderings[game];
-      const charsPerGame = new Map(
-        charOrder.map((gameClass) => [gameClass, []])
-      );
-
-      return [game, charsPerGame];
-    })
-  );
-
-  for (const char of characters) {
-    const classArray = grouped.get(char.game)?.get(char.class);
-    if (classArray !== undefined) {
-      classArray.push(char);
-    }
-  }
-
-  return grouped;
-}
-
 export default function useEditorController() {
   const [state, dispatch] = useReducer(reduceEditorState, initialEditorState);
   const { data } = useGameInfoFetch();
-  const { characters, classOrderings } = data ?? {};
 
   // Nasty-looking state sync, but it's necessary to make sure Editor doesn't
   // fall victim to singleton behavior. Do not replace with useEffect
@@ -151,10 +120,7 @@ export default function useEditorController() {
     }
   }
 
-  const groupedByGame: CharsGroupedByGame = useMemo(() => {
-    if (!characters || !classOrderings) return new Map();
-    return groupCharacters(characters, classOrderings);
-  }, [characters, classOrderings]);
+  const { characters, classOrderings } = data ?? {};
 
   const changeCharacter = useCallback((newCharacter: Character) => {
     dispatch({ type: "characterPicked", payload: { newCharacter } });
@@ -188,12 +154,15 @@ export default function useEditorController() {
     initialized: true,
 
     /**
-     * Represents state for character data loaded from the server. Available in
-     * different formats, depending on your needs. Values are read-only.
+     * Represents state borrowed from the server. All values are read-only.
      */
-    characters: {
-      list: data?.characters ?? [],
-      groupedByGame,
+    gameData: {
+      characters: characters ?? [],
+      classOrderings: classOrderings ?? {
+        eo1: [],
+        eo2: [],
+        eo3: [],
+      },
     },
 
     /**

@@ -1,7 +1,8 @@
-import { memo, useState } from "react";
+import { memo, useState, useMemo } from "react";
 import {
   Character,
   CharsGroupedByGame,
+  ClassOrderings,
   GameOrigin,
   gameOrigins,
 } from "@/typesConstants/gameData";
@@ -13,7 +14,8 @@ import ControlsContainer, {
 } from "@/components/ControlsContainer";
 
 type Props = {
-  groupedCharacters: CharsGroupedByGame;
+  characters: readonly Character[];
+  classOrderings: ClassOrderings;
   selectedCharacterId: string;
   onCharacterChange: (newCharacter: Character) => void;
   randomizeCharacter: () => void;
@@ -29,18 +31,49 @@ const nameAliases = {
   eo3: "Etrian Odyssey III: The Drowned City",
 } as const satisfies Record<GameOrigin, string>;
 
+function groupCharacters(
+  characters: readonly Character[],
+  orderings: ClassOrderings
+): CharsGroupedByGame {
+  const grouped: CharsGroupedByGame = new Map(
+    gameOrigins.map((game) => {
+      const charOrder = orderings[game];
+      const charsPerGame = new Map(
+        charOrder.map((gameClass) => [gameClass, []])
+      );
+
+      return [game, charsPerGame];
+    })
+  );
+
+  for (const char of characters) {
+    const classArray = grouped.get(char.game)?.get(char.class);
+    if (classArray !== undefined) {
+      classArray.push(char);
+    }
+  }
+
+  return grouped;
+}
+
 function CharacterMenus({
-  groupedCharacters,
   selectedCharacterId,
+  characters,
+  classOrderings,
   onCharacterChange,
   randomizeCharacter,
 }: Props) {
   const [selectedGame, setSelectedGame] = useState<GameOrigin>("eo1");
-  const selectedGroup = groupedCharacters.get(selectedGame);
+  const groupedByGame: CharsGroupedByGame = useMemo(() => {
+    if (!characters || !classOrderings) return new Map();
+    return groupCharacters(characters, classOrderings);
+  }, [characters, classOrderings]);
+
+  const selectedGroup = groupedByGame.get(selectedGame);
 
   const selectedGameContent = (
     <div className="grid w-full grid-cols-2 gap-3">
-      {selectedGroup === undefined || selectedGroup.size === 0 ? (
+      {characters.length === 0 || selectedGroup === undefined ? (
         <NoCharactersDisplay />
       ) : (
         Array.from(selectedGroup, ([gameClass, characterList], groupIndex) => (
