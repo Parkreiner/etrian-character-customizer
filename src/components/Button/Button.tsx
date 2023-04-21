@@ -1,4 +1,4 @@
-import { ComponentPropsWithRef } from "react";
+import { ComponentPropsWithRef, forwardRef } from "react";
 import { cva } from "class-variance-authority";
 
 // No need for "danger" intent; the client can't do destructive actions
@@ -35,15 +35,13 @@ const buttonStyles = cva("flex flex-row", {
 });
 
 /** Defaults to medium size if size is not specified. */
-export default function Button({
-  intent,
-  children,
-  type = "button",
-  size = "medium",
-  ...delegated
-}: Props) {
+function Button(
+  { intent, children, type = "button", size = "medium", ...delegated }: Props,
+  ref?: React.ForwardedRef<HTMLButtonElement>
+) {
   return (
     <button
+      ref={ref}
       className={buttonStyles({ intent, size })}
       type={type}
       {...delegated}
@@ -52,3 +50,5 @@ export default function Button({
     </button>
   );
 }
+
+export default forwardRef(Button);
