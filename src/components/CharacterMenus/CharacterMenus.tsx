@@ -1,13 +1,12 @@
-import { memo, useState, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import {
   Character,
-  CharsGroupedByGame,
   ClassOrderings,
   GameOrigin,
   gameOrigins,
 } from "@/typesConstants/gameData";
 
-import CharacterPanel from "./CharacterPanel";
+import CharacterClassPanel from "./CharacterClassPanel";
 import Button from "@/components/Button";
 import ControlsContainer, {
   TabInfoArray,
@@ -21,40 +20,11 @@ type Props = {
   randomizeCharacter: () => void;
 };
 
-function NoCharactersDisplay() {
-  return <div>No characters to display</div>;
-}
-
 const nameAliases = {
   eo1: "Etrian Odyssey",
   eo2: "Etrian Odyssey II: Heroes of Lagaard",
   eo3: "Etrian Odyssey III: The Drowned City",
 } as const satisfies Record<GameOrigin, string>;
-
-function groupCharacters(
-  characters: readonly Character[],
-  orderings: ClassOrderings
-): CharsGroupedByGame {
-  const grouped: CharsGroupedByGame = new Map(
-    gameOrigins.map((game) => {
-      const charOrder = orderings[game];
-      const charsPerGame = new Map(
-        charOrder.map((gameClass) => [gameClass, []])
-      );
-
-      return [game, charsPerGame];
-    })
-  );
-
-  for (const char of characters) {
-    const classArray = grouped.get(char.game)?.get(char.class);
-    if (classArray !== undefined) {
-      classArray.push(char);
-    }
-  }
-
-  return grouped;
-}
 
 function CharacterMenus({
   selectedCharacterId,
@@ -64,28 +34,28 @@ function CharacterMenus({
   randomizeCharacter,
 }: Props) {
   const [selectedGame, setSelectedGame] = useState<GameOrigin>("eo1");
-  const groupedByGame: CharsGroupedByGame = useMemo(() => {
-    if (!characters || !classOrderings) return new Map();
-    return groupCharacters(characters, classOrderings);
-  }, [characters, classOrderings]);
+  const sortedCharacters = useMemo(() => {
+    return [...characters].sort((char1, char2) => {
+      if (char1.id === char2.id) return 0;
+      return char1.id < char2.id ? -1 : 1;
+    });
+  }, [characters]);
 
-  const selectedGroup = groupedByGame.get(selectedGame);
+  const charsByGame = sortedCharacters.filter(
+    (char) => char.game === selectedGame
+  );
 
   const selectedGameContent = (
     <div className="grid w-full grid-cols-2 gap-3">
-      {characters.length === 0 || selectedGroup === undefined ? (
-        <NoCharactersDisplay />
-      ) : (
-        Array.from(selectedGroup, ([gameClass, characterList], groupIndex) => (
-          <CharacterPanel
-            key={groupIndex}
-            gameClass={gameClass}
-            characterList={characterList}
-            selectedCharacterId={selectedCharacterId}
-            onCharacterChange={onCharacterChange}
-          />
-        ))
-      )}
+      {classOrderings[selectedGame].map((gameClass, index) => (
+        <CharacterClassPanel
+          key={index}
+          gameClass={gameClass}
+          selectedCharacterId={selectedCharacterId}
+          onCharacterChange={onCharacterChange}
+          characters={charsByGame.filter((char) => char.class === gameClass)}
+        />
+      ))}
     </div>
   );
 
