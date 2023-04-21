@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useLayoutEffect, useRef } from "react";
 import { cva } from "class-variance-authority";
 import * as Tabs from "@/components/Tabs";
 import TooltipTemplate from "@/components/TooltipTemplate";
@@ -50,7 +50,7 @@ export default function ControlsContainer<T extends string>({
 }: Props<T>) {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
