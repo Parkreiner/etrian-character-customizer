@@ -73,7 +73,7 @@ export default memo(function CharacterMenus({
   });
 
   return (
-    <fieldset>
+    <fieldset className="relative">
       <ControlsContainer<GameOrigin>
         tabs={tabInfo}
         selectedTabValue={selectedGame}
@@ -81,10 +81,12 @@ export default memo(function CharacterMenus({
         tabGroupLabel="Select a game"
       />
 
-      <div className="mx-auto mt-2 max-w-fit">
-        <Button intent="secondary" size="small" onClick={randomizeCharacter}>
-          Click to randomize
-        </Button>
+      <div className="absolute mx-auto mt-1.5 w-full">
+        <div className="mx-auto max-w-fit">
+          <Button intent="secondary" size="small" onClick={randomizeCharacter}>
+            Click to randomize
+          </Button>
+        </div>
       </div>
     </fieldset>
   );
