@@ -2,6 +2,7 @@ import { Fragment, useLayoutEffect, useRef } from "react";
 import { cva } from "class-variance-authority";
 import * as Tabs from "@/components/Tabs";
 import TooltipTemplate from "@/components/TooltipTemplate";
+import styles from "./scrollbar.module.css";
 
 /**
  * An object describing one "tab" in the ControlsContainer component.
@@ -101,8 +102,11 @@ export default function ControlsContainer<T extends string>({
       </Tabs.List>
 
       <div className="mt-2 h-96">
-        <div className="h-full overflow-y-hidden rounded-md bg-teal-600 p-4">
-          <div ref={scrollContainerRef} className="h-full overflow-y-auto">
+        <div className="h-full overflow-y-hidden rounded-md bg-teal-600 py-4 pl-4 pr-3">
+          <div
+            ref={scrollContainerRef}
+            className={`${styles.scrollbar} h-full overflow-y-scroll pr-3`}
+          >
             {tabs.map((tab, index) => (
               <Tabs.Content<T> key={index} value={tab.value}>
                 {tab.tabView}
