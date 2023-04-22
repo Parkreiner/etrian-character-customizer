@@ -26,7 +26,7 @@ const nameAliases = {
   eo3: "Etrian Odyssey III: The Drowned City",
 } as const satisfies Record<GameOrigin, string>;
 
-function CharacterMenus({
+export default memo(function CharacterMenus({
   selectedCharacterId,
   characters,
   classOrderings,
@@ -88,7 +88,4 @@ function CharacterMenus({
       </div>
     </fieldset>
   );
-}
-
-const Memoized = memo(CharacterMenus);
-export default Memoized;
+});

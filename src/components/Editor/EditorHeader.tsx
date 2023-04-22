@@ -1,6 +1,7 @@
+import { memo } from "react";
 import EditorModalButton from "./EditorModalButton";
 
-export default function EditorHeader() {
+export default memo(function EditorHeader() {
   return (
     <header className="border-b-2 border-teal-900 py-4">
       <div className="mx-auto flex w-full max-w-[1400px] flex-row gap-x-10 align-baseline">
@@ -26,4 +27,4 @@ export default function EditorHeader() {
       </div>
     </header>
   );
-}
+});
