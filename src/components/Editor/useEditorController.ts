@@ -164,7 +164,10 @@ export default function useEditorController() {
      * Represents state borrowed from the server. All values are read-only.
      *
      * As the app grows bigger, it might make sense to remove this in favor of
-     * having components consume useGameInfoFetch directly.
+     * having components consume useGameInfoFetch directly. However, the trade-
+     * off is that every component consuming the hook would need to start
+     * handling cases for data being undefined, instead of having that logic be
+     * resolved in one spot (Editor).
      */
     gameData: { characters, classOrderings },
 
