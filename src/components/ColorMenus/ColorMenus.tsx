@@ -8,10 +8,10 @@ import { CharacterColors } from "@/typesConstants/colors";
 import useColorMenusState from "./useColorMenusState";
 
 import ColorButton from "./ColorButton";
-import ColorPicker from "@/components/ColorPicker";
 import ControlsContainer, {
   TabInfoArray,
 } from "@/components/ControlsContainer";
+import MenuViewLayout from "./MenuViewLayout";
 
 type ExternalProps = {
   /**
@@ -33,6 +33,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
   const { state, updaters } = useColorMenusState(colors);
   const activeColorArray = colors[state.activeCategory];
   const activeIndex = state.activeIndices[state.activeCategory];
+  const activeHexColor = activeColorArray[activeIndex] ?? "#000000";
 
   // Really verbose function, but there's a lot it needs to do
   const onHexChange = (newHexColor: string) => {
@@ -88,14 +89,33 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
     onColorChange({ ...colors, [state.activeCategory]: newTuple });
   };
 
+  const selectSkinPreset = (hex1: string, hex2: string) => {
+    const skipUpdate =
+      hex1 === activeColorArray[0] && hex2 === activeColorArray[1];
+
+    if (skipUpdate) {
+      return;
+    }
+
+    onColorChange({
+      ...colors,
+      [state.activeCategory]: [hex1, hex2],
+    });
+  };
+
   const tabs: TabInfoArray<UiTab> = [
     {
       value: "skin",
       tabText: "Skin",
       tabIcon: tabIcons.skin,
       tabView: (
-        <fieldset>
-          <section className="mb-4 flex flex-row justify-center gap-x-3 bg-teal-900 py-4">
+        <MenuViewLayout
+          tab="skin"
+          activeHex={activeHexColor}
+          onHexChange={onHexChange}
+          selectSkinPreset={selectSkinPreset}
+        >
+          <div className="flex flex-row justify-center gap-x-3">
             <ColorButton
               primaryHex={colors.skin[0]}
               onClick={() => updaters.changeSelectedFill("skin", 0)}
@@ -109,13 +129,8 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             >
               2
             </ColorButton>
-          </section>
-
-          <ColorPicker
-            hexColor={colors.skin[state.activeIndices.skin]}
-            onHexChange={onHexChange}
-          />
-        </fieldset>
+          </div>
+        </MenuViewLayout>
       ),
     },
     {
@@ -129,64 +144,61 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       tabText: "Eyes",
       tabIcon: tabIcons.eyes,
       tabView: (
-        <fieldset>
-          <section className="mb-4 flex flex-col gap-y-3 bg-teal-900 py-4">
-            <div className="flex flex-row justify-center gap-x-3">
-              <ColorButton
-                primaryHex={colors.leftEye[0]}
-                onClick={() => updaters.changeSelectedFill("leftEye", 0)}
-              >
-                Left 1
-              </ColorButton>
+        <MenuViewLayout
+          tab="eyes"
+          activeHex={activeHexColor}
+          onHexChange={onHexChange}
+        >
+          <div className="flex flex-row justify-center gap-x-3">
+            <ColorButton
+              primaryHex={colors.leftEye[0]}
+              onClick={() => updaters.changeSelectedFill("leftEye", 0)}
+            >
+              Left 1
+            </ColorButton>
 
-              <label>
-                Link eyes?
-                <input
-                  type="checkbox"
-                  checked={state.eyeSet1Linked}
-                  onChange={updaters.toggleEyeLink1}
-                />
-              </label>
+            <label>
+              Link eyes?
+              <input
+                type="checkbox"
+                checked={state.eyeSet1Linked}
+                onChange={updaters.toggleEyeLink1}
+              />
+            </label>
 
-              <ColorButton
-                primaryHex={colors.rightEye[0]}
-                onClick={() => updaters.changeSelectedFill("rightEye", 0)}
-              >
-                Right 1
-              </ColorButton>
-            </div>
+            <ColorButton
+              primaryHex={colors.rightEye[0]}
+              onClick={() => updaters.changeSelectedFill("rightEye", 0)}
+            >
+              Right 1
+            </ColorButton>
+          </div>
 
-            <div className="flex flex-row justify-center gap-x-3 ">
-              <ColorButton
-                primaryHex={colors.leftEye[1]}
-                onClick={() => updaters.changeSelectedFill("leftEye", 1)}
-              >
-                Left 2
-              </ColorButton>
+          <div className="flex flex-row justify-center gap-x-3 ">
+            <ColorButton
+              primaryHex={colors.leftEye[1]}
+              onClick={() => updaters.changeSelectedFill("leftEye", 1)}
+            >
+              Left 2
+            </ColorButton>
 
-              <label>
-                Link eyes?
-                <input
-                  type="checkbox"
-                  checked={state.eyeSet2Linked}
-                  onChange={updaters.toggleEyeLink2}
-                />
-              </label>
+            <label>
+              Link eyes?
+              <input
+                type="checkbox"
+                checked={state.eyeSet2Linked}
+                onChange={updaters.toggleEyeLink2}
+              />
+            </label>
 
-              <ColorButton
-                primaryHex={colors.rightEye[1]}
-                onClick={() => updaters.changeSelectedFill("rightEye", 1)}
-              >
-                Right 2
-              </ColorButton>
-            </div>
-          </section>
-
-          <ColorPicker
-            hexColor={activeColorArray[activeIndex] as string}
-            onHexChange={onHexChange}
-          />
-        </fieldset>
+            <ColorButton
+              primaryHex={colors.rightEye[1]}
+              onClick={() => updaters.changeSelectedFill("rightEye", 1)}
+            >
+              Right 2
+            </ColorButton>
+          </div>
+        </MenuViewLayout>
       ),
     },
     {
