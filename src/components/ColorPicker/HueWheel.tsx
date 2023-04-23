@@ -39,7 +39,7 @@ export default function HueWheel({ hue, onHueChange }: Props) {
           {/* Ranges are a little funky to make hue wrap-arounds easier */}
           <input
             id={textId}
-            className="no-arrow h-16 bg-teal-600 text-right text-[72px] font-extrabold hover:ring-red-900"
+            className="no-arrow h-16 bg-teal-900 text-right text-[72px] font-extrabold hover:ring-red-900"
             type="number"
             min="-1"
             max="360"

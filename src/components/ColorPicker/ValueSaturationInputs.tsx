@@ -62,7 +62,7 @@ export default function SaturationValueInputs({ hsv, onChannelChange }: Props) {
               }}
               aria-label={`Slider for ${labelText}`}
             >
-              <Slider.Track className="relative h-[4px] grow rounded-full bg-teal-900">
+              <Slider.Track className="relative h-[4px] grow rounded-full bg-teal-950">
                 <Slider.Range className="absolute h-full rounded-full bg-teal-100" />
               </Slider.Track>
               <Slider.Thumb className="block h-5 w-5 rounded-[10px] bg-white shadow-[0_2px_10px] shadow-gray-900 hover:bg-teal-100 focus:shadow-[0_0_0_5px] focus:shadow-gray-800 focus:outline-none" />
