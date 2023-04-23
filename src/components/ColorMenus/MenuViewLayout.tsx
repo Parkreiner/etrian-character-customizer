@@ -22,6 +22,18 @@ const colorPresets = {
   skin: SKIN_COLOR_PRESETS,
 } as const;
 
+function SectionHeader({ children }: PropsWithChildren) {
+  return (
+    <div className="mb-3 flex flex-row items-center gap-x-2">
+      <h2 className="h-fit text-xs font-semibold uppercase tracking-wider text-teal-50">
+        {children}
+      </h2>
+
+      <div className="h-0.5 flex-grow bg-teal-50 opacity-80" />
+    </div>
+  );
+}
+
 export default function MenuViewLayout({
   tab,
   activeHex,
@@ -31,14 +43,20 @@ export default function MenuViewLayout({
 }: Props) {
   return (
     <fieldset>
-      <section className="mb-4 rounded-md bg-teal-900 py-4">{children}</section>
+      <section className="mb-4 rounded-md bg-teal-900 px-4 pb-6 pt-4">
+        <SectionHeader>Options ({tab})</SectionHeader>
+        {children}
+      </section>
 
       <section className="mb-4 rounded-md bg-teal-900 p-4">
+        <SectionHeader>Color Editor</SectionHeader>
         <ColorPicker hexColor={activeHex} onHexChange={onHexChange} />
       </section>
 
-      <section className="rounded-md bg-teal-900 px-8 py-8">
-        <ul className="grid max-w-[400px] grid-cols-3 justify-between gap-3">
+      <section className="rounded-md bg-teal-900 px-4 py-4">
+        <SectionHeader>Color Presets</SectionHeader>
+
+        <ul className="grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
           {(tab === "hair" || tab === "eyes") &&
             colorPresets[tab].map((hex, index) => (
               <li key={index}>

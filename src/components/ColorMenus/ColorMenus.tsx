@@ -120,6 +120,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             <ColorButton
               primaryHex={colors.skin[0]}
               onClick={() => updaters.changeSelectedFill("skin", 0)}
+              selected={state.activeCategory === "skin" && activeIndex === 0}
             >
               1
             </ColorButton>
@@ -127,6 +128,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             <ColorButton
               primaryHex={colors.skin[1]}
               onClick={() => updaters.changeSelectedFill("skin", 1)}
+              selected={state.activeCategory === "skin" && activeIndex === 1}
             >
               2
             </ColorButton>
@@ -134,6 +136,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
         </MenuViewLayout>
       ),
     },
+
     {
       value: "hair",
       tabText: "Hair",
@@ -148,6 +151,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             <ColorButton
               primaryHex={colors.hair[0]}
               onClick={() => updaters.changeSelectedFill("hair", 0)}
+              selected={state.activeCategory === "hair" && activeIndex === 0}
             >
               1
             </ColorButton>
@@ -155,6 +159,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             <ColorButton
               primaryHex={colors.hair[1]}
               onClick={() => updaters.changeSelectedFill("hair", 1)}
+              selected={state.activeCategory === "hair" && activeIndex === 1}
             >
               2
             </ColorButton>
@@ -162,6 +167,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
         </MenuViewLayout>
       ),
     },
+
     {
       value: "eyes",
       tabText: "Eyes",
@@ -176,8 +182,9 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             <ColorButton
               primaryHex={colors.leftEye[0]}
               onClick={() => updaters.changeSelectedFill("leftEye", 0)}
+              selected={state.activeCategory === "leftEye" && activeIndex === 0}
             >
-              Left 1
+              <abbr title="Left eye option 1">L1</abbr>
             </ColorButton>
 
             <LinkToggle
@@ -189,8 +196,11 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             <ColorButton
               primaryHex={colors.rightEye[0]}
               onClick={() => updaters.changeSelectedFill("rightEye", 0)}
+              selected={
+                state.activeCategory === "rightEye" && activeIndex === 0
+              }
             >
-              Right 1
+              <abbr title="Right eye option 1">R1</abbr>
             </ColorButton>
           </div>
 
@@ -198,8 +208,9 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             <ColorButton
               primaryHex={colors.leftEye[1]}
               onClick={() => updaters.changeSelectedFill("leftEye", 1)}
+              selected={state.activeCategory === "leftEye" && activeIndex === 1}
             >
-              Left 2
+              <abbr title="Left eye option 2">L2</abbr>
             </ColorButton>
 
             <LinkToggle
@@ -211,13 +222,17 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             <ColorButton
               primaryHex={colors.rightEye[1]}
               onClick={() => updaters.changeSelectedFill("rightEye", 1)}
+              selected={
+                state.activeCategory === "rightEye" && activeIndex === 1
+              }
             >
-              Right 2
+              <abbr title="Right eye option 2">R2</abbr>
             </ColorButton>
           </div>
         </MenuViewLayout>
       ),
     },
+
     {
       visible: colors.misc.length > 0,
       value: "misc",
