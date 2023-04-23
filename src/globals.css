@@ -20,3 +20,7 @@
   margin: 0;
   -moz-appearance: textfield !important;
 }
+
+abbr {
+  text-decoration: none;
+}
