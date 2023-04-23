@@ -33,7 +33,7 @@ export default function MenuViewLayout({
     <fieldset>
       <section className="mb-4 rounded-md bg-teal-900 py-4">{children}</section>
 
-      <section className="mb-4">
+      <section className="mb-4 rounded-md bg-teal-900 p-4">
         <ColorPicker hexColor={activeHex} onHexChange={onHexChange} />
       </section>
 

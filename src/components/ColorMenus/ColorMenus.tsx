@@ -7,6 +7,7 @@ import { tabIcons } from "./localConstants";
 import { CharacterColors } from "@/typesConstants/colors";
 import useColorMenusState from "./useColorMenusState";
 
+import LinkToggle from "./LinkToggle";
 import ColorButton from "./ColorButton";
 import ControlsContainer, {
   TabInfoArray,
@@ -137,7 +138,29 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       value: "hair",
       tabText: "Hair",
       tabIcon: tabIcons.hair,
-      tabView: <p>Here&apos;s some hair!</p>,
+      tabView: (
+        <MenuViewLayout
+          tab="hair"
+          activeHex={activeHexColor}
+          onHexChange={onHexChange}
+        >
+          <div className="flex flex-row justify-center gap-x-3">
+            <ColorButton
+              primaryHex={colors.hair[0]}
+              onClick={() => updaters.changeSelectedFill("hair", 0)}
+            >
+              1
+            </ColorButton>
+
+            <ColorButton
+              primaryHex={colors.hair[1]}
+              onClick={() => updaters.changeSelectedFill("hair", 1)}
+            >
+              2
+            </ColorButton>
+          </div>
+        </MenuViewLayout>
+      ),
     },
     {
       value: "eyes",
@@ -149,7 +172,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
           activeHex={activeHexColor}
           onHexChange={onHexChange}
         >
-          <div className="flex flex-row justify-center gap-x-3">
+          <div className="mb-4 flex flex-row items-center justify-center gap-x-1">
             <ColorButton
               primaryHex={colors.leftEye[0]}
               onClick={() => updaters.changeSelectedFill("leftEye", 0)}
@@ -157,14 +180,11 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
               Left 1
             </ColorButton>
 
-            <label>
-              Link eyes?
-              <input
-                type="checkbox"
-                checked={state.eyeSet1Linked}
-                onChange={updaters.toggleEyeLink1}
-              />
-            </label>
+            <LinkToggle
+              active={state.eyeSet1Linked}
+              toggleActive={updaters.toggleEyeLink1}
+              accessibleLabel="Link eye set 1?"
+            />
 
             <ColorButton
               primaryHex={colors.rightEye[0]}
@@ -174,7 +194,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             </ColorButton>
           </div>
 
-          <div className="flex flex-row justify-center gap-x-3 ">
+          <div className="flex flex-row items-center justify-center gap-x-1">
             <ColorButton
               primaryHex={colors.leftEye[1]}
               onClick={() => updaters.changeSelectedFill("leftEye", 1)}
@@ -182,14 +202,11 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
               Left 2
             </ColorButton>
 
-            <label>
-              Link eyes?
-              <input
-                type="checkbox"
-                checked={state.eyeSet2Linked}
-                onChange={updaters.toggleEyeLink2}
-              />
-            </label>
+            <LinkToggle
+              active={state.eyeSet2Linked}
+              toggleActive={updaters.toggleEyeLink2}
+              accessibleLabel="Link eye set 2?"
+            />
 
             <ColorButton
               primaryHex={colors.rightEye[1]}
