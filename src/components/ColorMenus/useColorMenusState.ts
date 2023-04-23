@@ -13,6 +13,7 @@ type MenusState = {
   activeIndices: CategoryIndices;
   eyeSet1Linked: boolean;
   eyeSet2Linked: boolean;
+  lastEyeSelection: "leftEye" | "rightEye";
 };
 
 type MenusAction =
@@ -29,6 +30,7 @@ type MenusAction =
 const initialState = {
   activeTab: "skin",
   activeCategory: "skin",
+  lastEyeSelection: "leftEye",
   eyeSet1Linked: true,
   eyeSet2Linked: true,
 
@@ -48,7 +50,7 @@ export function reduceMenusState(
   switch (action.type) {
     case "tabChanged": {
       const { newTab } = action.payload;
-      const newCategory = newTab === "eyes" ? "leftEye" : newTab;
+      const newCategory = newTab === "eyes" ? state.lastEyeSelection : newTab;
 
       return {
         ...state,
@@ -65,17 +67,21 @@ export function reduceMenusState(
 
       if (skipUpdate) return state;
 
+      const updateForEyes =
+        newCategory === "leftEye" || newCategory === "rightEye";
+
       // This part should be redundant with how the UI is set up, but it doesn't
       // hurt to be thorough.
-      const newTab =
-        newCategory === "leftEye" || newCategory === "rightEye"
-          ? "eyes"
-          : newCategory;
+      const newTab = updateForEyes ? "eyes" : newCategory;
+      const newLastSelection = updateForEyes
+        ? newCategory
+        : state.lastEyeSelection;
 
       return {
         ...state,
         activeCategory: newCategory,
         activeTab: newTab,
+        lastEyeSelection: newLastSelection,
         activeIndices: { ...state.activeIndices, [newCategory]: newIndex },
       };
     }
