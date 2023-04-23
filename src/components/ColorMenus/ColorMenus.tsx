@@ -1,24 +1,13 @@
 /**
- * @file Contains all the core logic for managing colors for a character.
- *
- * This is a complicated component, and while I tried to split it up, all those
- * attempts seemed to make things worse, not just for performance, but also for
- * readability. If you're using VSCode, consider collapsing the function
- * and array/object definitions to make things a bit more navigable.
- *
- * At the very least, *using* the component should be simple. You only have to
- * worry about what you're passing in to satisfy ExternalProps.
+ * @file Contains the top-level component view for managing colors for a
+ * character.
  */
-import { useState } from "react";
-import { clamp } from "@/utils/math";
 import { UiTab } from "./localTypes";
 import { tabIcons } from "./localConstants";
-import {
-  CharacterColors,
-  ColorCategory,
-  ColorTuple,
-} from "@/typesConstants/colors";
+import { CharacterColors } from "@/typesConstants/colors";
+import useColorMenusState from "./useColorMenusState";
 
+import ColorButton from "./ColorButton";
 import ColorPicker from "@/components/ColorPicker";
 import ControlsContainer, {
   TabInfoArray,
@@ -38,88 +27,66 @@ type ExternalProps = {
   onColorChange: (newColors: CharacterColors) => void;
 };
 
-type CategoryIndices = {
-  [key in ColorCategory]: key extends "misc" ? number : 0 | 1;
-};
-
-const initialIndices: CategoryIndices = {
-  skin: 0,
-  hair: 0,
-  leftEye: 0,
-  rightEye: 0,
-  misc: 0,
-};
-
 type CoreProps = Omit<ExternalProps, "characterKey">;
 
 function ColorMenusCore({ colors, onColorChange }: CoreProps) {
-  const [activeCategory, setActiveCategory] = useState<ColorCategory>("skin");
-  const [activeIndices, setActiveIndices] = useState(initialIndices);
-  const [eyesLinked, setEyesLinked] = useState(true);
+  const { state, updaters } = useColorMenusState(colors);
+  const activeColorArray = colors[state.activeCategory];
+  const activeIndex = state.activeIndices[state.activeCategory];
 
-  const toggleLink = () => setEyesLinked((current) => !current);
-
+  // Really verbose function, but there's a lot it needs to do
   const onHexChange = (newHexColor: string) => {
-    const activeIndex = activeIndices[activeCategory];
-    const updateBothEyes =
-      eyesLinked &&
-      (activeCategory === "leftEye" || activeCategory === "rightEye");
+    const eyesSelected =
+      state.activeCategory === "leftEye" || state.activeCategory === "rightEye";
 
-    const skipUpdate =
-      (updateBothEyes &&
-        newHexColor === colors.leftEye[activeIndex] &&
-        newHexColor === colors.rightEye[activeIndex]) ||
-      newHexColor === colors[activeCategory][activeIndex];
+    const updateIsForSet1 =
+      eyesSelected && state.eyeSet1Linked && activeIndex === 0;
 
-    if (skipUpdate) return;
-    const newTuple = colors[activeCategory].map((oldHex, index) => {
+    if (updateIsForSet1) {
+      const needUpdate =
+        newHexColor !== colors.leftEye[0] || newHexColor !== colors.rightEye[0];
+
+      if (needUpdate) {
+        onColorChange({
+          ...colors,
+          leftEye: [newHexColor, colors.leftEye[1]],
+          rightEye: [newHexColor, colors.rightEye[1]],
+        });
+      }
+
+      return;
+    }
+
+    const updateIsForSet2 =
+      eyesSelected && state.eyeSet2Linked && activeIndex === 1;
+
+    if (updateIsForSet2) {
+      const needUpdate =
+        newHexColor !== colors.leftEye[1] || newHexColor !== colors.rightEye[1];
+
+      if (needUpdate) {
+        onColorChange({
+          ...colors,
+          leftEye: [colors.leftEye[0], newHexColor],
+          rightEye: [colors.rightEye[0], newHexColor],
+        });
+      }
+
+      return;
+    }
+
+    // No more linked values past here
+    const skipUpdate = newHexColor === activeColorArray[activeIndex];
+    if (skipUpdate) {
+      return;
+    }
+
+    const newTuple = activeColorArray.map((oldHex, index) => {
       return index === activeIndex ? newHexColor : oldHex;
     });
 
-    if (updateBothEyes) {
-      // This is really ugly, but it's just a limitation of the built-in
-      // Array.map method typing. It can't preserve tuple lengths
-      onColorChange({
-        ...colors,
-        leftEye: newTuple as unknown as ColorTuple,
-        rightEye: newTuple as unknown as ColorTuple,
-      });
-    } else {
-      // I have no idea why TypeScript isn't complaining here; the operation is
-      // safe, but it should be detecting that this is mixing arrays/tuples
-      onColorChange({ ...colors, [activeCategory]: newTuple });
-    }
+    onColorChange({ ...colors, [state.activeCategory]: newTuple });
   };
-
-  const onCategoryIndexChange = (newIndex: number) => {
-    if (activeCategory === "misc") {
-      const normalized =
-        Number.isInteger(newIndex) && newIndex >= 0 ? newIndex : 0;
-
-      const clamped = clamp(normalized, 0, colors.misc.length);
-      const skipUpdate = clamped === activeIndices.misc;
-
-      if (skipUpdate) return;
-      return setActiveIndices({ ...activeIndices, misc: clamped });
-    }
-
-    const activeIndex = activeIndices[activeCategory];
-    const skipUpdate =
-      newIndex === activeIndex || (newIndex !== 0 && newIndex !== 1);
-
-    if (skipUpdate) return;
-    setActiveIndices({ ...activeIndices, [activeCategory]: newIndex });
-  };
-
-  const onTabChange = (newTab: UiTab) => {
-    const newCategory = newTab === "eyes" ? "leftEye" : newTab;
-    setActiveCategory(newCategory);
-  };
-
-  const activeTab: UiTab =
-    activeCategory === "leftEye" || activeCategory === "rightEye"
-      ? "eyes"
-      : activeCategory;
 
   const tabs: TabInfoArray<UiTab> = [
     {
@@ -128,16 +95,24 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       tabIcon: tabIcons.skin,
       tabView: (
         <fieldset>
-          <button type="button" onClick={() => onCategoryIndexChange(0)}>
-            Skin 1
-          </button>
+          <section className="mb-4 flex flex-row justify-center gap-x-3 bg-teal-900 py-4">
+            <ColorButton
+              primaryHex={colors.skin[0]}
+              onClick={() => updaters.changeSelectedFill("skin", 0)}
+            >
+              1
+            </ColorButton>
 
-          <button type="button" onClick={() => onCategoryIndexChange(1)}>
-            Skin 2
-          </button>
+            <ColorButton
+              primaryHex={colors.skin[1]}
+              onClick={() => updaters.changeSelectedFill("skin", 1)}
+            >
+              2
+            </ColorButton>
+          </section>
 
           <ColorPicker
-            hexColor={colors.skin[activeIndices.skin]}
+            hexColor={colors.skin[state.activeIndices.skin]}
             onHexChange={onHexChange}
           />
         </fieldset>
@@ -155,69 +130,62 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       tabIcon: tabIcons.eyes,
       tabView: (
         <fieldset>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveCategory("leftEye");
-              onCategoryIndexChange(0);
-            }}
-          >
-            Left eye 1
-          </button>
+          <section className="mb-4 flex flex-col gap-y-3 bg-teal-900 py-4">
+            <div className="flex flex-row justify-center gap-x-3">
+              <ColorButton
+                primaryHex={colors.leftEye[0]}
+                onClick={() => updaters.changeSelectedFill("leftEye", 0)}
+              >
+                Left 1
+              </ColorButton>
 
-          <br />
+              <label>
+                Link eyes?
+                <input
+                  type="checkbox"
+                  checked={state.eyeSet1Linked}
+                  onChange={updaters.toggleEyeLink1}
+                />
+              </label>
 
-          <button
-            type="button"
-            onClick={() => {
-              setActiveCategory("leftEye");
-              onCategoryIndexChange(1);
-            }}
-          >
-            Left eye 2
-          </button>
+              <ColorButton
+                primaryHex={colors.rightEye[0]}
+                onClick={() => updaters.changeSelectedFill("rightEye", 0)}
+              >
+                Right 1
+              </ColorButton>
+            </div>
 
-          <br />
+            <div className="flex flex-row justify-center gap-x-3 ">
+              <ColorButton
+                primaryHex={colors.leftEye[1]}
+                onClick={() => updaters.changeSelectedFill("leftEye", 1)}
+              >
+                Left 2
+              </ColorButton>
 
-          <button
-            type="button"
-            onClick={() => {
-              setActiveCategory("rightEye");
-              onCategoryIndexChange(0);
-            }}
-          >
-            Right eye 1
-          </button>
+              <label>
+                Link eyes?
+                <input
+                  type="checkbox"
+                  checked={state.eyeSet2Linked}
+                  onChange={updaters.toggleEyeLink2}
+                />
+              </label>
 
-          <br />
+              <ColorButton
+                primaryHex={colors.rightEye[1]}
+                onClick={() => updaters.changeSelectedFill("rightEye", 1)}
+              >
+                Right 2
+              </ColorButton>
+            </div>
+          </section>
 
-          <button
-            type="button"
-            onClick={() => {
-              setActiveCategory("rightEye");
-              onCategoryIndexChange(1);
-            }}
-          >
-            Right eye 2
-          </button>
-
-          <br />
-
-          <label>
-            Link eyes?
-            <input type="checkbox" checked={eyesLinked} onChange={toggleLink} />
-          </label>
-
-          {/**
-           * This condition is redundant at runtime, but necessary to
-           * provide type narrowing to TypeScript at compile-time
-           */}
-          {(activeCategory === "leftEye" || activeCategory === "rightEye") && (
-            <ColorPicker
-              hexColor={colors[activeCategory][activeIndices[activeCategory]]}
-              onHexChange={onHexChange}
-            />
-          )}
+          <ColorPicker
+            hexColor={activeColorArray[activeIndex] as string}
+            onHexChange={onHexChange}
+          />
         </fieldset>
       ),
     },
@@ -235,8 +203,8 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
     <fieldset>
       <ControlsContainer<UiTab>
         tabs={tabs}
-        selectedTabValue={activeTab}
-        onTabChange={onTabChange}
+        selectedTabValue={state.activeTab}
+        onTabChange={updaters.changeTab}
         tabGroupLabel="Select which part you want to customize"
       />
     </fieldset>
