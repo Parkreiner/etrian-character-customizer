@@ -90,14 +90,28 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
     onColorChange({ ...colors, [state.activeCategory]: newTuple });
   };
 
-  const selectSkinPreset = (hex1: string, hex2: string) => {
-    const skipUpdate =
-      hex1 === activeColorArray[0] && hex2 === activeColorArray[1];
-
-    if (skipUpdate) {
+  const selectHexPreset = (hex1: string, hex2: string) => {
+    if (state.activeTab === "misc") {
       return;
     }
 
+    if (state.activeTab === "eyes") {
+      const updateBothEyes = state.eyeSet1Linked || state.eyeSet2Linked;
+
+      if (updateBothEyes) {
+        const newTuple = [hex1, hex2] as const;
+        return onColorChange({
+          ...colors,
+          leftEye: newTuple,
+          rightEye: newTuple,
+        });
+      }
+    }
+
+    const skipUpdate =
+      hex1 === activeColorArray[0] && hex2 === activeColorArray[1];
+
+    if (skipUpdate) return;
     onColorChange({
       ...colors,
       [state.activeCategory]: [hex1, hex2],
@@ -114,7 +128,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
           tab="skin"
           activeHex={activeHexColor}
           onHexChange={onHexChange}
-          selectSkinPreset={selectSkinPreset}
+          selectHexPreset={selectHexPreset}
         >
           <div className="flex flex-row justify-center gap-x-3">
             <ColorButton
@@ -146,6 +160,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
           tab="hair"
           activeHex={activeHexColor}
           onHexChange={onHexChange}
+          selectHexPreset={selectHexPreset}
         >
           <div className="flex flex-row justify-center gap-x-3">
             <ColorButton
@@ -177,8 +192,9 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
           tab="eyes"
           activeHex={activeHexColor}
           onHexChange={onHexChange}
+          selectHexPreset={selectHexPreset}
         >
-          <div className="mb-4 flex flex-row items-center justify-center gap-x-1">
+          <div className="mb-4 flex flex-row items-center justify-center gap-x-1.5">
             <ColorButton
               primaryHex={colors.leftEye[0]}
               onClick={() => updaters.changeSelectedFill("leftEye", 0)}
@@ -190,7 +206,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             <LinkToggle
               active={state.eyeSet1Linked}
               toggleActive={updaters.toggleEyeLink1}
-              accessibleLabel="Link eye set 1?"
+              accessibleLabel="Link L1-R1"
             />
 
             <ColorButton
@@ -204,7 +220,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             </ColorButton>
           </div>
 
-          <div className="flex flex-row items-center justify-center gap-x-1">
+          <div className="flex flex-row items-center justify-center gap-x-1.5">
             <ColorButton
               primaryHex={colors.leftEye[1]}
               onClick={() => updaters.changeSelectedFill("leftEye", 1)}
@@ -216,7 +232,7 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
             <LinkToggle
               active={state.eyeSet2Linked}
               toggleActive={updaters.toggleEyeLink2}
-              accessibleLabel="Link eye set 2?"
+              accessibleLabel="Link L2-R2"
             />
 
             <ColorButton

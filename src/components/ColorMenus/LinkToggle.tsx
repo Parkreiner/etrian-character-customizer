@@ -18,14 +18,16 @@ export default function LinkToggle({
     <Toggle.Root
       pressed={active}
       onPressedChange={toggleActive}
-      className="block max-h-[26px] max-w-[26px] rounded-full bg-black p-1"
+      className={`block max-h-[26px] max-w-[26px] rounded-full p-1 ${
+        active ? "bg-teal-200" : "bg-teal-600"
+      }`}
     >
       <VisuallyHidden>{accessibleLabel}</VisuallyHidden>
 
       <TooltipTemplate labelText={accessibleLabel}>
         <LinkIcon
-          className={`h-full w-full ${
-            active ? "stroke-[#BDFFF2]" : "stroke-gray-400"
+          className={`h-full w-full stroke-teal-950 ${
+            active === false ? "opacity-80" : ""
           }`}
         />
       </TooltipTemplate>

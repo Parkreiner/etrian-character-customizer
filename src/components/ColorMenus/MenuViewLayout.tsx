@@ -3,6 +3,7 @@ import { UiTab } from "./localTypes";
 import ColorPicker from "@/components/ColorPicker";
 import {
   CharacterColors,
+  ColorTuple,
   HAIR_EYE_COLOR_PRESETS,
   SKIN_COLOR_PRESETS,
 } from "@/typesConstants/colors";
@@ -13,14 +14,14 @@ type Props = PropsWithChildren<{
   activeHex: string;
   defaultColors?: CharacterColors;
   onHexChange: (newHexColor: string) => void;
-  selectSkinPreset?: (hex1: string, hex2: string) => void;
+  selectHexPreset?: (hex1: string, hex2: string) => void;
 }>;
 
 const colorPresets = {
   eyes: HAIR_EYE_COLOR_PRESETS,
   hair: HAIR_EYE_COLOR_PRESETS,
   skin: SKIN_COLOR_PRESETS,
-} as const;
+} as const satisfies Record<Exclude<UiTab, "misc">, readonly ColorTuple[]>;
 
 function SectionHeader({ children }: PropsWithChildren) {
   return (
@@ -38,7 +39,7 @@ export default function MenuViewLayout({
   tab,
   activeHex,
   onHexChange,
-  selectSkinPreset,
+  selectHexPreset,
   children,
 }: Props) {
   return (
@@ -56,29 +57,19 @@ export default function MenuViewLayout({
       <section className="rounded-md bg-teal-900 px-4 py-4">
         <SectionHeader>Color Presets</SectionHeader>
 
-        <ul className="grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
-          {(tab === "hair" || tab === "eyes") &&
-            colorPresets[tab].map((hex, index) => (
-              <li key={index}>
-                <ColorButton
-                  primaryHex={hex}
-                  onClick={() => onHexChange(hex)}
-                />
-              </li>
-            ))}
-
-          {tab === "skin" &&
-            selectSkinPreset !== undefined &&
-            colorPresets.skin.map(([hex1, hex2], index) => (
+        {tab !== "misc" && selectHexPreset !== undefined && (
+          <ul className="grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
+            {colorPresets[tab].map(([hex1, hex2], index) => (
               <li key={index}>
                 <ColorButton
                   primaryHex={hex1}
                   secondaryHex={hex2}
-                  onClick={() => selectSkinPreset(hex1, hex2)}
+                  onClick={() => selectHexPreset(hex1, hex2)}
                 />
               </li>
             ))}
-        </ul>
+          </ul>
+        )}
       </section>
     </fieldset>
   );
