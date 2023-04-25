@@ -6,7 +6,7 @@
  * indicator gets covered in SVG vines before it slides up to exit. The effect
  * logic is going to need a whole lot more math to figure out how to place them.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { exitAnimationDurationMs } from "./localConstants";
 
 const initialStyles = {
@@ -19,18 +19,33 @@ export default function useExitAnimation(
   onAnimationCompletion: () => void
 ) {
   const [styles, setStyles] = useState<React.CSSProperties>(initialStyles);
+  const timeoutIdRef = useRef(0);
 
   useEffect(() => {
     if (!appLoaded) return;
-    setStyles((current) => ({ ...current, bottom: "100%" }));
 
-    const timeoutId = window.setTimeout(
+    setStyles((current) => {
+      if (current.bottom === "100%") return current;
+      return { ...current, bottom: "100%" };
+    });
+  }, [appLoaded]);
+
+  useEffect(() => {
+    if (!appLoaded || timeoutIdRef.current !== 0) return;
+
+    timeoutIdRef.current = window.setTimeout(
       onAnimationCompletion,
       exitAnimationDurationMs
     );
-
-    return () => window.clearTimeout(timeoutId);
   }, [appLoaded, onAnimationCompletion]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutIdRef.current !== 0) {
+        window.clearTimeout(timeoutIdRef.current);
+      }
+    };
+  }, []);
 
   return styles;
 }
