@@ -39,28 +39,34 @@ export default function MenuViewLayout({
 
   return (
     <fieldset>
-      <Card title={`Options (${tab})`} striped={true}>
-        {children}
-      </Card>
+      <div className="mb-3">
+        <Card title={`Options (${tab})`} striped={true}>
+          {children}
+        </Card>
+      </div>
 
-      <Card title="Color Editor" striped={true}>
-        <ColorPicker hexColor={activeHex} onHexChange={onHexChange} />
-      </Card>
+      <div className="mb-3">
+        <Card title="Color Editor" striped={true}>
+          <ColorPicker hexColor={activeHex} onHexChange={onHexChange} />
+        </Card>
+      </div>
 
       {canShowPresets && (
-        <Card title="Color Presets" striped={true}>
-          <ul className="grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
-            {colorPresets[tab].map(([hex1, hex2], index) => (
-              <li key={index}>
-                <ColorButton
-                  primaryHex={hex1}
-                  secondaryHex={hex2}
-                  onClick={() => selectHexPreset(hex1, hex2)}
-                />
-              </li>
-            ))}
-          </ul>
-        </Card>
+        <div className="mb-3">
+          <Card title="Color Presets" striped={true}>
+            <ul className="grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
+              {colorPresets[tab].map(([hex1, hex2], index) => (
+                <li key={index}>
+                  <ColorButton
+                    primaryHex={hex1}
+                    secondaryHex={hex2}
+                    onClick={() => selectHexPreset(hex1, hex2)}
+                  />
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
       )}
     </fieldset>
   );

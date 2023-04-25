@@ -1,14 +1,41 @@
+import { cva } from "class-variance-authority";
 import { PropsWithChildren } from "react";
+
+type GapSize = "small" | "medium";
 
 type Props = PropsWithChildren<{
   title: string;
   striped?: boolean;
+  gapSize?: GapSize;
 }>;
 
-export default function Card({ title, children, striped = false }: Props) {
+const containerStyles = cva("flex flex-col rounded-md bg-teal-900 p-4", {
+  variants: {
+    gapSize: {
+      medium: "pb-6",
+      small: "",
+    } satisfies Record<GapSize, string>,
+  },
+});
+
+const headerStyles = cva("flex flex-row items-center gap-x-2", {
+  variants: {
+    gapSize: {
+      medium: "mb-3",
+      small: "mb-2",
+    } satisfies Record<GapSize, string>,
+  },
+});
+
+export default function Card({
+  title,
+  children,
+  striped = false,
+  gapSize = "medium",
+}: Props) {
   return (
-    <section className="mb-4 flex flex-col rounded-md bg-teal-900 px-4 pb-6 pt-4">
-      <div className="mb-3 flex flex-row items-center gap-x-2">
+    <section className={containerStyles({ gapSize })}>
+      <div className={headerStyles({ gapSize })}>
         <h2 className="h-fit text-xs font-semibold uppercase tracking-wider text-teal-50">
           {title}
         </h2>
