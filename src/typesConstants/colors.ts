@@ -29,55 +29,20 @@ export type ColorCategory = keyof CharacterColors;
  * Defines all color presets for hair and eyes. Every two colors are designed to
  * work with each other.
  */
-export const HAIR_EYE_COLOR_PRESETS = [
-  // Pinks
-  "#F6FFFF",
-  "#A73871",
-
-  // Reds
-  "#CA394B",
-  "#8D071A",
-
-  // Browns
-  "#AA6560",
-  "#6E4349",
-
-  // Oranges
-  "#FAB47B",
-  "#C76245",
-
-  // Yellows
-  "#FCE87E",
-  "#E38950",
-
-  // Greens
-  "#49B679",
-  "#2D5B44",
-
-  // Blues
-  "#68A1E7",
-  "#346EA9",
-
-  // Plums
-  "#696DB1",
-  "#373A65",
-
-  // Magentas
-  "#A44FA4",
-  "#632662",
-
-  // Lavenders
-  "#D8ACFE",
-  "#715697",
-
-  // Whites
-  "#EFE5E3",
-  "#AA8C97",
-
-  // Blacks
-  "#4E4355",
-  "#2B1B22",
-] as const satisfies readonly string[];
+export const HAIR_EYE_COLOR_PRESETS: readonly ColorTuple[] = [
+  ["#F68DB4", "#A73871"],
+  ["#CA394B", "#8D071A"],
+  ["#AA6560", "#6E4349"],
+  ["#FAB47B", "#C76245"],
+  ["#FCE87E", "#E38950"],
+  ["#49B679", "#2D5B44"],
+  ["#68A1E7", "#346EA9"],
+  ["#696DB1", "#373A65"],
+  ["#A44FA4", "#632662"],
+  ["#D8ACFE", "#715697"],
+  ["#EFE5E3", "#AA8C97"],
+  ["#4E4355", "#2B1B22"],
+];
 
 /**
  * This is a curated list of all the skin tones from Etrian V. All races had
