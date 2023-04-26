@@ -18,6 +18,11 @@ export default function useExitAnimation(
   appLoaded: boolean,
   onAnimationCompletion: () => void
 ) {
+  // Can't treat styles as a derived value, because the state should only be
+  // able to transition one-way (from bottom: 0 to bottom: 100%). Could move the
+  // state sync outside the effect and have it run inline, but LoadingIndicator
+  // should always be small; rendering twice should have limited consequences.
+  const [styles, setStyles] = useState<React.CSSProperties>(initialStyles);
   const completionCallbackRef = useRef(onAnimationCompletion);
 
   // This effect must always be called before the timeout effect
@@ -28,24 +33,14 @@ export default function useExitAnimation(
   useEffect(() => {
     if (!appLoaded) return;
 
-    const callRef = () => completionCallbackRef.current();
-    const timeoutId = window.setTimeout(callRef, exitAnimationDurationMs);
-    return () => window.clearTimeout(timeoutId);
-  }, [appLoaded]);
-
-  // Can't treat styles as a derived value, because the state should only be
-  // able to transition one-way (from bottom: 0 to bottom: 100%). Could move the
-  // state sync outside the effect and have it run inline, but LoadingIndicator
-  // should always be small; rendering twice should have limited consequences.
-  const [styles, setStyles] = useState<React.CSSProperties>(initialStyles);
-
-  useEffect(() => {
-    if (!appLoaded) return;
-
     setStyles((current) => {
       if (current.bottom === "100%") return current;
       return { ...current, bottom: "100%" };
     });
+
+    const callRef = () => completionCallbackRef.current();
+    const timeoutId = window.setTimeout(callRef, exitAnimationDurationMs);
+    return () => window.clearTimeout(timeoutId);
   }, [appLoaded]);
 
   return styles;
