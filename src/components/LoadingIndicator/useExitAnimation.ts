@@ -9,9 +9,11 @@
 import { useState, useEffect, useRef } from "react";
 import { exitAnimationDurationMs } from "./localConstants";
 
+const finalFramePosition = "translateY(-100vh)";
+
 const initialStyles = {
   transition: `all ${exitAnimationDurationMs}ms ease-in-out`,
-  bottom: "0",
+  transform: "translateY(0)",
 } as const satisfies React.CSSProperties;
 
 export default function useExitAnimation(
@@ -33,9 +35,9 @@ export default function useExitAnimation(
   useEffect(() => {
     if (!appLoaded) return;
 
-    setStyles((current) => {
-      if (current.bottom === "100%") return current;
-      return { ...current, bottom: "100%" };
+    setStyles((currentStyles) => {
+      if (currentStyles.transform === finalFramePosition) return currentStyles;
+      return { ...currentStyles, transform: finalFramePosition };
     });
 
     const callRef = () => completionCallbackRef.current();
