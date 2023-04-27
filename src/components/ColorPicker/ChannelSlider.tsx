@@ -46,38 +46,31 @@ export default function ColorSlider({
   onChannelValueChange,
 }: Props) {
   const instanceId = useId();
-
-  const timeoutIdRef = useRef(0);
-  const intervalIdRef = useRef(0);
-  const tickRef = useRef<(() => void) | null>(null);
+  const mouseHoldIdRef = useRef(0);
+  const mouseHoldCallbackRef = useRef<(() => void) | null>(null);
 
   const { displayText, labelText, max, unit } = allChannelInfo[channel];
   const numberInputId = `${instanceId}-${channel}`;
 
   const setupMouseHoldLogic = () => {
-    if (timeoutIdRef.current !== 0 || intervalIdRef.current !== 0) return;
+    if (mouseHoldIdRef.current !== 0) return;
 
-    timeoutIdRef.current = window.setTimeout(() => {
-      timeoutIdRef.current = 0;
-      intervalIdRef.current = window.setInterval(() => {
-        tickRef.current?.();
-      }, 200);
+    mouseHoldIdRef.current = window.setTimeout(() => {
+      mouseHoldIdRef.current = window.setInterval(() => {
+        mouseHoldCallbackRef.current?.();
+      }, 100);
     }, 1000);
   };
 
   const clearMouseHoldLogic = () => {
-    if (timeoutIdRef.current !== 0) {
-      window.clearTimeout(timeoutIdRef.current);
-      timeoutIdRef.current = 0;
+    if (mouseHoldIdRef.current !== 0) {
+      window.clearTimeout(mouseHoldIdRef.current);
+      window.clearInterval(mouseHoldIdRef.current);
+      mouseHoldIdRef.current = 0;
     }
 
-    if (intervalIdRef.current !== 0) {
-      window.clearInterval(intervalIdRef.current);
-      intervalIdRef.current = 0;
-    }
-
-    if (tickRef.current !== null) {
-      tickRef.current = null;
+    if (mouseHoldCallbackRef.current !== null) {
+      mouseHoldCallbackRef.current = null;
     }
   };
 
@@ -85,7 +78,7 @@ export default function ColorSlider({
     const newValue = value - 1;
     onChannelValueChange(newValue);
 
-    tickRef.current = () => decrement(newValue);
+    mouseHoldCallbackRef.current = () => decrement(newValue);
     setupMouseHoldLogic();
   };
 
@@ -93,7 +86,7 @@ export default function ColorSlider({
     const newValue = value + 1;
     onChannelValueChange(newValue);
 
-    tickRef.current = () => increment(newValue);
+    mouseHoldCallbackRef.current = () => increment(newValue);
     setupMouseHoldLogic();
   };
 
