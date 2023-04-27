@@ -9,7 +9,7 @@
  * 1. A state update should happen immediately.
  * 2.
  */
-import { useId, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { HSVColor, RGBColor } from "./localTypes";
 
 import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -20,21 +20,21 @@ type Channel = keyof RGBColor | keyof HSVColor;
 
 type ChannelInfo = {
   displayText: string;
-  labelText: string;
+  fullName: string;
   max: number;
   unit: "%" | "°" | "";
 };
 
 const allChannelInfo = {
-  red: { displayText: "R", labelText: "Red", max: 255, unit: "" },
-  green: { displayText: "G", labelText: "Green", max: 255, unit: "" },
-  blue: { displayText: "B", labelText: "Blue", max: 255, unit: "" },
-  hue: { displayText: "H", labelText: "Hue", max: 359, unit: "°" },
-  sat: { displayText: "S", labelText: "Saturation", max: 100, unit: "%" },
-  val: { displayText: "V", labelText: "Value/Brightness", max: 100, unit: "%" },
+  red: { displayText: "R", fullName: "Red", max: 255, unit: "" },
+  green: { displayText: "G", fullName: "Green", max: 255, unit: "" },
+  blue: { displayText: "B", fullName: "Blue", max: 255, unit: "" },
+  hue: { displayText: "H", fullName: "Hue", max: 359, unit: "°" },
+  sat: { displayText: "S", fullName: "Saturation", max: 100, unit: "%" },
+  val: { displayText: "V", fullName: "Value/Brightness", max: 100, unit: "%" },
 } as const satisfies Record<Channel, ChannelInfo>;
 
-type Props = {
+type SliderProps = {
   channel: Channel;
   value: number;
   onChannelValueChange: (newValue: number) => void;
@@ -44,13 +44,16 @@ export default function ColorSlider({
   channel,
   value,
   onChannelValueChange,
-}: Props) {
+}: SliderProps) {
   const instanceId = useId();
+
   const mouseHoldIdRef = useRef(0);
   const mouseHoldCallbackRef = useRef<(() => void) | null>(null);
+  const channelCallbackRef = useRef(onChannelValueChange);
 
-  const { displayText, labelText, max, unit } = allChannelInfo[channel];
-  const numberInputId = `${instanceId}-${channel}`;
+  useEffect(() => {
+    channelCallbackRef.current = onChannelValueChange;
+  }, [onChannelValueChange]);
 
   const setupMouseHoldLogic = () => {
     if (mouseHoldIdRef.current !== 0) return;
@@ -59,7 +62,7 @@ export default function ColorSlider({
       mouseHoldIdRef.current = window.setInterval(() => {
         mouseHoldCallbackRef.current?.();
       }, 100);
-    }, 1000);
+    }, 600);
   };
 
   const clearMouseHoldLogic = () => {
@@ -76,7 +79,7 @@ export default function ColorSlider({
 
   const decrement = (value: number) => {
     const newValue = value - 1;
-    onChannelValueChange(newValue);
+    channelCallbackRef.current(newValue);
 
     mouseHoldCallbackRef.current = () => decrement(newValue);
     setupMouseHoldLogic();
@@ -84,20 +87,23 @@ export default function ColorSlider({
 
   const increment = (value: number) => {
     const newValue = value + 1;
-    onChannelValueChange(newValue);
+    channelCallbackRef.current(newValue);
 
     mouseHoldCallbackRef.current = () => increment(newValue);
     setupMouseHoldLogic();
   };
 
+  const { displayText, fullName, max, unit } = allChannelInfo[channel];
+  const numberInputId = `${instanceId}-${channel}`;
+
   return (
     <div className="flex w-full p-1 align-bottom first:mb-1">
-      <TooltipTemplate labelText={labelText}>
+      <TooltipTemplate labelText={fullName}>
         <label
           htmlFor={numberInputId}
           className="mr-3 block w-2 basis-6 text-center font-bold text-teal-50"
         >
-          <VisuallyHidden>Number input for {labelText} (</VisuallyHidden>
+          <VisuallyHidden>Number input for {fullName} (</VisuallyHidden>
           {displayText}
           <VisuallyHidden>)</VisuallyHidden>
         </label>
@@ -112,26 +118,30 @@ export default function ColorSlider({
         onValueChange={(newSliderValues) => {
           onChannelValueChange(newSliderValues[0] as number);
         }}
-        aria-label={`Slider for ${labelText}`}
+        aria-label={`Slider for ${fullName}`}
       >
-        <Slider.Track className="relative h-[4px] grow rounded-full bg-teal-950">
-          <Slider.Range className="absolute h-full rounded-full bg-teal-100" />
+        <Slider.Track className="relative h-[4px] grow rounded-full bg-black">
+          <Slider.Range className="absolute h-full rounded-full bg-teal-200" />
         </Slider.Track>
         <Slider.Thumb className="block h-5 w-2 rounded-sm bg-white shadow-[0_2px_10px] shadow-gray-900 hover:bg-teal-100 focus:shadow-[0_0_0_5px] focus:shadow-gray-800 focus:outline-none" />
       </Slider.Root>
 
       <div className="text-md ml-4 flex w-32 flex-row items-center justify-between gap-x-2 text-center font-medium text-teal-100">
+        {/*
+         * Buttons are currently copy-pasted twice; didn't feel worth it to
+         * split them off into a separate component just yet.
+         */}
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
           onMouseDown={() => decrement(value)}
           onMouseUp={clearMouseHoldLogic}
           onMouseLeave={clearMouseHoldLogic}
         >
-          <VisuallyHidden>Decrement {displayText}</VisuallyHidden>◄
+          <VisuallyHidden>Decrement {fullName}</VisuallyHidden>◄
         </button>
 
         <p className="h-fit w-16 text-teal-50">
-          <VisuallyHidden>{displayText} is at</VisuallyHidden>
+          <VisuallyHidden>{fullName} is at</VisuallyHidden>
           {value}
           {unit}
         </p>
@@ -142,7 +152,7 @@ export default function ColorSlider({
           onMouseUp={clearMouseHoldLogic}
           onMouseLeave={clearMouseHoldLogic}
         >
-          <VisuallyHidden>Increment {displayText}</VisuallyHidden>►
+          <VisuallyHidden>Increment {fullName}</VisuallyHidden>►
         </button>
       </div>
     </div>

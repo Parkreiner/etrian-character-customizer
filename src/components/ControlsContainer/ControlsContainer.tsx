@@ -101,7 +101,7 @@ export default function ControlsContainer<T extends string>({
         {tabs.map(toTabsTrigger)}
       </Tabs.List>
 
-      <div className="mt-2 h-[600px] shadow-md">
+      <div className="mt-2 h-[400px] shadow-md">
         <div className="h-full overflow-y-hidden rounded-md bg-teal-600 py-4 pl-4 pr-3">
           <div
             ref={scrollContainerRef}
