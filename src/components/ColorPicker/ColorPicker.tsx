@@ -28,10 +28,11 @@
 import { useState } from "react";
 import { HSVColor, RGBColor } from "./localTypes";
 import { hexToRgb, rgbToHsv, hsvToHex, rgbToHex } from "./colorHelpers";
+import { clamp } from "@/utils/math";
 
-import ValueSaturationInputs from "./ValueSaturationInputs";
 import RgbInputs from "./RgbInputs";
 import HueWheel from "./HueWheel";
+import ChannelSlider from "./ChannelSlider";
 
 type Props = {
   hexColor: string;
@@ -44,14 +45,12 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
   const [cachedHex, setCachedHex] = useState(hexColor);
 
   const onRgbChannelChange = (channel: keyof RGBColor, newValue: number) => {
-    const inputInvalid =
-      !Number.isInteger(newValue) || newValue < 0 || newValue > 255;
-
-    if (inputInvalid) {
+    const clamped = clamp(newValue, 0, 255);
+    if (!Number.isInteger(clamped) || rgb[channel] === clamped) {
       return;
     }
 
-    const newRgb = { ...rgb, [channel]: newValue };
+    const newRgb = { ...rgb, [channel]: clamped };
     const newHex = rgbToHex(newRgb);
 
     setHsv(rgbToHsv(newRgb));
@@ -60,17 +59,14 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
   };
 
   const onHsvChannelChange = (channel: keyof HSVColor, newValue: number) => {
-    const inputInvalid =
-      !Number.isInteger(newValue) ||
-      newValue < 0 ||
-      (channel === "hue" && newValue > 359) ||
-      ((channel === "val" || channel === "sat") && newValue > 100);
+    const maxValue = channel === "hue" ? 359 : 100;
+    const clamped = clamp(newValue, 0, maxValue);
 
-    if (inputInvalid) {
+    if (!Number.isInteger(clamped) || hsv[channel] === clamped) {
       return;
     }
 
-    const newHsv = { ...hsv, [channel]: newValue };
+    const newHsv = { ...hsv, [channel]: clamped };
     const newHex = hsvToHex(newHsv);
 
     setHsv(newHsv);
@@ -78,10 +74,7 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
     onHexChange(newHex);
   };
 
-  // The "Ugliest Pattern in React", courtesy of the official docs themselves.
-  // It's basically useEffect, except that the re-render has better performance
-  // because only this component re-renders; the child components aren't allowed
-  // to re-render until this parent has a stable render without state changes
+  // Ugly state sync – necessary evil to avoid UI lockups
   const needStateSync = hexColor !== cachedHex;
   if (needStateSync) {
     const freshHsv = rgbToHsv(rgb);
@@ -96,7 +89,24 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
         onHueChange={(newValue) => onHsvChannelChange("hue", newValue)}
       />
 
-      <ValueSaturationInputs hsv={hsv} onChannelChange={onHsvChannelChange} />
+      <section className="flex w-full flex-col justify-center">
+        <ChannelSlider
+          channel="sat"
+          value={hsv.sat}
+          onChannelValueChange={(newValue) =>
+            onHsvChannelChange("sat", newValue)
+          }
+        />
+
+        <ChannelSlider
+          channel="val"
+          value={hsv.val}
+          onChannelValueChange={(newValue) =>
+            onHsvChannelChange("val", newValue)
+          }
+        />
+      </section>
+
       <RgbInputs rgb={rgb} onChannelChange={onRgbChannelChange} />
     </fieldset>
   );
