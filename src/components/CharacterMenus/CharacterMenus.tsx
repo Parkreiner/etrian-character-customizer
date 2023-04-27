@@ -65,8 +65,8 @@ export default memo(function CharacterMenus({
       accessibleTabLabel: nameAliases[game],
       tabView: game === selectedGame ? selectedGameContent : null,
       tabText: (
-        <abbr title={nameAliases[game]} className="no-underline">
-          {game.toUpperCase()}
+        <abbr title={nameAliases[game]} className="uppercase">
+          {game}
         </abbr>
       ),
     };
