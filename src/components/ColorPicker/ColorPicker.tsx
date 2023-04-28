@@ -26,13 +26,13 @@
  * the movements are locked to a circle (this will probably be hard)
  */
 import { useState } from "react";
-import { HSVColor, RGBColor } from "./localTypes";
+import { HSVColor, RGBColor, rgbChannels, allChannelInfo } from "./localTypes";
 import { hexToRgb, rgbToHsv, hsvToHex, rgbToHex } from "./colorHelpers";
 import { clamp } from "@/utils/math";
 
-import RgbInputs from "./RgbInputs";
 import HueWheel from "./HueWheel";
 import ChannelSlider from "./ChannelSlider";
+import ChannelInput from "./ChannelInput";
 
 type Props = {
   hexColor: string;
@@ -42,10 +42,12 @@ type Props = {
 export default function ColorPicker({ hexColor, onHexChange }: Props) {
   const rgb = hexToRgb(hexColor);
   const [hsv, setHsv] = useState(() => rgbToHsv(rgb));
-  const [cachedHex, setCachedHex] = useState(hexColor);
+  const [lastInternalHex, setLastInternalHex] = useState(hexColor);
 
   const onRgbChannelChange = (channel: keyof RGBColor, newValue: number) => {
-    const clamped = clamp(newValue, 0, 255);
+    const { max } = allChannelInfo[channel];
+    const clamped = clamp(newValue, 0, max);
+
     if (!Number.isInteger(clamped) || rgb[channel] === clamped) {
       return;
     }
@@ -54,13 +56,13 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
     const newHex = rgbToHex(newRgb);
 
     setHsv(rgbToHsv(newRgb));
-    setCachedHex(newHex);
+    setLastInternalHex(newHex);
     onHexChange(newHex);
   };
 
   const onHsvChannelChange = (channel: keyof HSVColor, newValue: number) => {
-    const maxValue = channel === "hue" ? 359 : 100;
-    const clamped = clamp(newValue, 0, maxValue);
+    const { max } = allChannelInfo[channel];
+    const clamped = clamp(newValue, 0, max);
 
     if (!Number.isInteger(clamped) || hsv[channel] === clamped) {
       return;
@@ -70,16 +72,16 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
     const newHex = hsvToHex(newHsv);
 
     setHsv(newHsv);
-    setCachedHex(newHex);
+    setLastInternalHex(newHex);
     onHexChange(newHex);
   };
 
-  // Ugly state sync – necessary evil to avoid UI lockups
-  const needStateSync = hexColor !== cachedHex;
+  // Ugly state sync – needed to avoid UI getting out of sync with parent
+  const needStateSync = hexColor !== lastInternalHex;
   if (needStateSync) {
     const freshHsv = rgbToHsv(rgb);
     setHsv(freshHsv);
-    setCachedHex(hexColor);
+    setLastInternalHex(hexColor);
   }
 
   return (
@@ -107,7 +109,18 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
         />
       </section>
 
-      <RgbInputs rgb={rgb} onChannelChange={onRgbChannelChange} />
+      <section className="mt-4 flex w-full flex-row flex-wrap justify-center gap-x-4">
+        {rgbChannels.map((channel) => (
+          <ChannelInput
+            key={channel}
+            channel={channel}
+            value={rgb[channel]}
+            onChannelValueChange={(newValue) =>
+              onRgbChannelChange(channel, newValue)
+            }
+          />
+        ))}
+      </section>
     </fieldset>
   );
 }

@@ -10,31 +10,13 @@
  * 2.
  */
 import { useEffect, useId, useRef } from "react";
-import { HSVColor, RGBColor } from "./localTypes";
+import { Channel, allChannelInfo } from "./localTypes";
 
 import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import * as Slider from "@radix-ui/react-slider";
 import TooltipTemplate from "@/components/TooltipTemplate";
 
-type Channel = keyof RGBColor | keyof HSVColor;
-
-type ChannelInfo = {
-  displayText: string;
-  fullName: string;
-  max: number;
-  unit: "%" | "°" | "";
-};
-
-const allChannelInfo = {
-  red: { displayText: "R", fullName: "Red", max: 255, unit: "" },
-  green: { displayText: "G", fullName: "Green", max: 255, unit: "" },
-  blue: { displayText: "B", fullName: "Blue", max: 255, unit: "" },
-  hue: { displayText: "H", fullName: "Hue", max: 359, unit: "°" },
-  sat: { displayText: "S", fullName: "Saturation", max: 100, unit: "%" },
-  val: { displayText: "V", fullName: "Value/Brightness", max: 100, unit: "%" },
-} as const satisfies Record<Channel, ChannelInfo>;
-
-type SliderProps = {
+type Props = {
   channel: Channel;
   value: number;
   onChannelValueChange: (newValue: number) => void;
@@ -44,7 +26,7 @@ export default function ColorSlider({
   channel,
   value,
   onChannelValueChange,
-}: SliderProps) {
+}: Props) {
   const instanceId = useId();
   const mouseHoldIdRef = useRef(0);
   const channelCallbackRef = useRef(onChannelValueChange);

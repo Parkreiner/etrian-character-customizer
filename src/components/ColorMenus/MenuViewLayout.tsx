@@ -4,7 +4,6 @@ import Card from "@/components/Card";
 import ColorButton from "./ColorButton";
 
 import {
-  CharacterColors,
   ColorTuple,
   HAIR_EYE_COLOR_PRESETS,
   SKIN_COLOR_PRESETS,
@@ -14,7 +13,6 @@ import { UiTab } from "./localTypes";
 type Props = PropsWithChildren<{
   tab: UiTab;
   activeHex: string;
-  defaultColors?: CharacterColors;
   onHexChange: (newHexColor: string) => void;
   selectHexPreset?: (hex1: string, hex2: string) => void;
 }>;
@@ -53,7 +51,7 @@ export default function MenuViewLayout({
 
       {canShowPresets && (
         <div className="mb-3">
-          <Card title="Color Presets" striped={true}>
+          <Card title={`Presets (${tab})`} striped={true}>
             <ul className="grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
               {colorPresets[tab].map(([hex1, hex2], index) => (
                 <li key={index}>
