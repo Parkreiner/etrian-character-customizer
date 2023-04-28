@@ -55,7 +55,7 @@ export default function ColorSlider({
 
   const onMouseClick = (valueOffset: -1 | 1) => {
     let localValue = value + valueOffset;
-    onChannelValueChange(localValue);
+    channelCallbackRef.current(localValue);
 
     mouseHoldIdRef.current = window.setTimeout(() => {
       mouseHoldIdRef.current = window.setInterval(() => {
