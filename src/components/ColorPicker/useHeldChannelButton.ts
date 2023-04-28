@@ -41,5 +41,16 @@ export default function useHeldChannelButton(
     }
   }, []);
 
-  return { onMouseDown, cancelMouseDown } as const;
+  return {
+    /**
+     * Sets up the main click logic. Do NOT assign to onClick; always use
+     * onMouseDown. Things will break if you use onClick.
+     */
+    onMouseDown,
+
+    /**
+     * Must be attached to BOTH the onMouseUp and onMouseLeave events
+     */
+    cancelMouseDown,
+  } as const;
 }
