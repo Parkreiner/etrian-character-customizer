@@ -8,6 +8,7 @@ type CategoryIndices = {
 };
 
 type MenusState = {
+  characterKey: string;
   activeTab: UiTab;
   activeCategory: ColorCategory;
   activeIndices: CategoryIndices;
@@ -20,6 +21,7 @@ type MenusAction =
   | { type: "eyeSet1Toggled" }
   | { type: "eyeSet2Toggled" }
   | { type: "tabChanged"; payload: { newTab: UiTab } }
+  | { type: "characterChanged"; payload: { newCharacterKey: string } }
   | {
       type: "newColorFillSelected";
       payload:
@@ -28,6 +30,7 @@ type MenusAction =
     };
 
 const initialState = {
+  characterKey: "",
   activeTab: "skin",
   activeCategory: "skin",
   lastEyeSelection: "leftEye",
@@ -93,10 +96,21 @@ export function reduceMenusState(
     case "eyeSet2Toggled": {
       return { ...state, eyeSet2Linked: !state.eyeSet2Linked };
     }
+
+    case "characterChanged": {
+      const { newCharacterKey } = action.payload;
+      return {
+        ...initialState,
+        characterKey: newCharacterKey,
+      };
+    }
   }
 }
 
-export default function useColorMenusState(colors: CharacterColors) {
+export default function useColorMenusState(
+  key: string,
+  colors: CharacterColors
+) {
   const [state, dispatch] = useReducer(reduceMenusState, initialState);
 
   const changeSelectedFill = useCallback(
@@ -133,6 +147,11 @@ export default function useColorMenusState(colors: CharacterColors) {
   const toggleEyeLink2 = useCallback(() => {
     dispatch({ type: "eyeSet2Toggled" });
   }, []);
+
+  // Very necessary evil to avoid screen flickers
+  if (state.characterKey !== key) {
+    dispatch({ type: "characterChanged", payload: { newCharacterKey: key } });
+  }
 
   return {
     state,
