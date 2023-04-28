@@ -18,7 +18,7 @@ export default function useHeldChannelButton(
     channelCallbackRef.current = valueChangeCallback;
   }, [valueChangeCallback]);
 
-  const onMouseDown = useCallback(
+  const startMouseDown = useCallback(
     (valueOffset: -1 | 1) => {
       let localValue = value + valueOffset;
       channelCallbackRef.current(localValue);
@@ -46,7 +46,7 @@ export default function useHeldChannelButton(
      * Sets up the main click logic. Do NOT assign to onClick; always use
      * onMouseDown. Things will break if you use onClick.
      */
-    onMouseDown,
+    startMouseDown,
 
     /**
      * Must be attached to BOTH the onMouseUp and onMouseLeave events

@@ -29,7 +29,7 @@ export default function ColorSlider({
   onChannelValueChange,
 }: Props) {
   const instanceId = useId();
-  const { onMouseDown, cancelMouseDown } = useHeldChannelButton(
+  const { startMouseDown, cancelMouseDown } = useHeldChannelButton(
     value,
     onChannelValueChange
   );
@@ -64,7 +64,7 @@ export default function ColorSlider({
         <Slider.Track className="relative h-[4px] grow rounded-full bg-black">
           <Slider.Range className="absolute h-full rounded-full bg-teal-200" />
         </Slider.Track>
-        <Slider.Thumb className="block h-5 w-2 rounded-sm bg-white shadow-[0_2px_10px] shadow-gray-900 hover:bg-teal-100 focus:shadow-[0_0_0_5px] focus:shadow-gray-800 focus:outline-none" />
+        <Slider.Thumb className="block h-5 w-2 rounded-sm bg-teal-50 shadow-[0_2px_10px] shadow-gray-900 hover:bg-teal-200 focus:shadow-[0_0_0_5px] focus:shadow-gray-800 focus:outline-none" />
       </Slider.Root>
 
       <div className="text-md ml-4 flex w-32 flex-row items-center justify-between gap-x-2 text-center font-medium text-teal-100">
@@ -74,7 +74,8 @@ export default function ColorSlider({
          */}
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
-          onMouseDown={() => onMouseDown(-1)}
+          onClick={() => onChannelValueChange(value - 1)}
+          onMouseDown={() => startMouseDown(-1)}
           onMouseUp={cancelMouseDown}
           onMouseLeave={cancelMouseDown}
         >
@@ -89,7 +90,8 @@ export default function ColorSlider({
 
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
-          onMouseDown={() => onMouseDown(1)}
+          onClick={() => onChannelValueChange(value + 1)}
+          onMouseDown={() => startMouseDown(1)}
           onMouseUp={cancelMouseDown}
           onMouseLeave={cancelMouseDown}
         >

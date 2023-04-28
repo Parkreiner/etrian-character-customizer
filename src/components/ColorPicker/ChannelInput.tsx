@@ -18,7 +18,7 @@ export default function ChannelInput({
   onChannelValueChange,
 }: Props) {
   const instanceId = useId();
-  const { onMouseDown, cancelMouseDown } = useHeldChannelButton(
+  const { startMouseDown, cancelMouseDown } = useHeldChannelButton(
     value,
     onChannelValueChange
   );
@@ -58,17 +58,22 @@ export default function ChannelInput({
       </div>
 
       <div className="flex h-full flex-col flex-nowrap bg-teal-700 p-1 pl-1.5 pr-[5px] text-[9px] leading-none">
-        {arrows.map((symbol) => (
-          <button
-            className="first:pb-0.5 hover:text-white"
-            key={symbol}
-            onMouseDown={() => onMouseDown(symbol === "▲" ? 1 : -1)}
-            onMouseUp={cancelMouseDown}
-            onMouseLeave={cancelMouseDown}
-          >
-            {symbol}
-          </button>
-        ))}
+        {arrows.map((symbol) => {
+          const valueOffset = symbol === "▲" ? 1 : -1;
+
+          return (
+            <button
+              className="text-teal-100 opacity-90 first:pb-0.5 hover:text-white hover:opacity-100"
+              key={symbol}
+              onClick={() => onChannelValueChange(value + valueOffset)}
+              onMouseDown={() => startMouseDown(valueOffset)}
+              onMouseUp={cancelMouseDown}
+              onMouseLeave={cancelMouseDown}
+            >
+              {symbol}
+            </button>
+          );
+        })}
       </div>
     </fieldset>
   );
