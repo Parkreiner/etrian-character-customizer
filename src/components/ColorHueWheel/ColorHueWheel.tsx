@@ -1,4 +1,4 @@
-import { useId, useLayoutEffect, useRef } from "react";
+import { useId, useLayoutEffect } from "react";
 import useSquareDimensions from "./useSquareDimensions";
 
 type Props = {
@@ -7,27 +7,29 @@ type Props = {
 };
 
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
-  const { size, ref: containerRef } = useSquareDimensions<HTMLDivElement>();
-  const sliderRef = useRef<HTMLButtonElement>(null);
   const instanceId = useId();
+  const { size: containerSize, ref: containerRef } =
+    useSquareDimensions<HTMLDivElement>();
+
+  const { size: sliderSize, ref: sliderRef } =
+    useSquareDimensions<HTMLButtonElement>();
 
   useLayoutEffect(() => {
     const slider = sliderRef.current;
-    if (!slider || size === null) return;
+    if (!slider || containerSize === null || sliderSize === null) return;
 
-    const degrees = (hue + 90) % 360;
-    const radians = (Math.PI * degrees) / 180;
+    const radians = (Math.PI * hue) / 180;
+    const containerRadius = containerSize / 2;
+    const yMagnitude = containerRadius * Math.sin(radians);
+    const xMagnitude = containerRadius * Math.cos(radians);
 
-    const radius = size / 2;
-    const yVector = radius * Math.sin(radians);
-    const xVector = radius * Math.cos(radians);
-
-    const topOffset = radius - yVector;
-    const leftOffset = radius + xVector;
+    const sliderRadius = sliderSize / 2;
+    const topOffset = containerRadius - yMagnitude - sliderRadius;
+    const leftOffset = containerRadius + xMagnitude - sliderRadius;
 
     slider.style.top = `${topOffset}px`;
     slider.style.left = `${leftOffset}px`;
-  }, [hue, size]);
+  }, [hue, containerSize, sliderSize, sliderRef]);
 
   const textId = `${instanceId}-text`;
 
