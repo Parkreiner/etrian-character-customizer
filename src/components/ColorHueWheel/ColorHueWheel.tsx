@@ -6,6 +6,8 @@ type Props = {
   onHueChange: (newHue: number) => void;
 };
 
+const RADIAN_CONVERSION_FACTOR = Math.PI / 180;
+
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
   const instanceId = useId();
   const { size: containerSize, ref: containerRef } =
@@ -18,7 +20,7 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
     const slider = sliderRef.current;
     if (!slider || containerSize === null || sliderSize === null) return;
 
-    const radians = (Math.PI * hue) / 180;
+    const radians = hue * RADIAN_CONVERSION_FACTOR;
     const containerRadius = containerSize / 2;
     const yMagnitude = containerRadius * Math.sin(radians);
     const xMagnitude = containerRadius * Math.cos(radians);
