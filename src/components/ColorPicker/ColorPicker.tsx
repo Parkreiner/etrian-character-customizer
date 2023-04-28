@@ -109,7 +109,7 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
         />
       </section>
 
-      <section className="mt-4 flex w-full flex-row flex-wrap justify-center gap-x-4">
+      <section className="mt-4 flex w-full flex-row flex-wrap justify-center gap-x-3 md:flex-nowrap">
         {rgbChannels.map((channel) => (
           <ChannelInput
             key={channel}
