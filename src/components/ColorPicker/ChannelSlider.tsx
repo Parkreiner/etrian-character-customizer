@@ -9,12 +9,13 @@
  * 1. A state update should happen immediately.
  * 2.
  */
-import { useEffect, useId, useRef } from "react";
+import { useId } from "react";
 import { Channel, allChannelInfo } from "./localTypes";
 
 import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import * as Slider from "@radix-ui/react-slider";
 import TooltipTemplate from "@/components/TooltipTemplate";
+import useHeldChannelButton from "./useHeldChannelButton";
 
 type Props = {
   channel: Channel;
@@ -28,32 +29,10 @@ export default function ColorSlider({
   onChannelValueChange,
 }: Props) {
   const instanceId = useId();
-  const mouseHoldIdRef = useRef(0);
-  const channelCallbackRef = useRef(onChannelValueChange);
-
-  useEffect(() => {
-    channelCallbackRef.current = onChannelValueChange;
-  }, [onChannelValueChange]);
-
-  const onMouseClick = (valueOffset: -1 | 1) => {
-    let localValue = value + valueOffset;
-    channelCallbackRef.current(localValue);
-
-    mouseHoldIdRef.current = window.setTimeout(() => {
-      mouseHoldIdRef.current = window.setInterval(() => {
-        localValue += valueOffset;
-        channelCallbackRef.current(localValue);
-      }, 100);
-    }, 600);
-  };
-
-  const clearMouseHoldId = () => {
-    if (mouseHoldIdRef.current !== 0) {
-      window.clearTimeout(mouseHoldIdRef.current);
-      window.clearInterval(mouseHoldIdRef.current);
-      mouseHoldIdRef.current = 0;
-    }
-  };
+  const { onMouseDown, cancelMouseDown } = useHeldChannelButton(
+    value,
+    onChannelValueChange
+  );
 
   const { displayText, fullName, max, unit } = allChannelInfo[channel];
   const numberInputId = `${instanceId}-${channel}`;
@@ -95,9 +74,9 @@ export default function ColorSlider({
          */}
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
-          onMouseDown={() => onMouseClick(-1)}
-          onMouseUp={clearMouseHoldId}
-          onMouseLeave={clearMouseHoldId}
+          onMouseDown={() => onMouseDown(-1)}
+          onMouseUp={cancelMouseDown}
+          onMouseLeave={cancelMouseDown}
         >
           <VisuallyHidden>Decrement {fullName}</VisuallyHidden>◄
         </button>
@@ -110,9 +89,9 @@ export default function ColorSlider({
 
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
-          onMouseDown={() => onMouseClick(1)}
-          onMouseUp={clearMouseHoldId}
-          onMouseLeave={clearMouseHoldId}
+          onMouseDown={() => onMouseDown(1)}
+          onMouseUp={cancelMouseDown}
+          onMouseLeave={cancelMouseDown}
         >
           <VisuallyHidden>Increment {fullName}</VisuallyHidden>►
         </button>
