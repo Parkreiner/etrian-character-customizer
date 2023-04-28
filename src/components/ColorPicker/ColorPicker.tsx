@@ -30,7 +30,7 @@ import { HSVColor, RGBColor, rgbChannels, allChannelInfo } from "./localTypes";
 import { hexToRgb, rgbToHsv, hsvToHex, rgbToHex } from "./colorHelpers";
 import { clamp } from "@/utils/math";
 
-import HueWheel from "./HueWheel";
+import ColorHueWheel from "@/components/ColorHueWheel";
 import ChannelSlider from "./ChannelSlider";
 import ChannelInput from "./ChannelInput";
 
@@ -86,10 +86,12 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
 
   return (
     <fieldset className="w-full">
-      <HueWheel
-        hue={hsv.hue}
-        onHueChange={(newValue) => onHsvChannelChange("hue", newValue)}
-      />
+      <div className="mb-4 mt-2">
+        <ColorHueWheel
+          hue={hsv.hue}
+          onHueChange={(newValue) => onHsvChannelChange("hue", newValue)}
+        />
+      </div>
 
       <section className="flex w-full flex-col justify-center">
         <ChannelSlider
