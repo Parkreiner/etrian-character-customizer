@@ -14,7 +14,7 @@ import ControlsContainer, {
 } from "@/components/ControlsContainer";
 import MenuViewLayout from "./MenuViewLayout";
 
-type Props = {
+type ExternalProps = {
   /**
    * A key for linking a character to the ColorsMenu component.
    *
@@ -28,15 +28,10 @@ type Props = {
   onColorChange: (newColors: CharacterColors) => void;
 };
 
-export default function ColorMenusCore({
-  colors,
-  onColorChange,
-  characterKey,
-}: Props) {
-  // The custom hook resyncs the state based on character key changes;
-  // originally had the entire component do an unmount, but that was way too
-  // slow with all the layout effects going on, and the UI had screen flickers
-  const { state, updaters } = useColorMenusState(characterKey, colors);
+type CoreProps = Omit<ExternalProps, "characterKey">;
+
+function ColorMenusCore({ colors, onColorChange }: CoreProps) {
+  const { state, updaters } = useColorMenusState(colors);
   const activeColorArray = colors[state.activeCategory];
   const activeIndex = state.activeIndices[state.activeCategory];
   const activeHexColor = activeColorArray[activeIndex] ?? "#000000";
@@ -274,4 +269,10 @@ export default function ColorMenusCore({
       />
     </fieldset>
   );
+}
+
+export default function ColorMenus(props: ExternalProps) {
+  // All of ColorMenusCore will remount on key change; it's the fastest and
+  // most fool-proof way to get the state synced up after a character changes
+  return <ColorMenusCore key={props.characterKey} {...props} />;
 }
