@@ -46,51 +46,31 @@ export default function ColorSlider({
   onChannelValueChange,
 }: SliderProps) {
   const instanceId = useId();
-
   const mouseHoldIdRef = useRef(0);
-  const mouseHoldCallbackRef = useRef<(() => void) | null>(null);
   const channelCallbackRef = useRef(onChannelValueChange);
 
   useEffect(() => {
     channelCallbackRef.current = onChannelValueChange;
   }, [onChannelValueChange]);
 
-  const setupMouseHoldLogic = () => {
-    if (mouseHoldIdRef.current !== 0) return;
+  const onMouseClick = (valueOffset: -1 | 1) => {
+    let localValue = value + valueOffset;
+    onChannelValueChange(localValue);
 
     mouseHoldIdRef.current = window.setTimeout(() => {
       mouseHoldIdRef.current = window.setInterval(() => {
-        mouseHoldCallbackRef.current?.();
+        localValue += valueOffset;
+        channelCallbackRef.current(localValue);
       }, 100);
     }, 600);
   };
 
-  const clearMouseHoldLogic = () => {
+  const clearMouseHoldId = () => {
     if (mouseHoldIdRef.current !== 0) {
       window.clearTimeout(mouseHoldIdRef.current);
       window.clearInterval(mouseHoldIdRef.current);
       mouseHoldIdRef.current = 0;
     }
-
-    if (mouseHoldCallbackRef.current !== null) {
-      mouseHoldCallbackRef.current = null;
-    }
-  };
-
-  const decrement = (value: number) => {
-    const newValue = value - 1;
-    channelCallbackRef.current(newValue);
-
-    mouseHoldCallbackRef.current = () => decrement(newValue);
-    setupMouseHoldLogic();
-  };
-
-  const increment = (value: number) => {
-    const newValue = value + 1;
-    channelCallbackRef.current(newValue);
-
-    mouseHoldCallbackRef.current = () => increment(newValue);
-    setupMouseHoldLogic();
   };
 
   const { displayText, fullName, max, unit } = allChannelInfo[channel];
@@ -133,9 +113,9 @@ export default function ColorSlider({
          */}
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
-          onMouseDown={() => decrement(value)}
-          onMouseUp={clearMouseHoldLogic}
-          onMouseLeave={clearMouseHoldLogic}
+          onMouseDown={() => onMouseClick(-1)}
+          onMouseUp={clearMouseHoldId}
+          onMouseLeave={clearMouseHoldId}
         >
           <VisuallyHidden>Decrement {fullName}</VisuallyHidden>◄
         </button>
@@ -148,9 +128,9 @@ export default function ColorSlider({
 
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
-          onMouseDown={() => increment(value)}
-          onMouseUp={clearMouseHoldLogic}
-          onMouseLeave={clearMouseHoldLogic}
+          onMouseDown={() => onMouseClick(1)}
+          onMouseUp={clearMouseHoldId}
+          onMouseLeave={clearMouseHoldId}
         >
           <VisuallyHidden>Increment {fullName}</VisuallyHidden>►
         </button>
