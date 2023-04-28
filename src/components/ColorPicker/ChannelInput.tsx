@@ -49,21 +49,21 @@ export default function ChannelInput({
           step="1"
           onChange={(e) => onChannelValueChange(e.target.valueAsNumber)}
         />
+      </div>
 
-        <div className="flex flex-col flex-nowrap pr-1 text-[9px] leading-none">
-          {arrows.map((symbol) => (
-            <button
-              className="opacity-80 first:pb-0.5 hover:text-white hover:opacity-100"
-              key={symbol}
-              onClick={() => {
-                const offset = symbol === "▲" ? 1 : -1;
-                onChannelValueChange(value + offset);
-              }}
-            >
-              {symbol}
-            </button>
-          ))}
-        </div>
+      <div className="flex h-full flex-col flex-nowrap bg-teal-700 p-1 pl-1.5 pr-[5px] text-[9px] leading-none">
+        {arrows.map((symbol) => (
+          <button
+            className="first:pb-0.5 hover:text-white"
+            key={symbol}
+            onClick={() => {
+              const offset = symbol === "▲" ? 1 : -1;
+              onChannelValueChange(value + offset);
+            }}
+          >
+            {symbol}
+          </button>
+        ))}
       </div>
     </fieldset>
   );
