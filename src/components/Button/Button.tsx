@@ -35,7 +35,7 @@ const buttonStyles = cva("flex flex-row", {
 });
 
 /** Defaults to medium size if size is not specified. */
-function Button(
+export default forwardRef(function Button(
   { intent, children, type = "button", size = "medium", ...delegated }: Props,
   ref?: React.ForwardedRef<HTMLButtonElement>
 ) {
@@ -49,6 +49,4 @@ function Button(
       <span>{children}</span>
     </button>
   );
-}
-
-export default forwardRef(Button);
+});
