@@ -19,12 +19,12 @@ function AppFallback() {
 
 export default function App() {
   return (
-    <ErrorBoundary fallback={<AppFallback />}>
-      <div className="h-full w-full bg-gradient-to-br from-teal-100 to-teal-50">
+    <div className="h-full w-full bg-gradient-to-br from-teal-100 to-teal-50">
+      <ErrorBoundary fallback={<AppFallback />}>
         <TooltipProvider delayDuration={500}>
           <Editor />
         </TooltipProvider>
-      </div>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </div>
   );
 }
