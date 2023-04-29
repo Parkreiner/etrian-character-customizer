@@ -1,6 +1,6 @@
 import { useCallback, useId } from "react";
-import useDegreesSlider from "./useDegreesSlider";
-import useSliderKeyboardInput from "./useSliderKeyboardInput";
+import useSliderPosition from "./useSliderPosition";
+import useSliderInputs from "./useSliderInputs";
 
 type Props = {
   hue: number;
@@ -8,18 +8,18 @@ type Props = {
 };
 
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
-  const { containerRef, sliderRef } = useDegreesSlider(hue);
-  const sliderRef2 = useSliderKeyboardInput(hue, onHueChange);
+  const instanceId = useId();
+  const { containerRef, sliderRef } = useSliderPosition(hue);
+  const sliderRef2 = useSliderInputs(hue, onHueChange);
 
-  const connectSliderRefs = useCallback(
-    (node: HTMLButtonElement) => {
+  const updateSliderRefs = useCallback(
+    (node: HTMLButtonElement | null) => {
       sliderRef.current = node;
       sliderRef2.current = node;
     },
     [sliderRef, sliderRef2]
   );
 
-  const instanceId = useId();
   const textId = `${instanceId}-text`;
 
   return (
@@ -51,7 +51,7 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
       </div>
 
       <button
-        ref={connectSliderRefs}
+        ref={updateSliderRefs}
         className="absolute w-4 rounded-full bg-yellow-400"
       />
     </div>

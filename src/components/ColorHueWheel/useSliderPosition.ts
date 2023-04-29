@@ -3,7 +3,7 @@ import useSquareDimensions from "./useSquareDimensions";
 
 const RADIAN_CONVERSION_FACTOR = Math.PI / 180;
 
-export default function useDegreesSlider(degrees: number) {
+export default function useSliderPosition(sliderDegrees: number) {
   const { size: containerSize, ref: containerRef } =
     useSquareDimensions<HTMLDivElement>();
 
@@ -14,7 +14,7 @@ export default function useDegreesSlider(degrees: number) {
     const slider = sliderRef.current;
     if (!slider || containerSize === null || sliderSize === null) return;
 
-    const radians = degrees * RADIAN_CONVERSION_FACTOR;
+    const radians = sliderDegrees * RADIAN_CONVERSION_FACTOR;
     const containerRadius = containerSize / 2;
     const yMagnitude = containerRadius * Math.sin(radians);
     const xMagnitude = containerRadius * Math.cos(radians);
@@ -25,7 +25,7 @@ export default function useDegreesSlider(degrees: number) {
 
     slider.style.top = `${topOffset}px`;
     slider.style.left = `${leftOffset}px`;
-  }, [degrees, containerSize, sliderSize, sliderRef]);
+  }, [sliderDegrees, containerSize, sliderSize, sliderRef]);
 
   return { containerRef, sliderRef } as const;
 }
