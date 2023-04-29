@@ -1,4 +1,4 @@
-import { useId, useLayoutEffect } from "react";
+import { useEffect, useId, useLayoutEffect, useRef } from "react";
 import useSquareDimensions from "./useSquareDimensions";
 
 type Props = {
@@ -8,8 +8,23 @@ type Props = {
 
 const RADIAN_CONVERSION_FACTOR = Math.PI / 180;
 
+const cardinalDirections = {
+  ArrowRight: 0,
+  ArrowUp: 90,
+  ArrowLeft: 180,
+  ArrowDown: 270,
+} as const satisfies Record<string, number>;
+
+function isArrowKey(value: unknown): value is keyof typeof cardinalDirections {
+  return (
+    typeof value === "string" &&
+    (value as keyof typeof cardinalDirections) in cardinalDirections
+  );
+}
+
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
   const instanceId = useId();
+
   const { size: containerSize, ref: containerRef } =
     useSquareDimensions<HTMLDivElement>();
 
@@ -33,6 +48,43 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
     slider.style.left = `${leftOffset}px`;
   }, [hue, containerSize, sliderSize, sliderRef]);
 
+  const hueRef = useRef(hue);
+  const onHueChangeRef = useRef(onHueChange);
+
+  useEffect(() => {
+    hueRef.current = hue;
+    onHueChangeRef.current = onHueChange;
+  }, [hue, onHueChange]);
+
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (slider === null) return;
+
+    const onKeypress = (event: KeyboardEvent) => {
+      const { key } = event;
+      if (slider !== document.activeElement || !isArrowKey(key)) {
+        return;
+      }
+
+      // Have to do this to prevent other elements from scrolling around; only
+      // doing it when the key is definitely an arrow key
+      event.preventDefault();
+
+      const targetDegree = cardinalDirections[key];
+      if (hueRef.current === targetDegree) {
+        return;
+      }
+
+      const offset = targetDegree - hueRef.current < 0 ? -1 : 1;
+      const newHue = hueRef.current + offset;
+      const adjustedHue = newHue < 0 ? 359 : newHue % 360;
+      onHueChangeRef.current(adjustedHue);
+    };
+
+    slider.addEventListener("keydown", onKeypress);
+    return () => slider.removeEventListener("keydown", onKeypress);
+  }, [sliderRef]);
+
   const textId = `${instanceId}-text`;
 
   return (
@@ -54,10 +106,10 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
           max="360"
           step="1"
           value={hue}
-          onChange={(e) => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             const eventHue = e.target.valueAsNumber;
             const adjustedHue = eventHue < 0 ? 359 : eventHue % 360;
-            onHueChange(adjustedHue);
+            onHueChangeRef.current(adjustedHue);
           }}
         />
         <span className="h-fit text-[72px]">°</span>
@@ -65,7 +117,7 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
 
       <button
         ref={sliderRef}
-        className="absolute top-0 h-4 w-4 rounded-full bg-yellow-400"
+        className="absolute w-4 rounded-full bg-yellow-400"
       />
     </div>
   );
