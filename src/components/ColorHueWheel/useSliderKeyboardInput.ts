@@ -46,7 +46,12 @@ export default function useSliderKeyboardInput<Element extends HTMLElement>(
         return;
       }
 
-      const offset = targetDegree - hueRef.current < 0 ? -1 : 1;
+      const difference = targetDegree - hueRef.current;
+      const distance1 = Math.abs(difference);
+      const distance2 = 360 - distance1;
+      const signedBase = difference / distance1;
+      const offset = distance1 <= distance2 ? signedBase : -1 * signedBase;
+
       const newHue = hueRef.current + offset;
       const adjustedHue = newHue < 0 ? 359 : newHue % 360;
       onHueChangeRef.current(adjustedHue);
