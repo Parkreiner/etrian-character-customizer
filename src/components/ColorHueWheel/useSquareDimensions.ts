@@ -5,7 +5,7 @@
 import { useState, useRef, useLayoutEffect } from "react";
 
 export default function useSquareDimensions<Element extends HTMLElement>() {
-  const [elementWidth, setElementWidth] = useState<number | null>(null);
+  const [elementSize, setElementSize] = useState<number | null>(null);
   const elementRef = useRef<Element>(null);
 
   useLayoutEffect(() => {
@@ -13,21 +13,20 @@ export default function useSquareDimensions<Element extends HTMLElement>() {
     if (!element) return;
 
     const observer = new ResizeObserver((observedEntries) => {
+      // This implementation will not work for websites with vertical letters;
+      // inlineSize is based on the localized writing direction
       const elementWidth = observedEntries[0]?.borderBoxSize[0]?.inlineSize;
       if (elementWidth === undefined) return;
-      setElementWidth(elementWidth);
+      setElementSize(elementWidth);
+
+      // Have to set the height here and not any other effect to avoid screen
+      // flickering. Not even useLayoutEffect is fast enough.
+      element.style.height = `${elementWidth}px`;
     });
 
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
-
-  useLayoutEffect(() => {
-    const container = elementRef.current;
-    if (container && elementWidth !== null) {
-      container.style.height = `${elementWidth}px`;
-    }
-  }, [elementWidth]);
 
   return {
     /**
@@ -39,6 +38,6 @@ export default function useSquareDimensions<Element extends HTMLElement>() {
      * The size of the square element, made available for render logic. Will be
      * null on mount.
      */
-    size: elementWidth,
+    size: elementSize,
   } as const;
 }
