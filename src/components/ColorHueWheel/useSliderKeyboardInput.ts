@@ -14,11 +14,11 @@ function isArrowKey(value: unknown): value is keyof typeof cardinalDirections {
   );
 }
 
-export default function useSliderKeyboardInput<Element extends HTMLElement>(
+export default function useSliderKeyboardInput(
   hue: number,
   onHueChange: (newHue: number) => void
 ) {
-  const sliderRef = useRef<Element | null>(null);
+  const sliderRef = useRef<HTMLButtonElement | null>(null);
   const hueRef = useRef(hue);
   const onHueChangeRef = useRef(onHueChange);
 

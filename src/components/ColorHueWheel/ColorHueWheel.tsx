@@ -8,15 +8,8 @@ type Props = {
 };
 
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
-  const { containerRef, sliderRef } = useDegreesSlider<
-    HTMLDivElement,
-    HTMLButtonElement
-  >(hue);
-
-  const sliderRef2 = useSliderKeyboardInput<HTMLButtonElement>(
-    hue,
-    onHueChange
-  );
+  const { containerRef, sliderRef } = useDegreesSlider(hue);
+  const sliderRef2 = useSliderKeyboardInput(hue, onHueChange);
 
   const connectSliderRefs = useCallback(
     (node: HTMLButtonElement) => {

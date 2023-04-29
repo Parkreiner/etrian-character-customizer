@@ -3,13 +3,12 @@ import useSquareDimensions from "./useSquareDimensions";
 
 const RADIAN_CONVERSION_FACTOR = Math.PI / 180;
 
-export default function useDegreesSlider<
-  Container extends HTMLElement,
-  Slider extends HTMLElement
->(degrees: number) {
-  const { size: sliderSize, ref: sliderRef } = useSquareDimensions<Slider>();
+export default function useDegreesSlider(degrees: number) {
   const { size: containerSize, ref: containerRef } =
-    useSquareDimensions<Container>();
+    useSquareDimensions<HTMLDivElement>();
+
+  const { size: sliderSize, ref: sliderRef } =
+    useSquareDimensions<HTMLButtonElement>();
 
   useLayoutEffect(() => {
     const slider = sliderRef.current;
