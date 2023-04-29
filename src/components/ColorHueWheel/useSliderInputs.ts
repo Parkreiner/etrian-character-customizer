@@ -14,7 +14,7 @@ function isArrowKey(value: unknown): value is keyof typeof cardinalDirections {
   );
 }
 
-export default function useSliderKeyboardInput(
+export default function useSliderInput(
   hue: number,
   onHueChange: (newHue: number) => void
 ) {
@@ -27,6 +27,7 @@ export default function useSliderKeyboardInput(
     onHueChangeRef.current = onHueChange;
   }, [hue, onHueChange]);
 
+  // Sets up keyboard inputs
   useEffect(() => {
     const slider = sliderRef.current;
     if (slider === null) return;

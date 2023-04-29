@@ -7,6 +7,20 @@ type Props = {
   onHueChange: (newHue: number) => void;
 };
 
+/**
+ * 2023-04-29 - Ran into a glitch with React itself, based around useRef. For
+ * some reason, after the callback ref ran, all refs in this component started
+ * to get really screwy when you accessed their values. The div with
+ * containerRef would spit out errors about both ref and key not being valid
+ * props that you can access. There aren't any keys in this component, though,
+ * and the refs obviously exist. The thing also is, the div for the container
+ * ref isn't really accessed anywhere.
+ *
+ * The access glitch was so bad that even just logging the current values (not\
+ * doing anything else with them) caused errors in the console.
+ *
+ * Need to see if I can replicate this.
+ */
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
   const instanceId = useId();
   const { containerRef, sliderRef } = useSliderPosition(hue);
