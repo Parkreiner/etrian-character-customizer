@@ -1,90 +1,32 @@
-import { useEffect, useId, useLayoutEffect, useRef } from "react";
-import useSquareDimensions from "./useSquareDimensions";
+import { useCallback, useId } from "react";
+import useDegreesSlider from "./useDegreesSlider";
+import useSliderKeyboardInput from "./useSliderKeyboardInput";
 
 type Props = {
   hue: number;
   onHueChange: (newHue: number) => void;
 };
 
-const RADIAN_CONVERSION_FACTOR = Math.PI / 180;
-
-const cardinalDirections = {
-  ArrowRight: 0,
-  ArrowUp: 90,
-  ArrowLeft: 180,
-  ArrowDown: 270,
-} as const satisfies Record<string, number>;
-
-function isArrowKey(value: unknown): value is keyof typeof cardinalDirections {
-  return (
-    typeof value === "string" &&
-    (value as keyof typeof cardinalDirections) in cardinalDirections
-  );
-}
-
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
+  const { containerRef, sliderRef } = useDegreesSlider<
+    HTMLDivElement,
+    HTMLButtonElement
+  >(hue);
+
+  const sliderRef2 = useSliderKeyboardInput<HTMLButtonElement>(
+    hue,
+    onHueChange
+  );
+
+  const connectSliderRefs = useCallback(
+    (node: HTMLButtonElement) => {
+      sliderRef.current = node;
+      sliderRef2.current = node;
+    },
+    [sliderRef, sliderRef2]
+  );
+
   const instanceId = useId();
-
-  const { size: containerSize, ref: containerRef } =
-    useSquareDimensions<HTMLDivElement>();
-
-  const { size: sliderSize, ref: sliderRef } =
-    useSquareDimensions<HTMLButtonElement>();
-
-  useLayoutEffect(() => {
-    const slider = sliderRef.current;
-    if (!slider || containerSize === null || sliderSize === null) return;
-
-    const radians = hue * RADIAN_CONVERSION_FACTOR;
-    const containerRadius = containerSize / 2;
-    const yMagnitude = containerRadius * Math.sin(radians);
-    const xMagnitude = containerRadius * Math.cos(radians);
-
-    const sliderRadius = sliderSize / 2;
-    const topOffset = containerRadius - yMagnitude - sliderRadius;
-    const leftOffset = containerRadius + xMagnitude - sliderRadius;
-
-    slider.style.top = `${topOffset}px`;
-    slider.style.left = `${leftOffset}px`;
-  }, [hue, containerSize, sliderSize, sliderRef]);
-
-  const hueRef = useRef(hue);
-  const onHueChangeRef = useRef(onHueChange);
-
-  useEffect(() => {
-    hueRef.current = hue;
-    onHueChangeRef.current = onHueChange;
-  }, [hue, onHueChange]);
-
-  useEffect(() => {
-    const slider = sliderRef.current;
-    if (slider === null) return;
-
-    const onKeypress = (event: KeyboardEvent) => {
-      const { key } = event;
-      if (slider !== document.activeElement || !isArrowKey(key)) {
-        return;
-      }
-
-      // Have to do this to prevent other elements from scrolling around; only
-      // doing it when the key is definitely an arrow key
-      event.preventDefault();
-
-      const targetDegree = cardinalDirections[key];
-      if (hueRef.current === targetDegree) {
-        return;
-      }
-
-      const offset = targetDegree - hueRef.current < 0 ? -1 : 1;
-      const newHue = hueRef.current + offset;
-      const adjustedHue = newHue < 0 ? 359 : newHue % 360;
-      onHueChangeRef.current(adjustedHue);
-    };
-
-    slider.addEventListener("keydown", onKeypress);
-    return () => slider.removeEventListener("keydown", onKeypress);
-  }, [sliderRef]);
-
   const textId = `${instanceId}-text`;
 
   return (
@@ -106,17 +48,17 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
           max="360"
           step="1"
           value={hue}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          onChange={(e) => {
             const eventHue = e.target.valueAsNumber;
             const adjustedHue = eventHue < 0 ? 359 : eventHue % 360;
-            onHueChangeRef.current(adjustedHue);
+            onHueChange(adjustedHue);
           }}
         />
         <span className="h-fit text-[72px]">°</span>
       </div>
 
       <button
-        ref={sliderRef}
+        ref={connectSliderRefs}
         className="absolute w-4 rounded-full bg-yellow-400"
       />
     </div>

@@ -6,7 +6,7 @@ import { useState, useRef, useLayoutEffect } from "react";
 
 export default function useSquareDimensions<Element extends HTMLElement>() {
   const [elementSize, setElementSize] = useState<number | null>(null);
-  const elementRef = useRef<Element>(null);
+  const elementRef = useRef<Element | null>(null);
 
   useLayoutEffect(() => {
     const element = elementRef.current;
