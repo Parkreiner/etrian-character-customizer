@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { wrapHue } from "./localHelpers";
 
 const cardinalDirections = {
   ArrowRight: 0,
@@ -53,9 +54,8 @@ export default function useSliderInput(
       const signedBase = difference / distance1;
       const offset = distance1 <= distance2 ? signedBase : -1 * signedBase;
 
-      const newHue = hueRef.current + offset;
-      const adjustedHue = newHue < 0 ? 359 : newHue % 360;
-      onHueChangeRef.current(adjustedHue);
+      const newHue = wrapHue(hueRef.current + offset);
+      onHueChangeRef.current(newHue);
     };
 
     slider.addEventListener("keydown", onKeypress);
