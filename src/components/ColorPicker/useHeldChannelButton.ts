@@ -18,7 +18,7 @@ export default function useHeldChannelButton(
     channelCallbackRef.current = valueChangeCallback;
   }, [valueChangeCallback]);
 
-  const startMouseDown = useCallback(
+  const handleInput = useCallback(
     (valueOffset: -1 | 1) => {
       let localValue = value + valueOffset;
       channelCallbackRef.current(localValue);
@@ -33,7 +33,18 @@ export default function useHeldChannelButton(
     [value]
   );
 
-  const cancelMouseDown = useCallback(() => {
+  const onKeyDown = useCallback(
+    (event: React.KeyboardEvent, valueOffset: -1 | 1) => {
+      const { code, repeat } = event;
+      if (repeat || (code !== "Space" && code !== "Enter")) return;
+
+      event.preventDefault();
+      handleInput(valueOffset);
+    },
+    [handleInput]
+  );
+
+  const cleanUpHeldInput = useCallback(() => {
     if (mouseHoldIdRef.current !== 0) {
       window.clearTimeout(mouseHoldIdRef.current);
       window.clearInterval(mouseHoldIdRef.current);
@@ -46,11 +57,23 @@ export default function useHeldChannelButton(
      * Sets up the main click logic. Do NOT assign to onClick; always use
      * onMouseDown. Things will break if you use onClick.
      */
-    startMouseDown,
+    onMouseDown: handleInput,
 
     /**
-     * Must be attached to BOTH the onMouseUp and onMouseLeave events
+     * Works like onMouseDown, but is for handling keyboard input for the Space
+     * and Enter keys.
+     *
+     * Should always be attached to something when this hook is being used, just
+     * for accessibility reasons.
      */
-    cancelMouseDown,
+    onKeyDown,
+
+    /**
+     * Must be attached to ALL of these events:
+     * - onMouseUp
+     * - onMouseLeave
+     * - onKeyUp
+     */
+    cleanUpHeldInput,
   } as const;
 }

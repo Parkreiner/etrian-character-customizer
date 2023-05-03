@@ -1,18 +1,7 @@
-/**
- * > What am I trying to do?
- * I'm trying to make my buttons feel really nice, by letting you either click
- * them once to increment/decrement by a single step, or hold them down, to
- * keep doing that operation over a period of time, until you let go of the
- * mouse.
- *
- * What should happen when you press a button?
- * 1. A state update should happen immediately.
- * 2.
- */
 import { useId } from "react";
 import { Channel, allChannelInfo } from "./localTypes";
 
-import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import * as Slider from "@radix-ui/react-slider";
 import TooltipTemplate from "@/components/TooltipTemplate";
 import useHeldChannelButton from "./useHeldChannelButton";
@@ -29,7 +18,7 @@ export default function ColorSlider({
   onChannelValueChange,
 }: Props) {
   const instanceId = useId();
-  const { startMouseDown, cancelMouseDown } = useHeldChannelButton(
+  const { onMouseDown, onKeyDown, cleanUpHeldInput } = useHeldChannelButton(
     value,
     onChannelValueChange
   );
@@ -44,9 +33,13 @@ export default function ColorSlider({
           htmlFor={numberInputId}
           className="mr-3 block w-2 basis-6 text-center font-bold text-teal-50"
         >
-          <VisuallyHidden>Number input for {fullName} (</VisuallyHidden>
+          <VisuallyHidden.Root>
+            Number input for {fullName} (
+          </VisuallyHidden.Root>
+
           {displayText}
-          <VisuallyHidden>)</VisuallyHidden>
+
+          <VisuallyHidden.Root>)</VisuallyHidden.Root>
         </label>
       </TooltipTemplate>
 
@@ -74,28 +67,30 @@ export default function ColorSlider({
          */}
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
-          onClick={() => onChannelValueChange(value - 1)}
-          onMouseDown={() => startMouseDown(-1)}
-          onMouseUp={cancelMouseDown}
-          onMouseLeave={cancelMouseDown}
+          onKeyDown={(e) => onKeyDown(e, -1)}
+          onKeyUp={cleanUpHeldInput}
+          onMouseDown={() => onMouseDown(-1)}
+          onMouseUp={cleanUpHeldInput}
+          onMouseLeave={cleanUpHeldInput}
         >
-          <VisuallyHidden>Decrement {fullName}</VisuallyHidden>◄
+          <VisuallyHidden.Root>Decrement {fullName} </VisuallyHidden.Root>◄
         </button>
 
         <p className="h-fit w-16 text-teal-50">
-          <VisuallyHidden>{fullName} is at</VisuallyHidden>
+          <VisuallyHidden.Root>{fullName} is at</VisuallyHidden.Root>
           {value}
           {unit}
         </p>
 
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
-          onClick={() => onChannelValueChange(value + 1)}
-          onMouseDown={() => startMouseDown(1)}
-          onMouseUp={cancelMouseDown}
-          onMouseLeave={cancelMouseDown}
+          onKeyDown={(e) => onKeyDown(e, 1)}
+          onKeyUp={cleanUpHeldInput}
+          onMouseDown={() => onMouseDown(1)}
+          onMouseUp={cleanUpHeldInput}
+          onMouseLeave={cleanUpHeldInput}
         >
-          <VisuallyHidden>Increment {fullName}</VisuallyHidden>►
+          <VisuallyHidden.Root>Increment {fullName} </VisuallyHidden.Root>►
         </button>
       </div>
     </div>

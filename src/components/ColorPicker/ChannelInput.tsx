@@ -18,13 +18,13 @@ export default function ChannelInput({
   onChannelValueChange,
 }: Props) {
   const instanceId = useId();
-  const { startMouseDown, cancelMouseDown } = useHeldChannelButton(
+  const { onMouseDown, onKeyDown, cleanUpHeldInput } = useHeldChannelButton(
     value,
     onChannelValueChange
   );
 
-  const numberInputId = `${instanceId}-number-input`;
   const { displayText, fullName, max } = allChannelInfo[channel];
+  const numberInputId = `${instanceId}-number-input`;
 
   return (
     <fieldset className="flex grow items-center rounded-lg border-2 border-teal-700 text-teal-50">
@@ -65,10 +65,11 @@ export default function ChannelInput({
             <button
               className="text-teal-100 opacity-90 first:pb-0.5 hover:text-white hover:opacity-100"
               key={symbol}
-              onClick={() => onChannelValueChange(value + valueOffset)}
-              onMouseDown={() => startMouseDown(valueOffset)}
-              onMouseUp={cancelMouseDown}
-              onMouseLeave={cancelMouseDown}
+              onKeyDown={(e) => onKeyDown(e, valueOffset)}
+              onKeyUp={cleanUpHeldInput}
+              onMouseDown={() => onMouseDown(valueOffset)}
+              onMouseUp={cleanUpHeldInput}
+              onMouseLeave={cleanUpHeldInput}
             >
               {symbol}
             </button>
