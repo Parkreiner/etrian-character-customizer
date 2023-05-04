@@ -7,13 +7,8 @@ const baseCharacter: Omit<Character, "id" | "colors"> = {
   class: "protector",
   imgUrl: "http://jank.com",
 
-  svgs: {
-    leftEye: ["", ""],
-    rightEye: ["", ""],
-    hair: ["", ""],
-    skin: ["", ""],
-    misc: [],
-  },
+  svgs: [],
+  totalColors: 8,
 };
 
 const colorsForProtectors: readonly CharacterColors[] = [
