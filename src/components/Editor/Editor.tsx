@@ -11,6 +11,11 @@ export default function Editor() {
   const editorController = useEditorController();
   const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
 
+  const selectedCharacter =
+    editorController.gameData?.characters.find(
+      (char) => char.id === editorController.editor.selectedId
+    ) ?? null;
+
   return (
     <div className="h-full">
       {!introAnimationFinished && (
@@ -38,8 +43,7 @@ export default function Editor() {
                 />
 
                 <CharacterPreview
-                  selectedCharacterId={editorController.editor.selectedId}
-                  characters={editorController.gameData.characters}
+                  selectedCharacter={selectedCharacter}
                   colors={editorController.editor.colors}
                 />
 

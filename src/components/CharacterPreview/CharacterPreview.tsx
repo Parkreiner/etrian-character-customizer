@@ -1,28 +1,18 @@
 import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
 import Button from "@/components/Button";
+
 import DebugSquare from "./DebugSquare";
+import { downloadCharacter } from "./downloadCharacter";
+import useLiveCanvas from "./useLiveCanvas";
 
 type Props = {
-  selectedCharacterId: string;
+  selectedCharacter: Character | null;
   colors: CharacterColors;
-  characters: readonly Character[];
 };
 
-async function downloadCharacter(characterId: string, colors: CharacterColors) {
-  const inputPreview =
-    `Character ID: ${characterId}\n\n` + JSON.stringify(colors, null, 2);
-
-  window.alert(inputPreview);
-}
-
-export default function CharacterPreview({
-  selectedCharacterId,
-  colors,
-  characters,
-}: Props) {
-  const selectedCharacter =
-    characters.find((char) => char.id === selectedCharacterId) ?? null;
+export default function CharacterPreview({ selectedCharacter, colors }: Props) {
+  const canvasRef = useLiveCanvas(selectedCharacter, colors);
 
   return (
     <div className="flex flex-grow flex-col flex-nowrap justify-center self-stretch p-6">
@@ -46,6 +36,15 @@ export default function CharacterPreview({
         ))}
       </div>
 
+      <div>
+        <canvas ref={canvasRef} className="bg-black">
+          A preview of
+          {selectedCharacter === null && "no character"}
+          {selectedCharacter !== null &&
+            `a ${selectedCharacter.class} from ${selectedCharacter.game} (ID ${selectedCharacter.id})`}
+        </canvas>
+      </div>
+
       <div className="mx-auto max-w-fit pt-6">
         <Button
           intent="primary"
@@ -53,7 +52,7 @@ export default function CharacterPreview({
           disabled={selectedCharacter === null}
           onClick={() => {
             if (selectedCharacter !== null) {
-              downloadCharacter(selectedCharacterId, colors);
+              downloadCharacter(selectedCharacter.id, colors);
             }
           }}
         >
