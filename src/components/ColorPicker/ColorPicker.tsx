@@ -21,9 +21,6 @@
  *   the hex would be passed to onHexChange. But the new hex string would be the
  *   same as the old hex string, and so nothing would re-render. The only way to
  *   get the UI unstuck was by changing a V value or an RGB value.
- *
- * @todo Figure out how to implement the HueWheel component and make sure that
- * the movements are locked to a circle (this will probably be hard)
  */
 import { useState } from "react";
 import { HSVColor, RGBColor, rgbChannels, allChannelInfo } from "./localTypes";
