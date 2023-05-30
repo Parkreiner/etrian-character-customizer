@@ -1,4 +1,5 @@
 import { useId } from "react";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 import { wrapHue } from "./localHelpers";
 import useSlider from "./useSlider";
@@ -8,21 +9,6 @@ type Props = {
   onHueChange: (newHue: number) => void;
 };
 
-/**
- * 2023-04-29 - Ran into a glitch with React itself, based around useRef. For
- * some reason, after the callback ref ran, all refs in this component started
- * to get really screwy when you accessed their values. The div with
- * containerRef would spit out errors about both ref and key not being valid
- * props that you can access. There aren't any keys in this component, though,
- * and the refs obviously exist. The thing also is, the div for the container
- * ref isn't really accessed anywhere, yet that was where all the complaints
- * were coming from (presumably because it was the first ref attached?).
- *
- * The access glitch was so bad that even just logging the current values (not
- * doing anything else with them) caused errors in the console.
- *
- * Need to see if I can replicate this.
- */
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
   const hookId = useId();
   const { containerRef, sliderRef } = useSlider(hue, onHueChange);
@@ -58,7 +44,11 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
         className="absolute w-4 rounded-full bg-teal-50 hover:bg-teal-100 focus:bg-teal-100 focus:outline-none focus:ring focus:ring-yellow-400"
         tabIndex={0}
         aria-valuenow={hue}
-      />
+      >
+        <VisuallyHidden.Root>
+          Click and drag to adjust hue value
+        </VisuallyHidden.Root>
+      </button>
     </div>
   );
 }
