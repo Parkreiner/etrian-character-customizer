@@ -1,8 +1,7 @@
-import { useCallback, useId } from "react";
-import { wrapHue } from "./localHelpers";
+import { useId } from "react";
 
-import useSliderPosition from "./useSliderPosition";
-import useSliderInputs from "./useSliderInputs";
+import { wrapHue } from "./localHelpers";
+import useSlider from "./useSlider";
 
 type Props = {
   hue: number;
@@ -26,19 +25,7 @@ type Props = {
  */
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
   const instanceId = useId();
-  const { containerRef, sliderRef } = useSliderPosition(hue);
-  const sliderRef2 = useSliderInputs(hue, onHueChange);
-
-  // Function won't ever have its identity change; only adding sliders because
-  // ES Lint can't statically determine the refs are actually refs
-  const connectSliderRefs = useCallback(
-    (node: HTMLButtonElement | null) => {
-      sliderRef.current = node;
-      sliderRef2.current = node;
-    },
-    [sliderRef, sliderRef2]
-  );
-
+  const { containerRef, sliderRef } = useSlider(hue, onHueChange);
   const textId = `${instanceId}-text`;
 
   return (
@@ -67,7 +54,7 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
 
       <button
         role="slider"
-        ref={connectSliderRefs}
+        ref={sliderRef}
         className="absolute w-4 rounded-full bg-teal-50 hover:bg-teal-100 focus:bg-teal-100 focus:outline-none focus:ring focus:ring-yellow-400"
         tabIndex={0}
         aria-valuenow={hue}
