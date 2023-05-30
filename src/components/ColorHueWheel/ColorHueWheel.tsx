@@ -24,9 +24,9 @@ type Props = {
  * Need to see if I can replicate this.
  */
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
-  const instanceId = useId();
+  const hookId = useId();
   const { containerRef, sliderRef } = useSlider(hue, onHueChange);
-  const textId = `${instanceId}-text`;
+  const textId = `${hookId}-text`;
 
   return (
     <div

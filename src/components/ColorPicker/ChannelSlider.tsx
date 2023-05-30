@@ -17,14 +17,14 @@ export default function ColorSlider({
   value,
   onChannelValueChange,
 }: Props) {
-  const instanceId = useId();
+  const hookId = useId();
   const { onMouseDown, onKeyDown, cleanUpHeldInput } = useHeldChannelButton(
     value,
     onChannelValueChange
   );
 
   const { displayText, fullName, max, unit } = allChannelInfo[channel];
-  const numberInputId = `${instanceId}-${channel}`;
+  const numberInputId = `${hookId}-${channel}`;
 
   return (
     <div className="flex w-full p-1 align-bottom first:mb-1">

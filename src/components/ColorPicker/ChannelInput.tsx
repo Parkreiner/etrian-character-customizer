@@ -17,14 +17,14 @@ export default function ChannelInput({
   value,
   onChannelValueChange,
 }: Props) {
-  const instanceId = useId();
+  const hookId = useId();
   const { onMouseDown, onKeyDown, cleanUpHeldInput } = useHeldChannelButton(
     value,
     onChannelValueChange
   );
 
   const { displayText, fullName, max } = allChannelInfo[channel];
-  const numberInputId = `${instanceId}-number-input`;
+  const numberInputId = `${hookId}-number-input`;
 
   return (
     <fieldset className="flex grow items-center rounded-lg border-2 border-teal-700 text-teal-50">

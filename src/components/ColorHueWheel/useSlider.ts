@@ -4,6 +4,7 @@ import useSquareDimensions from "./useSquareDimensions";
 import { wrapHue } from "./localHelpers";
 
 const DEGREES_TO_RADIANS_FACTOR = Math.PI / 180;
+const RADIANS_TO_DEGREES_FACTOR = 180 / Math.PI;
 
 const cardinalDirections = {
   ArrowRight: 0,
@@ -73,6 +74,10 @@ export default function useSlider(
     const slider = sliderRef.current;
     if (slider === null) return;
 
+    // Still need to figure out event logic; clicking should start things, but
+    // it's basically kind of a drag-and-drop operation. I'm thinking that at
+    // at some point, I might have to shift "click ownership" from the slider to
+    // either the container or even the entire viewport
     const onClick = (event: MouseEvent) => {
       const container = containerRef.current;
       if (!container) return;
@@ -88,10 +93,11 @@ export default function useSlider(
         containerDimensions.top +
         Math.round((containerDimensions.bottom - containerDimensions.top) / 2);
 
-      // Still figuring this part out - the math isn't right yet
       const xLength = mouseX - containerCenterX;
       const yLength = mouseY - containerCenterY;
-      const newHueAngle = Math.atan2(xLength, yLength);
+      const hueOffset =
+        Math.atan2(xLength, yLength) * RADIANS_TO_DEGREES_FACTOR;
+      const newHueAngle = Math.round(360 + hueOffset);
 
       onHueChangeRef.current(newHueAngle);
     };
