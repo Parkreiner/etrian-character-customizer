@@ -4,7 +4,7 @@ import { Channel, allChannelInfo } from "./localTypes";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import * as Slider from "@radix-ui/react-slider";
 import TooltipTemplate from "@/components/TooltipTemplate";
-import useHeldChannelButton from "./useHeldChannelButton";
+import useHeldInputHandlers from "./useHeldInputHandlers";
 
 type Props = {
   channel: Channel;
@@ -18,10 +18,7 @@ export default function ColorSlider({
   onChannelValueChange,
 }: Props) {
   const hookId = useId();
-  const { onMouseDown, onKeyDown, cleanUpHeldInput } = useHeldChannelButton(
-    value,
-    onChannelValueChange
-  );
+  const handlers = useHeldInputHandlers(value, onChannelValueChange);
 
   const { displayText, fullName, max, unit } = allChannelInfo[channel];
   const numberInputId = `${hookId}-${channel}`;
@@ -45,6 +42,7 @@ export default function ColorSlider({
 
       <Slider.Root
         className="relative flex grow touch-none select-none items-center"
+        aria-label={`Slider for ${fullName}`}
         value={[value]}
         min={0}
         max={max}
@@ -52,7 +50,6 @@ export default function ColorSlider({
         onValueChange={(newSliderValues) => {
           onChannelValueChange(newSliderValues[0] as number);
         }}
-        aria-label={`Slider for ${fullName}`}
       >
         <Slider.Track className="relative h-[4px] grow rounded-full bg-black">
           <Slider.Range className="absolute h-full rounded-full bg-teal-200" />
@@ -67,11 +64,11 @@ export default function ColorSlider({
          */}
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
-          onKeyDown={(e) => onKeyDown(e, -1)}
-          onKeyUp={cleanUpHeldInput}
-          onMouseDown={() => onMouseDown(-1)}
-          onMouseUp={cleanUpHeldInput}
-          onMouseLeave={cleanUpHeldInput}
+          onKeyDown={(e) => handlers.onKeyDown(e, -1)}
+          onKeyUp={handlers.onKeyUp}
+          onMouseDown={() => handlers.onMouseDown(-1)}
+          onMouseUp={handlers.onMouseUp}
+          onMouseLeave={handlers.onMouseLeave}
         >
           <VisuallyHidden.Root>Decrement {fullName} </VisuallyHidden.Root>◄
         </button>
@@ -84,11 +81,11 @@ export default function ColorSlider({
 
         <button
           className="rounded-md bg-teal-700 px-2 py-1 text-xs hover:bg-teal-600 hover:text-white"
-          onKeyDown={(e) => onKeyDown(e, 1)}
-          onKeyUp={cleanUpHeldInput}
-          onMouseDown={() => onMouseDown(1)}
-          onMouseUp={cleanUpHeldInput}
-          onMouseLeave={cleanUpHeldInput}
+          onKeyDown={(e) => handlers.onKeyDown(e, 1)}
+          onKeyUp={handlers.onKeyUp}
+          onMouseDown={() => handlers.onMouseDown(1)}
+          onMouseUp={handlers.onMouseUp}
+          onMouseLeave={handlers.onMouseLeave}
         >
           <VisuallyHidden.Root>Increment {fullName} </VisuallyHidden.Root>►
         </button>

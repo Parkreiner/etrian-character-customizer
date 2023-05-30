@@ -2,7 +2,7 @@ import { Channel, allChannelInfo } from "./localTypes";
 import TooltipTemplate from "@/components/TooltipTemplate";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useId } from "react";
-import useHeldChannelButton from "./useHeldChannelButton";
+import useHeldInputHandlers from "./useHeldInputHandlers";
 
 type Props = {
   channel: Channel;
@@ -18,10 +18,7 @@ export default function ChannelInput({
   onChannelValueChange,
 }: Props) {
   const hookId = useId();
-  const { onMouseDown, onKeyDown, cleanUpHeldInput } = useHeldChannelButton(
-    value,
-    onChannelValueChange
-  );
+  const handlers = useHeldInputHandlers(value, onChannelValueChange);
 
   const { displayText, fullName, max } = allChannelInfo[channel];
   const numberInputId = `${hookId}-number-input`;
@@ -65,11 +62,11 @@ export default function ChannelInput({
             <button
               className="text-teal-100 opacity-90 first:pb-0.5 hover:text-white hover:opacity-100"
               key={symbol}
-              onKeyDown={(e) => onKeyDown(e, valueOffset)}
-              onKeyUp={cleanUpHeldInput}
-              onMouseDown={() => onMouseDown(valueOffset)}
-              onMouseUp={cleanUpHeldInput}
-              onMouseLeave={cleanUpHeldInput}
+              onKeyDown={(e) => handlers.onKeyDown(e, valueOffset)}
+              onKeyUp={handlers.onKeyUp}
+              onMouseDown={() => handlers.onMouseDown(valueOffset)}
+              onMouseUp={handlers.onMouseUp}
+              onMouseLeave={handlers.onMouseLeave}
             >
               {symbol}
             </button>
