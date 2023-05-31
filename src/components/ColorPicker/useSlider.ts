@@ -155,12 +155,13 @@ export default function useSlider(
 
       const timeDifference = Date.now() - keyDownStartTime;
 
-      // Using Math.min for some modifiers to prevent over-shooting the target
+      // Using Math.min for some modifiers to prevent over-shooting the target.
+      // 4 and 9 chosen because 5 and 10 weren't visually satisfying
       let accelerationModifier = 1;
       if (timeDifference >= 2000) {
-        accelerationModifier = Math.min(5, distance1);
+        accelerationModifier = Math.min(4, distance1);
       } else if (timeDifference >= 4000) {
-        accelerationModifier = Math.min(10, distance1);
+        accelerationModifier = Math.min(9, distance1);
       }
 
       const newHue = wrapHue(hueRef.current + offset * accelerationModifier);
