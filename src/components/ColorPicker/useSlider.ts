@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
 import useSquareDimensions from "./useSquareDimensions";
-import { wrapHue } from "./localHelpers";
+import { wrapHue } from "./colorHelpers";
 
 const DEGREES_TO_RADIANS_FACTOR = Math.PI / 180;
 const RADIANS_TO_DEGREES_FACTOR = 180 / Math.PI;
@@ -60,50 +60,60 @@ export default function useSlider(
 
   // Sets up mouse inputs
   useEffect(() => {
-    /**
-     * Thinking this through:
-     * 1. I feel like I have to define everything relative to the container.
-     * 2. So when you click on the slider, you don't really listen for anything
-     *    else beyond when the user lets go of the mouse. Your focus mainly
-     *    shifts to the container.
-     * 3. You then basically calculate the angle from the center of the
-     *    container to the mouse, and then translate that into the new hue. The
-     *    useLayoutEffect already in place will take care of changing the
-     *    position of the slider itself.
-     */
     const slider = sliderRef.current;
     if (slider === null) return;
 
-    // Still need to figure out event logic; clicking should start things, but
-    // it's basically kind of a drag-and-drop operation. I'm thinking that at
-    // at some point, I might have to shift "click ownership" from the slider to
-    // either the container or even the entire viewport
-    const onClick = (event: MouseEvent) => {
-      const container = containerRef.current;
-      if (!container) return;
+    let trackingMousePosition = false;
+
+    const startTracking = () => {
+      trackingMousePosition = true;
+    };
+
+    const endTracking = () => {
+      trackingMousePosition = false;
+    };
+
+    const onGlobalMouseMove = (event: MouseEvent) => {
+      if (!trackingMousePosition || !containerRef.current) return;
 
       const mouseX = event.pageX;
       const mouseY = event.pageY;
 
-      const containerDimensions = container.getBoundingClientRect();
-      const containerCenterX =
+      // Container center values could probably be extracted out in some way,
+      // since they won't be changing much
+      const containerDimensions = containerRef.current.getBoundingClientRect();
+      const containerCenterX = Math.round(
         containerDimensions.left +
-        Math.round((containerDimensions.right - containerDimensions.left) / 2);
-      const containerCenterY =
+          (containerDimensions.right - containerDimensions.left) / 2
+      );
+      const containerCenterY = Math.round(
         containerDimensions.top +
-        Math.round((containerDimensions.bottom - containerDimensions.top) / 2);
+          (containerDimensions.bottom - containerDimensions.top) / 2
+      );
 
-      const xLength = mouseX - containerCenterX;
-      const yLength = mouseY - containerCenterY;
+      const xDistance = mouseX - containerCenterX;
+      const yDistance = mouseY - containerCenterY;
       const hueOffset =
-        Math.atan2(xLength, yLength) * RADIANS_TO_DEGREES_FACTOR;
-      const newHueAngle = Math.round(360 + hueOffset);
+        Math.atan2(xDistance, yDistance) * RADIANS_TO_DEGREES_FACTOR;
 
+      // For some reason, (360 + hueOffset) was producing a value that was
+      // always 90 degrees off. The component works now, but need to figure out
+      // what's going on
+      const newHueAngle = Math.round((270 + hueOffset) % 360);
       onHueChangeRef.current(newHueAngle);
     };
 
-    slider.addEventListener("click", onClick);
-    return () => slider.removeEventListener("click", onClick);
+    slider.addEventListener("mousedown", startTracking);
+    window.addEventListener("mouseup", endTracking);
+    window.addEventListener("mouseleave", endTracking);
+    window.addEventListener("mousemove", onGlobalMouseMove);
+
+    return () => {
+      slider.removeEventListener("mousedown", startTracking);
+      window.removeEventListener("mouseup", endTracking);
+      window.removeEventListener("mouseleave", endTracking);
+      window.removeEventListener("mousemove", onGlobalMouseMove);
+    };
   }, [containerRef, sliderRef]);
 
   /**

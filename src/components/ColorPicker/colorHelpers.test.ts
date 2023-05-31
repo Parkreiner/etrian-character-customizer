@@ -1,8 +1,15 @@
 import { expect, it, describe, test } from "vitest";
 import { HSVColor, RGBColor } from "./localTypes";
 
-// Skipping hsvToHex; right now it's just composed of hsvToRgb and rgbToHex
-import { hexToRgb, rgbToHsv, rgbToHex, hsvToRgb } from "./colorHelpers";
+// Not testing hsvToHex right now; it's currently just composed of hsvToRgb and
+// rgbToHex
+import {
+  hexToRgb,
+  rgbToHsv,
+  rgbToHex,
+  hsvToRgb,
+  wrapHue,
+} from "./colorHelpers";
 
 describe(hexToRgb.name, () => {
   it("Should convert any seven-character hex string into a valid RGB object", () => {
@@ -255,5 +262,38 @@ describe(hsvToRgb.name, () => {
     }
 
     expect.hasAssertions();
+  });
+});
+
+describe(wrapHue.name, () => {
+  it("should have no effect on values that don't need wrapping", () => {
+    expect(wrapHue(20)).toBe(20);
+    expect(wrapHue(359)).toBe(359);
+    expect(wrapHue(181)).toBe(181);
+  });
+
+  it("should wrap integers that exceed 359 degrees (multiple times if necessary)", () => {
+    expect(wrapHue(360)).toBe(0);
+    expect(wrapHue(720)).toBe(0);
+    expect(wrapHue(547)).toBe(187);
+    expect(wrapHue(496)).toBe(136);
+  });
+
+  it("should wrap integers that fall below 0 degrees (multiple times if necessary)", () => {
+    expect(wrapHue(-1)).toBe(359);
+    expect(wrapHue(-720)).toBe(0);
+  });
+
+  it("should wrap decimal values, but not truncate them into integers", () => {
+    const input = 187.3871;
+    const wrapped = wrapHue(input);
+    const epsilon = 0.00001;
+
+    expect(Math.trunc(wrapped)).toBe(187);
+    expect(wrapped - input).toBeLessThanOrEqual(epsilon);
+  });
+
+  it("should have no special behaviors for NaN values (that should be a concern for the consumer)", () => {
+    expect(wrapHue(NaN)).toBeNaN();
   });
 });

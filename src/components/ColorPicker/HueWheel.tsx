@@ -1,7 +1,7 @@
 import { useId } from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
-import { wrapHue } from "./localHelpers";
+import { hsvToHex, wrapHue } from "./colorHelpers";
 import useSlider from "./useSlider";
 
 type Props = {
@@ -12,6 +12,8 @@ type Props = {
 export default function ColorHueWheel({ hue, onHueChange }: Props) {
   const hookId = useId();
   const { containerRef, sliderRef } = useSlider(hue, onHueChange);
+
+  const backgroundColor = hsvToHex({ hue, sat: 80, val: 100 });
   const textId = `${hookId}-text`;
 
   return (
@@ -19,7 +21,7 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
       ref={containerRef}
       className="relative mx-auto flex w-fit flex-col items-center justify-center rounded-full border-4 border-black p-4 text-yellow-50"
     >
-      <label htmlFor={textId} className="mb-1 font-semibold">
+      <label htmlFor={textId} className="mb-1 select-none font-semibold">
         Hue
       </label>
 
@@ -35,13 +37,14 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
           value={hue}
           onChange={(e) => onHueChange(wrapHue(e.target.valueAsNumber))}
         />
-        <span className="h-fit font-medium">°</span>
+        <span className="h-fit select-none font-medium">°</span>
       </div>
 
       <button
         role="slider"
         ref={sliderRef}
-        className="absolute w-4 rounded-full bg-teal-50 hover:bg-teal-100 focus:bg-teal-100 focus:outline-none focus:ring focus:ring-yellow-400"
+        className="absolute w-4 rounded-full border-2 border-black focus:outline-none focus:ring-1 focus:ring-teal-200"
+        style={{ backgroundColor }}
         tabIndex={0}
         aria-valuenow={hue}
       >
