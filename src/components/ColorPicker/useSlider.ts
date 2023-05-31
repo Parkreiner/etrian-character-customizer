@@ -126,7 +126,7 @@ export default function useSlider(
     const slider = sliderRef.current;
     if (slider === null) return;
 
-    let keyDownStartTime: number | null = null;
+    let keyDownStartTime = 0;
 
     const onKeyDown = (event: KeyboardEvent) => {
       const { key } = event;
@@ -138,7 +138,7 @@ export default function useSlider(
       // doing it when the key is definitely an arrow key
       event.preventDefault();
 
-      if (keyDownStartTime === null) {
+      if (keyDownStartTime === 0) {
         keyDownStartTime = Date.now();
       }
 
@@ -153,7 +153,7 @@ export default function useSlider(
       const signedBase = degreeDifference / distance1;
       const offset = distance1 <= distance2 ? signedBase : -1 * signedBase;
 
-      const timeDifference = Date.now() - (keyDownStartTime ?? 0);
+      const timeDifference = Date.now() - keyDownStartTime;
 
       // Using Math.min for some modifiers to prevent over-shooting the target
       let accelerationModifier = 1;
@@ -168,7 +168,7 @@ export default function useSlider(
     };
 
     const onKeyUp = () => {
-      keyDownStartTime = null;
+      keyDownStartTime = 0;
     };
 
     slider.addEventListener("keydown", onKeyDown);
