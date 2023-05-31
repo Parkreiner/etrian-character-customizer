@@ -13,14 +13,16 @@ export default function useSquareDimensions<Element extends HTMLElement>() {
     if (!element) return;
 
     const observer = new ResizeObserver((observedEntries) => {
-      // This implementation will not work for websites with vertical letters;
-      // inlineSize is based on the localized writing direction
+      // Normally, localized writing direction would make this logic like this
+      // break (vertical letters would make inlineSize be vertical, and
+      // borderBoxSize be horizontal), but because we're dealing with squares,
+      // it should still work
       const elementWidth = observedEntries[0]?.borderBoxSize[0]?.inlineSize;
       if (elementWidth === undefined) return;
       setElementSize(elementWidth);
 
-      // Have to set the height here and not any other effect to avoid screen
-      // flickering. Not even useLayoutEffect is fast enough.
+      // Have to mutate the height here instead of other effects (especially any
+      // that run based on React state) to avoid any UI screen flickering.
       element.style.height = `${elementWidth}px`;
     });
 
