@@ -44,9 +44,7 @@ export default function MenuViewLayout({
       </div>
 
       <div className="mb-3">
-        <Card title="Color Editor" striped={true}>
-          <ColorPicker hexColor={activeHex} onHexChange={onHexChange} />
-        </Card>
+        <ColorPicker hexColor={activeHex} onHexChange={onHexChange} />
       </div>
 
       {canShowPresets && (

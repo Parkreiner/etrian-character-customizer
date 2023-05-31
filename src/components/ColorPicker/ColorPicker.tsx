@@ -27,7 +27,8 @@ import { HSVColor, RGBColor, rgbChannels, allChannelInfo } from "./localTypes";
 import { hexToRgb, rgbToHsv, hsvToHex, rgbToHex } from "./colorHelpers";
 import { clamp } from "@/utils/math";
 
-import ColorHueWheel from "@/components/ColorHueWheel";
+import Card from "../Card";
+import HueWheel from "./HueWheel";
 import ChannelSlider from "./ChannelSlider";
 import ChannelInput from "./ChannelInput";
 
@@ -82,44 +83,46 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
   }
 
   return (
-    <fieldset className="w-full">
-      <div className="mb-4 mt-2">
-        <ColorHueWheel
-          hue={hsv.hue}
-          onHueChange={(newValue) => onHsvChannelChange("hue", newValue)}
-        />
-      </div>
+    <Card title="Color Picker" striped>
+      <fieldset className="w-full">
+        <div className="mb-4 mt-2">
+          <HueWheel
+            hue={hsv.hue}
+            onHueChange={(newValue) => onHsvChannelChange("hue", newValue)}
+          />
+        </div>
 
-      <section className="flex w-full flex-col justify-center">
-        <ChannelSlider
-          channel="sat"
-          value={hsv.sat}
-          onChannelValueChange={(newValue) =>
-            onHsvChannelChange("sat", newValue)
-          }
-        />
-
-        <ChannelSlider
-          channel="val"
-          value={hsv.val}
-          onChannelValueChange={(newValue) =>
-            onHsvChannelChange("val", newValue)
-          }
-        />
-      </section>
-
-      <section className="mt-4 flex w-full flex-row flex-wrap justify-center gap-x-3 md:flex-nowrap">
-        {rgbChannels.map((channel) => (
-          <ChannelInput
-            key={channel}
-            channel={channel}
-            value={rgb[channel]}
+        <section className="flex w-full flex-col justify-center">
+          <ChannelSlider
+            channel="sat"
+            value={hsv.sat}
             onChannelValueChange={(newValue) =>
-              onRgbChannelChange(channel, newValue)
+              onHsvChannelChange("sat", newValue)
             }
           />
-        ))}
-      </section>
-    </fieldset>
+
+          <ChannelSlider
+            channel="val"
+            value={hsv.val}
+            onChannelValueChange={(newValue) =>
+              onHsvChannelChange("val", newValue)
+            }
+          />
+        </section>
+
+        <section className="mt-4 flex w-full flex-row flex-wrap justify-center gap-x-3 md:flex-nowrap">
+          {rgbChannels.map((channel) => (
+            <ChannelInput
+              key={channel}
+              channel={channel}
+              value={rgb[channel]}
+              onChannelValueChange={(newValue) =>
+                onRgbChannelChange(channel, newValue)
+              }
+            />
+          ))}
+        </section>
+      </fieldset>
+    </Card>
   );
 }
