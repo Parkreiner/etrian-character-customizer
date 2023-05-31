@@ -1,3 +1,26 @@
+/*
+ * The version of Proza from Google Fonts is both uglier and more bland compared
+ * to the paid version from Bureau Roffa. It's also available in fewer weights,
+ * does not have the same type features, and does not have any display variants.
+ *
+ * @todo - Once the project is close to being finished, license the fonts and
+ * swap them in.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Courgette&family=Proza+Libre:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* For removing arrows from number inputs */
+.no-arrow,
+.no-arrow::-webkit-outer-spin-button,
+.no-arrow::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  -moz-appearance: textfield !important;
+}
+
+abbr {
+  text-decoration: none;
+}
