@@ -126,7 +126,9 @@ export default function useSlider(
     const slider = sliderRef.current;
     if (slider === null) return;
 
-    const onKeypress = (event: KeyboardEvent) => {
+    let keyDownStartTime: number | null = null;
+
+    const onKeyDown = (event: KeyboardEvent) => {
       const { key } = event;
       if (slider !== document.activeElement || !isArrowKey(key)) {
         return;
@@ -136,23 +138,46 @@ export default function useSlider(
       // doing it when the key is definitely an arrow key
       event.preventDefault();
 
+      if (keyDownStartTime === null) {
+        keyDownStartTime = Date.now();
+      }
+
       const targetDegree = cardinalDirections[key];
       if (hueRef.current === targetDegree) {
         return;
       }
 
-      const difference = targetDegree - hueRef.current;
-      const distance1 = Math.abs(difference);
+      const degreeDifference = targetDegree - hueRef.current;
+      const distance1 = Math.abs(degreeDifference);
       const distance2 = 360 - distance1;
-      const signedBase = difference / distance1;
+      const signedBase = degreeDifference / distance1;
       const offset = distance1 <= distance2 ? signedBase : -1 * signedBase;
 
-      const newHue = wrapHue(hueRef.current + offset);
+      const timeDifference = Date.now() - (keyDownStartTime ?? 0);
+
+      // Using Math.min for some modifiers to prevent over-shooting the target
+      let accelerationModifier = 1;
+      if (timeDifference >= 2000) {
+        accelerationModifier = Math.min(5, distance1);
+      } else if (timeDifference >= 4000) {
+        accelerationModifier = Math.min(10, distance1);
+      }
+
+      const newHue = wrapHue(hueRef.current + offset * accelerationModifier);
       onHueChangeRef.current(newHue);
     };
 
-    slider.addEventListener("keydown", onKeypress);
-    return () => slider.removeEventListener("keydown", onKeypress);
+    const onKeyUp = () => {
+      keyDownStartTime = null;
+    };
+
+    slider.addEventListener("keydown", onKeyDown);
+    slider.addEventListener("keyup", onKeyUp);
+
+    return () => {
+      slider.removeEventListener("keydown", onKeyDown);
+      slider.removeEventListener("keyup", onKeyUp);
+    };
   }, [sliderRef]);
 
   return { containerRef, sliderRef } as const;
