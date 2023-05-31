@@ -9,7 +9,7 @@ type Props = React.ComponentPropsWithoutRef<"button"> & {
   selected?: boolean;
 };
 
-const divStyles = cva("rounded-lg border-2", {
+const divStyles = cva("rounded-lg border-2 w-fit", {
   variants: {
     selected: {
       true: "border-teal-200",

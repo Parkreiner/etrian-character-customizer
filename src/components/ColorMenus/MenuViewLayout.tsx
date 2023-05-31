@@ -38,7 +38,7 @@ export default function MenuViewLayout({
   return (
     <fieldset>
       <div className="mb-3">
-        <Card title={`Options (${tab})`} striped={true}>
+        <Card title={`Swatches (${tab})`} striped={true}>
           {children}
         </Card>
       </div>
@@ -48,11 +48,11 @@ export default function MenuViewLayout({
       </div>
 
       {canShowPresets && (
-        <div className="mb-3">
+        <div>
           <Card title={`Presets (${tab})`} striped={true}>
             <ul className="grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
               {colorPresets[tab].map(([hex1, hex2], index) => (
-                <li key={index}>
+                <li key={index} className="mx-auto block">
                   <ColorButton
                     primaryHex={hex1}
                     secondaryHex={hex2}
