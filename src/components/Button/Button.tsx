@@ -14,7 +14,7 @@ type Props = Omit<ComponentPropsWithRef<"button">, OmittedBaseProps> & {
   size?: ButtonSize;
 };
 
-const buttonStyles = cva("flex flex-row", {
+const buttonStyles = cva("flex flex-row select-none", {
   variants: {
     intent: {
       primary:
