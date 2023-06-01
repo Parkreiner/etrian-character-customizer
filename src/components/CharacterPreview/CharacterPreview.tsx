@@ -1,61 +1,21 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
-import { CanvasPathEntry, Character } from "@/typesConstants/gameData";
+import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
+import {
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  renderCharacter,
+  imageToDataUrl,
+} from "./canvasHelpers";
 
 import Button from "@/components/Button";
-import useImageLoading from "../../hooks/useImageCache";
+import useImageCache from "@/hooks/useImageCache";
 
 type Props = {
   selectedCharacter: Character | null;
   colors: CharacterColors;
 };
-
-const placeholderFill = "#ff00ff";
-const canvasWidth = 600;
-const canvasHeight = 960;
-
-function renderCharacter(
-  canvasContext: CanvasRenderingContext2D,
-  characterImage: HTMLImageElement,
-  colors: CharacterColors,
-  pathEntries: readonly CanvasPathEntry[]
-): void {
-  const sortedSvgs = [...pathEntries].sort((entry1, entry2) => {
-    return entry1.layerIndex - entry2.layerIndex;
-  });
-
-  for (const entry of sortedSvgs) {
-    const { path: pathData, category, categoryIndex } = entry;
-    const pathNode = new Path2D(pathData);
-    const fillColor = colors[category][categoryIndex] ?? placeholderFill;
-    canvasContext.fillStyle = fillColor;
-    canvasContext.fill(pathNode);
-  }
-
-  const height = canvasWidth * (characterImage.height / characterImage.width);
-  canvasContext.drawImage(characterImage, 0, 0, canvasWidth, height);
-}
-
-function createDataUrl(
-  image: HTMLImageElement,
-  colors: CharacterColors,
-  pathEntries: readonly CanvasPathEntry[]
-): string {
-  const outputCanvas = document.createElement("canvas");
-  outputCanvas.width = image.width;
-  outputCanvas.height = image.height;
-
-  const outputContext = outputCanvas.getContext("2d");
-  if (outputContext === null) {
-    throw new Error(
-      "outputCanvas declared with multiple rendering contexts - this should be physically impossible"
-    );
-  }
-
-  renderCharacter(outputContext, image, colors, pathEntries);
-  return outputCanvas.toDataURL();
-}
 
 function downloadCharacter(filename: string, dataUrl: string): void {
   const fakeAnchor = document.createElement("a");
@@ -68,7 +28,7 @@ function downloadCharacter(filename: string, dataUrl: string): void {
 export default function CharacterPreview({ selectedCharacter, colors }: Props) {
   // Might need to add some state for tracking the status of this component
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const { processImage } = useImageLoading();
+  const { processImage } = useImageCache();
 
   useLayoutEffect(() => {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
@@ -80,40 +40,30 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
 
     return () => {
       previewContext.fillStyle = "#000000";
-      previewContext.clearRect(0, 0, canvasWidth, canvasHeight);
-      if (cleanup !== undefined) cleanup();
+      previewContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      cleanup?.();
     };
   }, [selectedCharacter, colors, processImage]);
 
-  // Not an effect for the app - just using this to learn HTML canvas
-  useEffect(() => {
-    const visibleContext = previewCanvasRef.current?.getContext("2d") ?? null;
-    if (visibleContext === null) return;
-
-    // Copy and paste canvas examples here
-
-    return () => {
-      visibleContext.fillStyle = "rgb(0, 0, 0)";
-      visibleContext.clearRect(0, 0, canvasWidth, canvasHeight);
-    };
-  }, []);
-
-  // Note: the download functionality can't work right now, because the mock
-  // image is being hosted on a separate source (Imgur). The browsers will treat
-  // the canvas as "tainted" until the image comes from a same-source server
-  const download = () => {
+  /**
+   * Note: the download functionality can't work right now, because the mock
+   * images are being hosted on a separate source (Imgur). Browsers will treat
+   * the canvas as "tainted" until the image comes from a same-source server
+   *
+   * @todo At some point, this functionality might need to be updated to process
+   * multiple images.
+   */
+  const downloadAllImages = () => {
     if (selectedCharacter === null) return;
 
     processImage(selectedCharacter.imgUrl, (image) => {
-      const dataUrl = createDataUrl(
+      const dataUrl = imageToDataUrl(
         image,
         selectedCharacter.initialColors,
         selectedCharacter.paths
       );
 
-      const colorsHash = btoa(JSON.stringify(selectedCharacter.initialColors));
-      const newFilename = `${selectedCharacter.class}${selectedCharacter.id}_${colorsHash}`;
-
+      const newFilename = `${selectedCharacter.class}${selectedCharacter.id}`;
       downloadCharacter(newFilename, dataUrl);
     });
   };
@@ -125,8 +75,8 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
       <canvas
         ref={previewCanvasRef}
         className="mx-auto w-[450px] grow-0 border-2 border-black"
-        width={canvasWidth}
-        height={canvasHeight}
+        width={CANVAS_WIDTH}
+        height={CANVAS_HEIGHT}
       >
         A preview of
         {selectedCharacter === null && "no character"}
@@ -139,7 +89,7 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
           intent="primary"
           size="large"
           disabled={downloadingDisabled}
-          onClick={download}
+          onClick={downloadAllImages}
         >
           Download
         </Button>
