@@ -3,8 +3,8 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { CanvasPathEntry, Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
 
-import DebugSquare from "./DebugSquare";
 import Button from "@/components/Button";
+import useImageLoading from "../../hooks/useImageCache";
 
 type Props = {
   selectedCharacter: Character | null;
@@ -13,16 +13,7 @@ type Props = {
 
 const placeholderFill = "#ff00ff";
 const canvasWidth = 600;
-const canvasHeight = 600;
-
-async function getCharacterImage(url: string): Promise<HTMLImageElement> {
-  const characterImage = new Image();
-  return new Promise((resolve, reject) => {
-    characterImage.onload = () => resolve(characterImage);
-    characterImage.onerror = reject;
-    characterImage.src = url;
-  });
-}
+const canvasHeight = 960;
 
 function renderCharacter(
   canvasContext: CanvasRenderingContext2D,
@@ -37,13 +28,13 @@ function renderCharacter(
   for (const entry of sortedSvgs) {
     const { path: pathData, category, categoryIndex } = entry;
     const pathNode = new Path2D(pathData);
-
     const fillColor = colors[category][categoryIndex] ?? placeholderFill;
     canvasContext.fillStyle = fillColor;
     canvasContext.fill(pathNode);
   }
 
-  canvasContext.drawImage(characterImage, 0, 0);
+  const height = canvasWidth * (characterImage.height / characterImage.width);
+  canvasContext.drawImage(characterImage, 0, 0, canvasWidth, height);
 }
 
 function createDataUrl(
@@ -75,33 +66,24 @@ function downloadCharacter(filename: string, dataUrl: string): void {
 }
 
 export default function CharacterPreview({ selectedCharacter, colors }: Props) {
+  // Might need to add some state for tracking the status of this component
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const { processImage } = useImageLoading();
 
   useLayoutEffect(() => {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
     if (previewContext === null || selectedCharacter === null) return;
 
-    let drawAfterFetch = true;
-
-    const draw = async () => {
-      try {
-        const image = await getCharacterImage(selectedCharacter.imgUrl);
-        if (!drawAfterFetch) return;
-
-        renderCharacter(previewContext, image, colors, selectedCharacter.paths);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    draw();
+    const cleanup = processImage(selectedCharacter.imgUrl, (image) => {
+      renderCharacter(previewContext, image, colors, selectedCharacter.paths);
+    });
 
     return () => {
       previewContext.fillStyle = "#000000";
       previewContext.clearRect(0, 0, canvasWidth, canvasHeight);
-      drawAfterFetch = false;
+      if (cleanup !== undefined) cleanup();
     };
-  }, [selectedCharacter, colors]);
+  }, [selectedCharacter, colors, processImage]);
 
   // Not an effect for the app - just using this to learn HTML canvas
   useEffect(() => {
@@ -116,70 +98,48 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
     };
   }, []);
 
-  const processDownload = async () => {
+  // Note: the download functionality can't work right now, because the mock
+  // image is being hosted on a separate source (Imgur). The browsers will treat
+  // the canvas as "tainted" until the image comes from a same-source server
+  const download = () => {
     if (selectedCharacter === null) return;
-    const {
-      id,
-      initialColors,
-      paths,
-      imgUrl,
-      class: className,
-    } = selectedCharacter;
 
-    try {
-      const characterImage = await getCharacterImage(imgUrl);
-      const dataUrl = createDataUrl(characterImage, initialColors, paths);
-      const colorsHash = btoa(JSON.stringify(initialColors));
-      const newFilename = `${className}${id}_${colorsHash}`;
+    processImage(selectedCharacter.imgUrl, (image) => {
+      const dataUrl = createDataUrl(
+        image,
+        selectedCharacter.initialColors,
+        selectedCharacter.paths
+      );
+
+      const colorsHash = btoa(JSON.stringify(selectedCharacter.initialColors));
+      const newFilename = `${selectedCharacter.class}${selectedCharacter.id}_${colorsHash}`;
 
       downloadCharacter(newFilename, dataUrl);
-    } catch (err) {
-      console.error(err);
-    }
+    });
   };
 
+  const downloadingDisabled = selectedCharacter === null;
+
   return (
-    <div className="flex flex-grow flex-col flex-nowrap justify-center self-stretch p-6">
-      <div className="my-4 flex flex-row flex-wrap gap-4 justify-self-center">
-        <DebugSquare color={colors.skin[0]}>Skin 1</DebugSquare>
-        <DebugSquare color={colors.skin[1]}>Skin 2</DebugSquare>
-
-        <DebugSquare color={colors.hair[0]}>Hair 1</DebugSquare>
-        <DebugSquare color={colors.hair[1]}>Hair 2</DebugSquare>
-
-        <DebugSquare color={colors.leftEye[0]}>L. Eye 1</DebugSquare>
-        <DebugSquare color={colors.leftEye[1]}>L. Eye 2</DebugSquare>
-
-        <DebugSquare color={colors.rightEye[0]}>R. Eye 1</DebugSquare>
-        <DebugSquare color={colors.rightEye[1]}>R. Eye 2</DebugSquare>
-
-        {colors.misc.map((color, index) => (
-          <DebugSquare key={index} color={color}>
-            Misc {index + 1}
-          </DebugSquare>
-        ))}
-      </div>
-
-      <div>
-        <canvas
-          ref={previewCanvasRef}
-          className="mx-auto h-[450px] w-[450px] border-2 border-black"
-          width={canvasWidth}
-          height={canvasHeight}
-        >
-          A preview of
-          {selectedCharacter === null && "no character"}
-          {selectedCharacter !== null &&
-            `a ${selectedCharacter.class} from ${selectedCharacter.game}`}
-        </canvas>
-      </div>
+    <div className="flex flex-col flex-nowrap justify-center self-stretch p-6">
+      <canvas
+        ref={previewCanvasRef}
+        className="mx-auto w-[450px] grow-0 border-2 border-black"
+        width={canvasWidth}
+        height={canvasHeight}
+      >
+        A preview of
+        {selectedCharacter === null && "no character"}
+        {selectedCharacter !== null &&
+          `a ${selectedCharacter.class} from ${selectedCharacter.game}`}
+      </canvas>
 
       <div className="mx-auto max-w-fit pt-6">
         <Button
           intent="primary"
           size="large"
-          disabled={selectedCharacter === null}
-          onClick={processDownload}
+          disabled={downloadingDisabled}
+          onClick={download}
         >
           Download
         </Button>
