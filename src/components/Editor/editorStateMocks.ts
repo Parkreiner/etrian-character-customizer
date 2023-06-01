@@ -5,7 +5,7 @@ import { CharacterColors } from "@/typesConstants/colors";
 const baseCharacter: Omit<Character, "id" | "initialColors"> = {
   game: "eo1",
   class: "protector",
-  imgUrl: "http://jank.com",
+  imgUrl: "https://i.imgur.com/2eiuAIn.png",
 
   paths: [],
   totalColors: 8,
