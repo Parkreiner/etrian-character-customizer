@@ -22,7 +22,7 @@ export default function CharacterPanel({
     <Card title={gameClass} striped={false} gapSize="small">
       {characters.length === 0 ? (
         <div className="flex h-full w-full grow items-center justify-center rounded-md bg-teal-800 py-1">
-          <p className="text-xs text-teal-100">No Characters</p>
+          <p className="text-xs text-teal-100">Coming Soon</p>
         </div>
       ) : (
         <ol className="flex w-full flex-row gap-x-2">
