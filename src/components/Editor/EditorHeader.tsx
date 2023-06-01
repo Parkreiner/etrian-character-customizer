@@ -6,7 +6,7 @@ export default memo(function EditorHeader() {
     <header className="border-b-2 border-teal-900 py-4">
       <div className="mx-auto flex w-full max-w-[1400px] flex-row gap-x-10 align-baseline">
         <h1 className="mr-auto cursor-default text-2xl italic">
-          Etrian Character Editor
+          Etrian Character Customizer
         </h1>
 
         <EditorModalButton
