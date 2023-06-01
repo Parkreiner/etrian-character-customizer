@@ -10,6 +10,7 @@ import {
 } from "./canvasHelpers";
 
 import Button from "@/components/Button";
+import GuideButton from "./GuideButton";
 import useImageCache from "@/hooks/useImageCache";
 
 type Props = {
@@ -71,7 +72,7 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
   const downloadingDisabled = selectedCharacter === null;
 
   return (
-    <div className="flex flex-col flex-nowrap justify-center self-stretch p-6">
+    <div className="flex h-full flex-col flex-nowrap justify-center pt-6">
       <canvas
         ref={previewCanvasRef}
         className="mx-auto w-[450px] grow-0 border-2 border-black"
@@ -84,7 +85,16 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
           `a ${selectedCharacter.class} from ${selectedCharacter.game}`}
       </canvas>
 
-      <div className="mx-auto max-w-fit pt-6">
+      <div className="mx-auto flex max-w-fit flex-row flex-nowrap items-center gap-x-5 pt-6">
+        <GuideButton
+          buttonText="Help"
+          modalTitle="Help"
+          modalDescription="How to use this application"
+          buttonTextJustify="right"
+        >
+          Baba-booey Baba-booey
+        </GuideButton>
+
         <Button
           intent="primary"
           size="large"
@@ -93,6 +103,15 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
         >
           Download
         </Button>
+
+        <GuideButton
+          buttonText="Credits"
+          modalTitle="Credits"
+          modalDescription="Credits and colophon"
+          buttonTextJustify="left"
+        >
+          Baba-booey Baba-booey
+        </GuideButton>
       </div>
     </div>
   );

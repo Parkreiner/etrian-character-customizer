@@ -1,31 +1,48 @@
 import { PropsWithChildren } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import Button from "@/components/Button";
+import { cva } from "class-variance-authority";
+
+type TextJustification = "left" | "center" | "right";
 
 type Props = PropsWithChildren<{
   buttonText: string;
+  buttonTextJustify?: TextJustification;
   modalTitle: string;
   modalDescription: string;
 }>;
 
-export default function EditorModalButton({
+const dialogButtonStyles = cva(
+  "w-12 text-lg font-medium underline underline-offset-2",
+  {
+    variants: {
+      buttonTextJustify: {
+        left: "text-left",
+        center: "text-center",
+        right: "text-right",
+      } satisfies Record<TextJustification, string>,
+    },
+  }
+);
+
+export default function GuideButton({
   children,
   buttonText,
   modalTitle,
   modalDescription,
+  buttonTextJustify = "center",
 }: Props) {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <Button intent="secondary" size="medium">
+        <button className={dialogButtonStyles({ buttonTextJustify })}>
           {buttonText}
-        </Button>
+        </button>
       </Dialog.Trigger>
 
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed top-0 left-0 h-full w-full backdrop-blur-sm" />
+        <Dialog.Overlay className="fixed left-0 top-0 h-full w-full backdrop-blur-sm" />
 
-        <div className="fixed top-0 left-0 flex h-full w-full items-center justify-center">
+        <div className="fixed left-0 top-0 flex h-full w-full items-center justify-center">
           <Dialog.Content className="relative min-h-[400px] w-full max-w-prose rounded-md bg-white p-10 shadow-md">
             <Dialog.Title className="text-2xl font-bold">
               {modalTitle}
