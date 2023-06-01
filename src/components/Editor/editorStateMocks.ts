@@ -2,12 +2,12 @@ import { Character, ClassOrderings } from "@/typesConstants/gameData";
 import { ApiResponse } from "@/hooks/useGameInfoFetch";
 import { CharacterColors } from "@/typesConstants/colors";
 
-const baseCharacter: Omit<Character, "id" | "colors"> = {
+const baseCharacter: Omit<Character, "id" | "initialColors"> = {
   game: "eo1",
   class: "protector",
   imgUrl: "http://jank.com",
 
-  svgs: [],
+  paths: [],
   totalColors: 8,
 };
 
@@ -102,7 +102,7 @@ export async function mockFetchCharacters(url: string) {
       return {
         ...baseCharacter,
         id: String(num),
-        colors: colorsForProtectors[num - 1] as CharacterColors,
+        initialColors: colorsForProtectors[num - 1] as CharacterColors,
       };
     }),
   };

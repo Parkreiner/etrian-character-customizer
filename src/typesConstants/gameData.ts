@@ -6,8 +6,8 @@ export type GameOrigin = (typeof gameOrigins)[number];
 export type CharacterGroup = Map<string, readonly Character[]>;
 export type CharsGroupedByGame = Map<GameOrigin, CharacterGroup>;
 
-export type SvgEntry = Readonly<{
-  pathData: string;
+export type CanvasPathEntry = Readonly<{
+  path: string;
   layerIndex: number;
   category: ColorCategory;
   categoryIndex: number;
@@ -18,9 +18,9 @@ export type Character = {
   game: GameOrigin;
   class: string;
   imgUrl: string;
-  svgs: readonly SvgEntry[];
+  paths: readonly CanvasPathEntry[];
 
-  colors: CharacterColors;
+  initialColors: CharacterColors;
   totalColors: number;
 };
 

@@ -49,7 +49,7 @@ export function reduceEditorState(
     return {
       initialized: true,
       selectedCharacterId: startingCharacter.id,
-      colors: startingCharacter.colors,
+      colors: startingCharacter.initialColors,
     };
   }
 
@@ -61,7 +61,7 @@ export function reduceEditorState(
       return {
         ...state,
         selectedCharacterId: newCharacter.id,
-        colors: newCharacter.colors,
+        colors: newCharacter.initialColors,
       };
     }
 
@@ -84,7 +84,7 @@ export function reduceEditorState(
       return {
         ...state,
         selectedCharacterId: currentCharacter.id,
-        colors: currentCharacter.colors,
+        colors: currentCharacter.initialColors,
       };
     }
 
