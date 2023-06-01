@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
-import { Character } from "@/typesConstants/gameData";
+import { CanvasPathEntry, Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
 
 import DebugSquare from "./DebugSquare";
@@ -24,19 +24,42 @@ async function getCharacterImage(url: string): Promise<HTMLImageElement> {
   });
 }
 
+function drawToCanvas(
+  canvasContext: CanvasRenderingContext2D,
+  colors: CharacterColors,
+  pathEntries: readonly CanvasPathEntry[]
+): void {
+  const sortedSvgs = [...pathEntries].sort((entry1, entry2) => {
+    return entry1.layerIndex - entry2.layerIndex;
+  });
+
+  for (const entry of sortedSvgs) {
+    const { path: pathData, category, categoryIndex } = entry;
+    const pathNode = new Path2D(pathData);
+
+    const fillColor = colors[category][categoryIndex] ?? placeholderFill;
+    canvasContext.fillStyle = fillColor;
+    canvasContext.fill(pathNode);
+  }
+}
+
 function createDataUrl(
   imageNode: HTMLImageElement,
   colors: CharacterColors,
-  svgs: Character["svgs"]
+  pathEntries: readonly CanvasPathEntry[]
 ): string {
   const outputCanvas = document.createElement("canvas");
   outputCanvas.width = imageNode.width;
   outputCanvas.height = imageNode.height;
 
-  ////////////////////////////
-  // Put drawing logic here //
-  ////////////////////////////
+  const outputContext = outputCanvas.getContext("2d");
+  if (outputContext === null) {
+    throw new Error(
+      "outputCanvas declared with multiple rendering contexts - this should be physically impossible"
+    );
+  }
 
+  drawToCanvas(outputContext, colors, pathEntries);
   return outputCanvas.toDataURL();
 }
 
@@ -48,29 +71,6 @@ function downloadCharacter(filename: string, dataUrl: string): void {
   fakeAnchor.click();
 }
 
-/**
- * Notes about implementing this:
- * - I think that the two canvases approach is actually the best way forward. If
- *   I only had one, I would need to resize the canvas to the dimensions of the
- *   image, download it, and then switch it back. It would look janky and no
- *   matter how fast the operation, would probably cause UI flicker
- *
- *   By having two, I have one canvas that will always be the preview canvas,
- *   and one that can resize itself as aggressively for the final output image
- *   as needed, without making the UI look weird.
- * - Because I have two canvases, they actually have slightly different concerns
- *   when it comes to resizing themselves. The preview canvas wants to stay
- *   responsive at all times, while the output canvas wants to be as accurate to
- *   the source images as possible
- * - Because you never see the output canvas, I feel that I don't actually need
- *   to draw on it in most situations. I feel like I could get away with waiting
- *   to draw on it until downloadCharacter runs. I just need to be sure to clear
- *   out the canvas afterwards. Actually, it might make sense to not render an
- *   output canvas at all, and only make it as part of the downloadCharacter
- *   function.
- * - Placing any kind of shape on the canvas doesn't seem that bad. It feels
- *   like the real challenge is going to be in figuring out WHERE to place them.
- */
 export default function CharacterPreview({ selectedCharacter, colors }: Props) {
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -78,21 +78,7 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
     if (previewContext === null || selectedCharacter === null) return;
 
-    const sortedEntries = [...selectedCharacter.svgs].sort((entry1, entry2) => {
-      return entry1.layerIndex - entry2.layerIndex;
-    });
-
-    for (const entry of sortedEntries) {
-      const { pathData, category, categoryIndex } = entry;
-      const pathNode = new Path2D(pathData);
-
-      const fillColor = colors[category][categoryIndex] ?? placeholderFill;
-      previewContext.fillStyle = fillColor;
-      previewContext.fill(pathNode);
-    }
-
-    // Still need to add image and clipping stuff here
-
+    drawToCanvas(previewContext, colors, selectedCharacter.paths);
     return () => {
       previewContext.fillStyle = "#000000";
       previewContext.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -114,12 +100,18 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
 
   const processDownload = async () => {
     if (selectedCharacter === null) return;
-    const { id, colors, svgs, imgUrl, class: className } = selectedCharacter;
+    const {
+      id,
+      initialColors,
+      paths,
+      imgUrl,
+      class: className,
+    } = selectedCharacter;
 
     try {
       const characterImage = await getCharacterImage(imgUrl);
-      const dataUrl = createDataUrl(characterImage, colors, svgs);
-      const colorsHash = btoa(JSON.stringify(colors));
+      const dataUrl = createDataUrl(characterImage, initialColors, paths);
+      const colorsHash = btoa(JSON.stringify(initialColors));
       const newFilename = `${className}${id}_${colorsHash}`;
 
       downloadCharacter(newFilename, dataUrl);
