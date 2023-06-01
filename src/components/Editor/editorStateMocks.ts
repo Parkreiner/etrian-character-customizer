@@ -7,7 +7,56 @@ const baseCharacter: Omit<Character, "id" | "initialColors"> = {
   class: "protector",
   imgUrl: "https://i.imgur.com/2eiuAIn.png",
 
-  paths: [],
+  paths: [
+    {
+      category: "skin",
+      categoryIndex: 0,
+      layerIndex: 0,
+      path: "M20 20 h 50 v 50 h -50 Z",
+    },
+    {
+      category: "skin",
+      categoryIndex: 1,
+      layerIndex: 0,
+      path: "M20 80 h 50 v 50 h -50 Z",
+    },
+    {
+      category: "hair",
+      categoryIndex: 0,
+      layerIndex: 0,
+      path: "M20 140 h 50 v 50 h -50 Z",
+    },
+    {
+      category: "hair",
+      categoryIndex: 1,
+      layerIndex: 0,
+      path: "M20 200 h 50 v 50 h -50 Z",
+    },
+    {
+      category: "leftEye",
+      categoryIndex: 0,
+      layerIndex: 0,
+      path: "M20 260 h 50 v 50 h -50 Z",
+    },
+    {
+      category: "leftEye",
+      categoryIndex: 1,
+      layerIndex: 0,
+      path: "M20 320 h 50 v 50 h -50 Z",
+    },
+    {
+      category: "rightEye",
+      categoryIndex: 0,
+      layerIndex: 0,
+      path: "M20 380 h 50 v 50 h -50 Z",
+    },
+    {
+      category: "rightEye",
+      categoryIndex: 1,
+      layerIndex: 0,
+      path: "M20 440 h 50 v 50 h -50 Z",
+    },
+  ],
   totalColors: 8,
 };
 
