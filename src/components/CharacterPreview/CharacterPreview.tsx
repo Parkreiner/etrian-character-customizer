@@ -24,8 +24,9 @@ async function getCharacterImage(url: string): Promise<HTMLImageElement> {
   });
 }
 
-function drawToCanvas(
+function renderCharacter(
   canvasContext: CanvasRenderingContext2D,
+  characterImage: HTMLImageElement,
   colors: CharacterColors,
   pathEntries: readonly CanvasPathEntry[]
 ): void {
@@ -41,16 +42,18 @@ function drawToCanvas(
     canvasContext.fillStyle = fillColor;
     canvasContext.fill(pathNode);
   }
+
+  canvasContext.drawImage(characterImage, 0, 0);
 }
 
 function createDataUrl(
-  imageNode: HTMLImageElement,
+  image: HTMLImageElement,
   colors: CharacterColors,
   pathEntries: readonly CanvasPathEntry[]
 ): string {
   const outputCanvas = document.createElement("canvas");
-  outputCanvas.width = imageNode.width;
-  outputCanvas.height = imageNode.height;
+  outputCanvas.width = image.width;
+  outputCanvas.height = image.height;
 
   const outputContext = outputCanvas.getContext("2d");
   if (outputContext === null) {
@@ -59,7 +62,7 @@ function createDataUrl(
     );
   }
 
-  drawToCanvas(outputContext, colors, pathEntries);
+  renderCharacter(outputContext, image, colors, pathEntries);
   return outputCanvas.toDataURL();
 }
 
@@ -78,10 +81,25 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
     if (previewContext === null || selectedCharacter === null) return;
 
-    drawToCanvas(previewContext, colors, selectedCharacter.paths);
+    let drawAfterFetch = true;
+
+    const draw = async () => {
+      try {
+        const image = await getCharacterImage(selectedCharacter.imgUrl);
+        if (!drawAfterFetch) return;
+
+        renderCharacter(previewContext, image, colors, selectedCharacter.paths);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    draw();
+
     return () => {
       previewContext.fillStyle = "#000000";
       previewContext.clearRect(0, 0, canvasWidth, canvasHeight);
+      drawAfterFetch = false;
     };
   }, [selectedCharacter, colors]);
 
