@@ -1,3 +1,7 @@
+/**
+ * @todo Also need to export a cache snapshot from the hook so that the cache
+ * can start to be used with React state
+ */
 import { useCallback } from "react";
 
 const imageCache = new Map<string, HTMLImageElement>();
@@ -29,9 +33,8 @@ export default function useImageCache() {
       }
 
       let processingCanceled = false;
-      const imagePromise = getImage(imageUrl);
 
-      imagePromise.then((image) => {
+      getImage(imageUrl).then((image) => {
         if (!processingCanceled) {
           imageCallback(image);
         }
