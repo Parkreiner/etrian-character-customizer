@@ -75,34 +75,34 @@ export default function CharacterMenus({
   );
 
   return (
-    <div className="flex h-full w-[450px] flex-col flex-nowrap bg-teal-600 py-4 pl-8 pr-4">
+    <div className="flex h-full w-[450px] flex-col flex-nowrap bg-teal-600 pb-1.5 pl-6 pr-5 pt-3">
+      <button
+        className="mx-auto mb-3 block max-w-fit rounded-full bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 shadow-lg transition-colors hover:bg-teal-200"
+        onClick={randomizeCharacter}
+      >
+        Randomize
+      </button>
+
       <fieldset className="flex-grow overflow-y-hidden">
-        <div className={`${styles.scrollbar} h-full overflow-y-scroll pr-4`}>
+        <div
+          className={`${styles.scrollbar} h-full overflow-y-scroll pb-1 pr-5`}
+        >
           <legend>
             <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
           </legend>
 
-          <button
-            className="mx-auto block max-w-fit rounded-full bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 shadow-lg hover:bg-teal-100"
-            onClick={randomizeCharacter}
-          >
-            Click to randomize
-          </button>
-
           {Array.from(grouped, ([game, gameEntries]) => (
-            <div key={game} className="mt-6 [&:nth-child(3)]:mt-4">
+            <div key={game} className="mt-5 [&:nth-child(2)]:mt-0">
               <Card title={nameAliases[game]} striped gapSize="small">
-                <div className="mt-1">
-                  {gameEntries.map((entry) => (
-                    <CharacterClassSection
-                      key={entry.class}
-                      gameClass={entry.class}
-                      selectedCharacterId={selectedCharacterId}
-                      characters={entry.characters}
-                      onCharacterChange={onCharacterChange}
-                    />
-                  ))}
-                </div>
+                {gameEntries.map((entry) => (
+                  <CharacterClassSection
+                    key={entry.class}
+                    gameClass={entry.class}
+                    selectedCharacterId={selectedCharacterId}
+                    characters={entry.characters}
+                    onCharacterChange={onCharacterChange}
+                  />
+                ))}
               </Card>
             </div>
           ))}
