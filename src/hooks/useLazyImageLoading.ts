@@ -107,10 +107,7 @@ const cache = new ImageCache();
 
 function subscribe(notifyReact: () => void) {
   cache.addSubscription(notifyReact);
-
-  return function unsubscribe() {
-    cache.removeSubscription(notifyReact);
-  };
+  return () => cache.removeSubscription(notifyReact);
 }
 
 export default function useLazyImageLoading(imageUrl: string) {
