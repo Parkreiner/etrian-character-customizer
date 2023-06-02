@@ -25,6 +25,7 @@ export default function CharacterClassSection({
   onCharacterChange,
 }: Props) {
   const HeaderTag = useCurrentHeader();
+  const placeholderSlotsToRender = Math.abs((5 - characters.length) % 5);
 
   return (
     <div className="mt-3 flex flex-row flex-nowrap items-center first:mt-1">
@@ -54,7 +55,7 @@ export default function CharacterClassSection({
                 </li>
               ))}
 
-              {range((5 - characters.length) % 5).map((num) => (
+              {range(placeholderSlotsToRender).map((num) => (
                 <li
                   key={num}
                   className="rounded-md bg-teal-950 opacity-60"
