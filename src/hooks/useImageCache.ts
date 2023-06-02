@@ -2,53 +2,99 @@
  * @todo Also need to export a cache snapshot from the hook so that the cache
  * can start to be used with React state
  */
-import { useCallback } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
-const imageCache = new Map<string, HTMLImageElement>();
+type MutableNotifierInfo = { notify: boolean };
 
-async function getImage(url: string): Promise<HTMLImageElement> {
-  const characterImage = new Image();
-  return new Promise((resolve, reject) => {
-    characterImage.onload = () => {
-      imageCache.set(url, characterImage);
-      resolve(characterImage);
-    };
+class ImageCache {
+  #cache = new Map<string, HTMLImageElement>();
+  #subscriptions = [] as (() => void)[];
 
-    characterImage.onerror = reject;
-    characterImage.src = url;
-  });
+  addSubscription(callback: () => void): void {
+    this.#subscriptions.push(callback);
+  }
+
+  removeSubscription(callback: () => void): void {
+    this.#subscriptions = this.#subscriptions.filter((cb) => cb !== callback);
+  }
+
+  get(imgUrl: string): HTMLImageElement | null {
+    return this.#cache.get(imgUrl) ?? null;
+  }
+
+  set(imgUrl: string, newImage: HTMLImageElement, notifySubscribers = true) {
+    this.#cache.set(imgUrl, newImage);
+
+    if (notifySubscribers) {
+      this.#subscriptions.forEach((cb) => cb());
+    }
+  }
+
+  loadImage(
+    url: string,
+    info: MutableNotifierInfo = { notify: true }
+  ): Promise<HTMLImageElement> {
+    const characterImage = new Image();
+    return new Promise((resolve, reject) => {
+      characterImage.onload = () => {
+        this.set(url, characterImage, info.notify);
+        resolve(characterImage);
+      };
+
+      characterImage.onerror = reject;
+      characterImage.src = url;
+    });
+  }
 }
 
-export default function useImageCache() {
-  const loadImage = useCallback((imageUrl: string) => {
-    return getImage(imageUrl);
-  }, []);
+const cache = new ImageCache();
+
+function subscribe(notifyReact: () => void) {
+  cache.addSubscription(notifyReact);
+
+  return function unsubscribe() {
+    cache.removeSubscription(notifyReact);
+  };
+}
+
+type ImageInfo =
+  | { loaded: false }
+  | { loaded: true; width: number; height: number };
+
+export default function useImageCache(imageUrl: string) {
+  const image = useSyncExternalStore(subscribe, () => cache.get(imageUrl));
+  const imageInfo: ImageInfo =
+    image === null
+      ? { loaded: false }
+      : { loaded: true, width: image.width, height: image.height };
 
   const processImage = useCallback(
-    (imageUrl: string, imageCallback: (image: HTMLImageElement) => void) => {
-      const cachedImage = imageCache.get(imageUrl);
-      if (cachedImage !== undefined) {
-        imageCallback(cachedImage);
+    (imageCallback: (image: HTMLImageElement) => void) => {
+      const info: MutableNotifierInfo = { notify: true };
+      const cleanup = () => {
+        info.notify = false;
+      };
 
-        return () => {
-          // Do nothing; always returning a function for better ergonomics
-        };
+      const cachedImage = cache.get(imageUrl);
+      if (cachedImage !== null) {
+        imageCallback(cachedImage);
+        return cleanup;
       }
 
-      let processingCanceled = false;
-
-      getImage(imageUrl).then((image) => {
-        if (!processingCanceled) {
+      cache.loadImage(imageUrl, info).then((image) => {
+        if (info.notify) {
           imageCallback(image);
         }
       });
 
-      return () => {
-        processingCanceled = true;
-      };
+      return cleanup;
     },
-    []
+    [imageUrl]
   );
 
-  return { loadImage, processImage } as const;
+  const loadNewImage = useCallback((newImageUrl: string) => {
+    return cache.loadImage(newImageUrl);
+  }, []);
+
+  return { imageInfo, processImage, loadNewImage } as const;
 }

@@ -29,8 +29,10 @@ function downloadCharacter(filename: string, dataUrl: string): void {
 
 export default function CharacterPreview({ selectedCharacter, colors }: Props) {
   const [status, setStatus] = useState<PreviewStatus>("idle");
+  const { imageInfo, processImage } = useImageCache(selectedCharacter.imgUrl);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const { processImage } = useImageCache();
+
+  console.log(imageInfo);
 
   // Logic is definitely janky. Probably need to split this up into two
   // effects – one that just renders any images already cached, and one that
@@ -41,7 +43,7 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
 
     setStatus("processing");
 
-    const cleanup = processImage(selectedCharacter.imgUrl, (image) => {
+    const cleanup = processImage((image) => {
       renderCharacter(previewContext, image, colors, selectedCharacter.paths);
       setStatus("idle");
     });
@@ -59,7 +61,7 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
   const downloadAllImages = () => {
     setStatus("processing");
 
-    processImage(selectedCharacter.imgUrl, (image) => {
+    processImage((image) => {
       const dataUrl = imageToDataUrl(
         image,
         selectedCharacter.initialColors,
