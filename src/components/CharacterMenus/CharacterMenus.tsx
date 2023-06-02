@@ -10,6 +10,7 @@ import {
 import Card from "@/components/Card";
 import CharacterClassSection from "./CharacterClassPanel";
 import styles from "./scrollbar.module.css";
+import HeaderProvider, { useCurrentHeader } from "@/contexts/HeaderLevels";
 
 type Props = {
   characters: readonly Character[];
@@ -69,6 +70,7 @@ export default function CharacterMenus({
   onCharacterChange,
   randomizeCharacter,
 }: Props) {
+  const HeaderTag = useCurrentHeader();
   const grouped = useMemo(
     () => groupCharacters(characters, classOrderings),
     [characters, classOrderings]
@@ -77,9 +79,9 @@ export default function CharacterMenus({
   return (
     <div className="flex h-full w-[430px] flex-col flex-nowrap bg-teal-600 pb-1.5">
       <div className="flex flex-nowrap items-baseline justify-between bg-teal-100 py-3 pl-7 pr-5">
-        <h1 className="text-base font-medium italic text-teal-950">
+        <HeaderTag className="text-base font-medium italic text-teal-950">
           Etrian Character Customizer
-        </h1>
+        </HeaderTag>
 
         <button
           className="block max-w-fit rounded-full border-[1px] border-teal-900/70 bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 transition-colors hover:bg-teal-200"
@@ -97,21 +99,23 @@ export default function CharacterMenus({
             <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
           </legend>
 
-          {Array.from(grouped, ([game, gameEntries]) => (
-            <div key={game} className="mt-5 [&:nth-child(2)]:mt-0">
-              <Card title={nameAliases[game]} striped gapSize="small">
-                {gameEntries.map((entry) => (
-                  <CharacterClassSection
-                    key={entry.class}
-                    gameClass={entry.class}
-                    selectedCharacterId={selectedCharacterId}
-                    characters={entry.characters}
-                    onCharacterChange={onCharacterChange}
-                  />
-                ))}
-              </Card>
-            </div>
-          ))}
+          <HeaderProvider>
+            {Array.from(grouped, ([game, gameEntries]) => (
+              <div key={game} className="mt-5 [&:nth-child(2)]:mt-0">
+                <Card title={nameAliases[game]} striped gapSize="small">
+                  {gameEntries.map((entry) => (
+                    <CharacterClassSection
+                      key={entry.class}
+                      gameClass={entry.class}
+                      selectedCharacterId={selectedCharacterId}
+                      characters={entry.characters}
+                      onCharacterChange={onCharacterChange}
+                    />
+                  ))}
+                </Card>
+              </div>
+            ))}
+          </HeaderProvider>
         </div>
       </fieldset>
     </div>
