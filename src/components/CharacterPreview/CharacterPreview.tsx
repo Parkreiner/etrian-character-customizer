@@ -74,7 +74,7 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
     <div className="flex h-full flex-col flex-nowrap justify-center pt-6">
       <canvas
         ref={previewCanvasRef}
-        className="mx-auto w-[450px] grow-0 border-2 border-black"
+        className="mx-auto w-[450px] grow-0 border-2 border-teal-700"
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
       >
@@ -84,12 +84,11 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
           `a ${selectedCharacter.class} from ${selectedCharacter.game}`}
       </canvas>
 
-      <div className="mx-auto flex max-w-fit flex-row flex-nowrap items-center gap-x-5 pt-6">
+      <div className="mx-auto flex max-w-fit flex-row flex-nowrap items-center gap-x-4 pt-6">
         <GuideButton
           buttonText="Help"
           modalTitle="Help"
           modalDescription="How to use this application"
-          buttonTextJustify="right"
         >
           Baba-booey Baba-booey
         </GuideButton>
@@ -106,7 +105,6 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
           buttonText="Credits"
           modalTitle="Credits"
           modalDescription="Credits and colophon"
-          buttonTextJustify="left"
         >
           Baba-booey Baba-booey
         </GuideButton>

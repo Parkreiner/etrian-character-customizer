@@ -1,40 +1,22 @@
 import { PropsWithChildren } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { cva } from "class-variance-authority";
-
-type TextJustification = "left" | "center" | "right";
 
 type Props = PropsWithChildren<{
   buttonText: string;
-  buttonTextJustify?: TextJustification;
   modalTitle: string;
   modalDescription: string;
 }>;
-
-const dialogButtonStyles = cva(
-  "w-24 text-lg font-medium underline underline-offset-2",
-  {
-    variants: {
-      buttonTextJustify: {
-        left: "text-left",
-        center: "text-center",
-        right: "text-right",
-      } satisfies Record<TextJustification, string>,
-    },
-  }
-);
 
 export default function GuideButton({
   children,
   buttonText,
   modalTitle,
   modalDescription,
-  buttonTextJustify = "center",
 }: Props) {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <button className={dialogButtonStyles({ buttonTextJustify })}>
+        <button className="w-24 rounded-full border-[1px] border-teal-900/70 px-4 py-1 text-sm font-medium text-teal-950 transition-colors hover:bg-teal-200">
           {buttonText}
         </button>
       </Dialog.Trigger>

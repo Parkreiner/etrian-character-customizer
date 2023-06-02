@@ -92,7 +92,7 @@ export default function ControlsContainer<T extends string>({
     <Tabs.Root<T>
       value={selectedTabValue}
       onValueChange={onTabChange}
-      className="flex h-full min-w-[400px] flex-col flex-nowrap self-stretch"
+      className="flex h-full min-w-[430px] flex-col flex-nowrap self-stretch"
     >
       <Tabs.List<T>
         className="flex gap-x-1 px-4 leading-none"
