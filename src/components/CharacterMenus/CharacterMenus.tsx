@@ -1,13 +1,15 @@
 import { useMemo } from "react";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+
 import {
   Character,
   ClassOrderings,
   GameOrigin,
 } from "@/typesConstants/gameData";
 
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import Card from "../Card/Card";
+import Card from "@/components/Card";
 import CharacterClassSection from "./CharacterClassPanel";
+import styles from "./scrollbar.module.css";
 
 type Props = {
   characters: readonly Character[];
@@ -73,39 +75,39 @@ export default function CharacterMenus({
   );
 
   return (
-    <div className="relative flex h-full w-[400px] flex-col flex-nowrap bg-teal-600 p-4">
+    <div className="flex h-full w-[450px] flex-col flex-nowrap bg-teal-600 py-4 pl-8 pr-4">
       <fieldset className="flex-grow overflow-y-hidden">
-        <div>
+        <div className={`${styles.scrollbar} h-full overflow-y-scroll pr-4`}>
           <legend>
             <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
           </legend>
 
+          <button
+            className="mx-auto block max-w-fit rounded-full bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 shadow-lg hover:bg-teal-100"
+            onClick={randomizeCharacter}
+          >
+            Click to randomize
+          </button>
+
           {Array.from(grouped, ([game, gameEntries]) => (
-            <div key={game} className="mt-6 [&:nth-child(2)]:mt-0">
+            <div key={game} className="mt-6 [&:nth-child(3)]:mt-4">
               <Card title={nameAliases[game]} striped gapSize="small">
-                {gameEntries.map((entry) => (
-                  <CharacterClassSection
-                    key={entry.class}
-                    gameClass={entry.class}
-                    selectedCharacterId={selectedCharacterId}
-                    characters={entry.characters}
-                    onCharacterChange={onCharacterChange}
-                  />
-                ))}
+                <div className="mt-1">
+                  {gameEntries.map((entry) => (
+                    <CharacterClassSection
+                      key={entry.class}
+                      gameClass={entry.class}
+                      selectedCharacterId={selectedCharacterId}
+                      characters={entry.characters}
+                      onCharacterChange={onCharacterChange}
+                    />
+                  ))}
+                </div>
               </Card>
             </div>
           ))}
         </div>
       </fieldset>
-
-      <div className="absolute bottom-0 left-0 w-full flex-grow-0 bg-gradient-to-t from-teal-600 to-teal-600/50 pb-4 pt-4">
-        <button
-          className="mx-auto block max-w-fit rounded-full bg-teal-50 px-4 py-1 font-medium text-teal-900 shadow-lg hover:bg-teal-100"
-          onClick={randomizeCharacter}
-        >
-          Click to randomize
-        </button>
-      </div>
     </div>
   );
 }

@@ -12,7 +12,7 @@ type Props = PropsWithChildren<{
 }>;
 
 const dialogButtonStyles = cva(
-  "w-12 text-lg font-medium underline underline-offset-2",
+  "w-24 text-lg font-medium underline underline-offset-2",
   {
     variants: {
       buttonTextJustify: {
