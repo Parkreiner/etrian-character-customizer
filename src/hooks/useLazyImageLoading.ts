@@ -19,7 +19,7 @@ const defaultSnapshot = {
 
 class ImageCache {
   #cache = new Map<string, HTMLImageElement>();
-  #snapshots = new Map<string, ReactSnapshot>();
+  #snapshots = new WeakMap<HTMLImageElement, ReactSnapshot>();
   #subscriptions = [] as (() => void)[];
 
   addSubscription(callback: () => void): void {
@@ -39,11 +39,14 @@ class ImageCache {
   }
 
   getSnapshot(imgUrl: string): ReactSnapshot {
-    return this.#snapshots.get(imgUrl) ?? defaultSnapshot;
+    const image = this.getImage(imgUrl);
+    return image === null
+      ? defaultSnapshot
+      : this.#snapshots.get(image) ?? defaultSnapshot;
   }
 
-  addSnapshot(imgUrl: string, snapshot: ReactSnapshot): void {
-    this.#snapshots.set(imgUrl, snapshot);
+  addSnapshot(image: HTMLImageElement, snapshot: ReactSnapshot): void {
+    this.#snapshots.set(image, snapshot);
     this.notifySubscribers();
   }
 
@@ -54,7 +57,7 @@ class ImageCache {
   ): void {
     this.#cache.set(imgUrl, newImage);
 
-    this.#snapshots.set(imgUrl, {
+    this.#snapshots.set(newImage, {
       status: "success",
       image: newImage,
       error: null,
@@ -74,22 +77,22 @@ class ImageCache {
       return Promise.resolve(prevImage);
     }
 
-    this.addSnapshot(imageUrl, { status: "loading", image: null, error: null });
-    const characterImage = new Image();
+    const newImage = new Image();
+    this.addSnapshot(newImage, { status: "loading", image: null, error: null });
 
     return new Promise((resolve, reject) => {
-      characterImage.onload = () => {
-        this.addImage(imageUrl, characterImage, info.mutable_notifyAfterLoad);
-        resolve(characterImage);
+      newImage.onload = () => {
+        this.addImage(imageUrl, newImage, info.mutable_notifyAfterLoad);
+        resolve(newImage);
       };
 
-      characterImage.onerror = (err) => {
+      newImage.onerror = (err) => {
         const parsedError =
           err instanceof Error
             ? err
             : new Error(`Non-error ${JSON.stringify(err)} thrown`);
 
-        this.addSnapshot(imageUrl, {
+        this.addSnapshot(newImage, {
           status: "error",
           image: null,
           error: parsedError,
@@ -98,7 +101,7 @@ class ImageCache {
         reject(parsedError);
       };
 
-      characterImage.src = imageUrl;
+      newImage.src = imageUrl;
     });
   }
 }
