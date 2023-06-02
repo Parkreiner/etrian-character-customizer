@@ -42,16 +42,11 @@ export default function CharacterPreview({ character, colors }: Props) {
     };
   }, [image, colors, character.paths]);
 
-  const loadImageRef = useRef(loadImage);
-  useEffect(() => {
-    loadImageRef.current = loadImage;
-  }, [loadImage]);
-
   useEffect(() => {
     if (image !== null) return;
-    const { abort } = loadImageRef.current(character.imgUrl);
+    const { abort } = loadImage(character.imgUrl);
     return () => abort();
-  }, [image, character.imgUrl]);
+  }, [image, character.imgUrl, loadImage]);
 
   // Note: the download functionality can't work right now, because the mock
   // images are being hosted on a separate source (Imgur). Browsers will treat
