@@ -15,6 +15,7 @@ export type CanvasPathEntry = Readonly<{
 
 export type Character = {
   id: string;
+  displayId: string;
   game: GameOrigin;
   class: string;
   imgUrl: string;

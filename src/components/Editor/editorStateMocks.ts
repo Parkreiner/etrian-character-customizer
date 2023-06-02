@@ -56,20 +56,7 @@ const characters: readonly Omit<Character, "id">[] = [
   {
     game: "eo1",
     class: "protector",
-    imgUrl: "https://i.imgur.com/2eiuAIn.png",
-    paths: sharedPathInfo,
-    totalColors: 8,
-    initialColors: {
-      skin: ["#f4dac5", "#cb988f"],
-      hair: ["#da7c48", "#814246"],
-      leftEye: ["#b17850", "#87494a"],
-      rightEye: ["#b17850", "#87494a"],
-      misc: [],
-    },
-  },
-  {
-    game: "eo1",
-    class: "protector",
+    displayId: "1",
     imgUrl: "https://i.imgur.com/gUP2q9Z.png",
     paths: sharedPathInfo,
     totalColors: 8,
@@ -84,6 +71,7 @@ const characters: readonly Omit<Character, "id">[] = [
   {
     game: "eo1",
     class: "protector",
+    displayId: "2",
     imgUrl: "https://i.imgur.com/kFRBqKf.png",
     paths: sharedPathInfo,
     totalColors: 8,
@@ -98,6 +86,7 @@ const characters: readonly Omit<Character, "id">[] = [
   {
     game: "eo1",
     class: "protector",
+    displayId: "3",
     imgUrl: "https://i.imgur.com/JgiPmIr.png",
     paths: sharedPathInfo,
     totalColors: 8,
@@ -112,6 +101,7 @@ const characters: readonly Omit<Character, "id">[] = [
   {
     game: "eo1",
     class: "protector",
+    displayId: "4",
     imgUrl: "https://i.imgur.com/g4uNxbA.png",
     paths: sharedPathInfo,
     totalColors: 8,
@@ -125,7 +115,23 @@ const characters: readonly Omit<Character, "id">[] = [
   },
   {
     game: "eo1",
+    class: "protector",
+    displayId: "5",
+    imgUrl: "https://i.imgur.com/2eiuAIn.png",
+    paths: sharedPathInfo,
+    totalColors: 8,
+    initialColors: {
+      skin: ["#f4dac5", "#cb988f"],
+      hair: ["#da7c48", "#814246"],
+      leftEye: ["#b17850", "#87494a"],
+      rightEye: ["#b17850", "#87494a"],
+      misc: [],
+    },
+  },
+  {
+    game: "eo1",
     class: "medic",
+    displayId: "5",
     imgUrl: "https://i.imgur.com/CzJePxE.png",
     paths: sharedPathInfo,
     totalColors: 8,

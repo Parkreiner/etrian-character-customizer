@@ -116,8 +116,9 @@ export default function useEditorController() {
   // fall victim to singleton behavior. Do not replace with useEffect
   if (!state.initialized && data !== undefined) {
     const startingCharacter =
-      data.characters.find((char) => char.class === "protector") ??
-      data.characters[0];
+      data.characters.find(
+        (char) => char.class === "protector" && char.displayId === "5"
+      ) ?? data.characters[0];
 
     if (startingCharacter) {
       dispatch({
