@@ -29,7 +29,10 @@ export default function useImageCache() {
       const cachedImage = imageCache.get(imageUrl);
       if (cachedImage !== undefined) {
         imageCallback(cachedImage);
-        return;
+
+        return () => {
+          // Do nothing; always returning a function for better ergonomics
+        };
       }
 
       let processingCanceled = false;

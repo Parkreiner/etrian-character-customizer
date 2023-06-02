@@ -32,6 +32,9 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const { processImage } = useImageCache();
 
+  // Logic is definitely janky. Probably need to split this up into two
+  // effects – one that just renders any images already cached, and one that
+  // handles loading and caching new images
   useLayoutEffect(() => {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
     if (previewContext === null) return;
@@ -46,15 +49,13 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
     return () => {
       previewContext.fillStyle = "#000000";
       previewContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-      cleanup?.();
+      cleanup();
     };
   }, [selectedCharacter, colors, processImage]);
 
-  /**
-   * Note: the download functionality can't work right now, because the mock
-   * images are being hosted on a separate source (Imgur). Browsers will treat
-   * the canvas as "tainted" until the image comes from a same-source server
-   */
+  // Note: the download functionality can't work right now, because the mock
+  // images are being hosted on a separate source (Imgur). Browsers will treat
+  // the canvas as "tainted" until the image comes from a same-source server
   const downloadAllImages = () => {
     setStatus("processing");
 
