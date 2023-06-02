@@ -116,12 +116,7 @@ export default function useSlider(
     };
   }, [containerRef, sliderRef]);
 
-  /**
-   * Sets up keyboard inputs
-   *
-   * @todo Add input acceleration if the user holds a key down for a while, so
-   * that they don't have to wait forever for their changes to happen
-   */
+  // Sets up keyboard inputs
   useEffect(() => {
     const slider = sliderRef.current;
     if (slider === null) return;
