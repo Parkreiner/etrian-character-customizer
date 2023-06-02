@@ -9,7 +9,6 @@ import {
   imageToDataUrl,
 } from "./canvasHelpers";
 
-import Button from "@/components/Button";
 import GuideButton from "./GuideButton";
 import useImageCache from "@/hooks/useImageCache";
 
@@ -95,14 +94,13 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
           Baba-booey Baba-booey
         </GuideButton>
 
-        <Button
-          intent="primary"
-          size="large"
+        <button
+          className="select-none rounded-full bg-teal-800 px-7 py-3 text-xl font-medium text-teal-50 shadow-md transition-colors"
           disabled={downloadingDisabled}
           onClick={downloadAllImages}
         >
           Download
-        </Button>
+        </button>
 
         <GuideButton
           buttonText="Credits"
