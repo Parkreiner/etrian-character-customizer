@@ -75,15 +75,21 @@ export default function CharacterMenus({
   );
 
   return (
-    <div className="flex h-full w-[450px] flex-col flex-nowrap bg-teal-600 pb-1.5 pl-6 pr-5 pt-3">
-      <button
-        className="mx-auto mb-3 block max-w-fit rounded-full bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 shadow-lg transition-colors hover:bg-teal-200"
-        onClick={randomizeCharacter}
-      >
-        Randomize
-      </button>
+    <div className="flex h-full w-[450px] flex-col flex-nowrap bg-teal-600 pb-1.5">
+      <div className="flex flex-nowrap items-baseline justify-between bg-teal-100 py-3 pl-7 pr-5">
+        <h1 className="text-base font-medium italic text-teal-950">
+          Etrian Character Customizer
+        </h1>
 
-      <fieldset className="flex-grow overflow-y-hidden">
+        <button
+          className="block max-w-fit rounded-full border-[1px] border-teal-900/70 bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 transition-colors hover:bg-teal-200"
+          onClick={randomizeCharacter}
+        >
+          Randomize
+        </button>
+      </div>
+
+      <fieldset className="flex-grow overflow-y-hidden pl-6 pr-5 pt-5">
         <div
           className={`${styles.scrollbar} h-full overflow-y-scroll pb-1 pr-5`}
         >
