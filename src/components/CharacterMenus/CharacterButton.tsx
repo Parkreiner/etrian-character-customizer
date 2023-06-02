@@ -1,12 +1,10 @@
-import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { PropsWithChildren } from "react";
 import { cva } from "class-variance-authority";
 
-type Props = {
+type Props = PropsWithChildren<{
   selected: boolean;
-  displayNumber: number;
-  labelText: string;
   onClick: () => void;
-};
+}>;
 
 const buttonStyles = cva(
   "h-full w-full rounded-md text-center font-bold text-teal-50 text-sm",
@@ -23,9 +21,8 @@ const buttonStyles = cva(
 
 export default function CharacterButton({
   selected,
-  displayNumber,
-  labelText,
   onClick,
+  children,
 }: Props) {
   return (
     <button
@@ -34,10 +31,7 @@ export default function CharacterButton({
       onClick={onClick}
       disabled={selected}
     >
-      {displayNumber}
-      <VisuallyHidden>
-        <span>({labelText})</span>
-      </VisuallyHidden>
+      {children}
     </button>
   );
 }
