@@ -2,7 +2,7 @@
  * @file Provides a very dumb, lo-fi way of lazy-loading images, while making
  * info about the images themselves available as state throughout the React app.
  */
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 
 type NotificationInfo = { mutable_notifyAfterLoad: boolean };
 type ReactSnapshot = Readonly<
@@ -114,9 +114,14 @@ function subscribe(notifyReact: () => void) {
 }
 
 export default function useLazyImageLoading(imageUrl: string) {
-  const imageInfo = useSyncExternalStore(subscribe, () =>
+  const { image, status, error } = useSyncExternalStore(subscribe, () =>
     cache.getSnapshot(imageUrl)
   );
+
+  useEffect(() => {
+    if (error === null) return;
+    console.error(error);
+  }, [error]);
 
   const loadImage = useCallback((newImageUrl: string) => {
     const info: NotificationInfo = { mutable_notifyAfterLoad: true };
@@ -129,5 +134,5 @@ export default function useLazyImageLoading(imageUrl: string) {
     return { promise, abort } as const;
   }, []);
 
-  return { imageInfo, loadImage } as const;
+  return { image, status, loadImage } as const;
 }

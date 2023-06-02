@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
@@ -26,47 +26,55 @@ function downloadCharacter(filename: string, dataUrl: string): void {
 }
 
 export default function CharacterPreview({ character, colors }: Props) {
-  const { imageInfo, loadImage } = useLazyImageLoading(character.imgUrl);
+  const [downloading, setDownloading] = useState(false);
+  const { image, status, loadImage } = useLazyImageLoading(character.imgUrl);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useLayoutEffect(() => {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
-    if (previewContext === null || imageInfo.image === null) return;
+    if (previewContext === null || image === null) return;
 
-    renderCharacter(previewContext, imageInfo.image, colors, character.paths);
+    renderCharacter(previewContext, image, colors, character.paths);
 
     return () => {
       previewContext.fillStyle = "#000000";
       previewContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     };
-  }, [imageInfo.image, colors, character.paths]);
+  }, [image, colors, character.paths]);
+
+  const loadImageRef = useRef(loadImage);
+  useEffect(() => {
+    loadImageRef.current = loadImage;
+  }, [loadImage]);
 
   useEffect(() => {
-    if (imageInfo.image !== null) return;
-    const { abort } = loadImage(character.imgUrl);
+    if (image !== null) return;
+    const { abort } = loadImageRef.current(character.imgUrl);
     return () => abort();
-  }, [imageInfo.image, character.imgUrl, loadImage]);
+  }, [image, character.imgUrl]);
 
   // Note: the download functionality can't work right now, because the mock
   // images are being hosted on a separate source (Imgur). Browsers will treat
   // the canvas as "tainted" until the image comes from a same-source server
   const downloadAllImages = () => {
-    if (imageInfo.image === null) return;
+    if (image === null) return;
+    setDownloading(true);
 
     Promise.resolve().then(() => {
       const dataUrl = imageToDataUrl(
-        imageInfo.image,
+        image,
         character.initialColors,
         character.paths
       );
 
       const newFilename = `${character.class}${character.id}`;
       downloadCharacter(newFilename, dataUrl);
+      setDownloading(false);
     });
   };
 
   const downloadsDisabled =
-    imageInfo.status === "error" || imageInfo.status === "loading";
+    downloading || status === "error" || status === "loading";
 
   return (
     <div className="flex h-full flex-col flex-nowrap justify-center pt-6">
