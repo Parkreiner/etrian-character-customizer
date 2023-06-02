@@ -56,14 +56,19 @@ export default function CharacterPreview({ character, colors }: Props) {
     setDownloading(true);
 
     Promise.resolve().then(() => {
-      const dataUrl = imageToDataUrl(
-        image,
-        character.initialColors,
-        character.paths
-      );
+      try {
+        const dataUrl = imageToDataUrl(
+          image,
+          character.initialColors,
+          character.paths
+        );
 
-      const newFilename = `${character.class}${character.id}`;
-      downloadCharacter(newFilename, dataUrl);
+        const newFilename = `${character.class}${character.id}`;
+        downloadCharacter(newFilename, dataUrl);
+      } catch (err) {
+        console.error(err);
+      }
+
       setDownloading(false);
     });
   };
