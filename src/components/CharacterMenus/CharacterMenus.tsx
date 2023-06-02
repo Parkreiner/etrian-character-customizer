@@ -9,7 +9,7 @@ import {
 
 import Card from "@/components/Card";
 import CharacterClassSection from "./CharacterClassPanel";
-import styles from "./scrollbar.module.css";
+import styles from "@/components/ControlsContainer/scrollbar.module.css";
 import HeaderProvider, { useCurrentHeader } from "@/contexts/HeaderLevels";
 
 type Props = {
