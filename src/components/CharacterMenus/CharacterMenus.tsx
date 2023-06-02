@@ -32,8 +32,22 @@ function groupCharacters(
   characters: readonly Character[],
   classOrderings: ClassOrderings
 ): Map<GameOrigin, readonly GroupEntry[]> {
+  /**
+   * Janky way of sorting, but it basically guarantees that characters will be
+   * listed the way they are in game.
+   *
+   * Chars for EO1/EO2 will be listed:
+   * 1, 2, 3, 4, 5
+   *
+   * Chars for EO3 will be listed:
+   * 1A, 2A, 3A, 4A, 5A
+   * 1B, 2B, 3B, 4B, 5B
+   */
   const sortedChars = [...characters].sort((char1, char2) => {
-    if (char1.id === char2.id) return 0;
+    if (char1.displayId === char2.displayId) return 0;
+    if (char1.displayId.length < char2.displayId.length) return -1;
+    if (char1.displayId.length < char2.displayId.length) return 1;
+
     return char1.id < char2.id ? -1 : 1;
   });
 
