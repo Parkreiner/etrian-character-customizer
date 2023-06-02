@@ -122,11 +122,11 @@ export default function useLazyImageLoading(imageUrl: string) {
     const info: NotificationInfo = { mutable_notifyAfterLoad: true };
 
     const promise = cache.fetchImage(newImageUrl, info);
-    const cleanup = () => {
+    const abort = () => {
       info.mutable_notifyAfterLoad = false;
     };
 
-    return { promise, cleanup } as const;
+    return { promise, abort } as const;
   }, []);
 
   return { imageInfo, loadImage } as const;

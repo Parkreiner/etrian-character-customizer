@@ -43,8 +43,8 @@ export default function CharacterPreview({ character, colors }: Props) {
 
   useEffect(() => {
     if (imageInfo.image !== null) return;
-    const { cleanup } = loadImage(character.imgUrl);
-    return () => cleanup();
+    const { abort } = loadImage(character.imgUrl);
+    return () => abort();
   }, [imageInfo.image, character.imgUrl, loadImage]);
 
   // Note: the download functionality can't work right now, because the mock
