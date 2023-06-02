@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
@@ -10,14 +10,14 @@ import {
 } from "./canvasHelpers";
 
 import GuideButton from "./GuideButton";
-import useImageCache from "@/hooks/useImageCache";
+import useLazyImageLoading from "@/hooks/useLazyImageLoading";
 
 type Props = {
-  selectedCharacter: Character;
+  character: Character;
   colors: CharacterColors;
 };
 
-type PreviewStatus = "idle" | "processing" | "error";
+type ComponentStatus = "idle" | "loading" | "error";
 
 function downloadCharacter(filename: string, dataUrl: string): void {
   const fakeAnchor = document.createElement("a");
@@ -27,41 +27,48 @@ function downloadCharacter(filename: string, dataUrl: string): void {
   fakeAnchor.click();
 }
 
-export default function CharacterPreview({ selectedCharacter, colors }: Props) {
-  const [status, setStatus] = useState<PreviewStatus>("idle");
-  const { imageInfo, processImage } = useImageCache(selectedCharacter.imgUrl);
+export default function CharacterPreview({
+  character: selectedCharacter,
+  colors,
+}: Props) {
+  const [status, setStatus] = useState<ComponentStatus>("idle");
+  const { image, loadImage } = useLazyImageLoading(selectedCharacter.imgUrl);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-
-  console.log(imageInfo);
 
   // Logic is definitely janky. Probably need to split this up into two
   // effects – one that just renders any images already cached, and one that
   // handles loading and caching new images
   useLayoutEffect(() => {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
-    if (previewContext === null) return;
+    if (previewContext === null || image === null) return;
 
-    setStatus("processing");
-
-    const cleanup = processImage((image) => {
-      renderCharacter(previewContext, image, colors, selectedCharacter.paths);
-      setStatus("idle");
-    });
-
+    renderCharacter(previewContext, image, colors, selectedCharacter.paths);
     return () => {
       previewContext.fillStyle = "#000000";
       previewContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-      cleanup();
     };
-  }, [selectedCharacter, colors, processImage]);
+  }, [image, colors, selectedCharacter.paths]);
+
+  useEffect(() => {
+    if (image !== null) return;
+
+    setStatus("loading");
+    const cleanup = loadImage(selectedCharacter.imgUrl);
+
+    return () => {
+      cleanup();
+      setStatus("idle");
+    };
+  }, [image, selectedCharacter.imgUrl, loadImage]);
 
   // Note: the download functionality can't work right now, because the mock
   // images are being hosted on a separate source (Imgur). Browsers will treat
   // the canvas as "tainted" until the image comes from a same-source server
   const downloadAllImages = () => {
-    setStatus("processing");
+    if (image === null) return;
+    setStatus("loading");
 
-    processImage((image) => {
+    Promise.resolve().then(() => {
       const dataUrl = imageToDataUrl(
         image,
         selectedCharacter.initialColors,
@@ -96,7 +103,7 @@ export default function CharacterPreview({ selectedCharacter, colors }: Props) {
 
         <button
           className="select-none rounded-full bg-teal-800 px-7 py-3 text-xl font-medium text-teal-50 shadow-md transition-colors"
-          disabled={status === "processing"}
+          disabled={status === "loading"}
           onClick={downloadAllImages}
         >
           Download

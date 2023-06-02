@@ -1,10 +1,14 @@
 /**
- * @todo Also need to export a cache snapshot from the hook so that the cache
- * can start to be used with React state
+ * @file Provides a very simple, lo-fi way of lazy-loading images, while making
+ * the images themselves available as state throughout the React app.
+ *
+ * This hook assumes that images will never need to be invalidated from the
+ * cache, so your only options are getting an image state value, or loading a
+ * new image.
  */
 import { useCallback, useSyncExternalStore } from "react";
 
-type MutableNotifierInfo = { notify: boolean };
+type MutableNotificationInfo = { notify: boolean };
 
 class ImageCache {
   #cache = new Map<string, HTMLImageElement>();
@@ -32,7 +36,7 @@ class ImageCache {
 
   loadImage(
     url: string,
-    info: MutableNotifierInfo = { notify: true }
+    info: MutableNotificationInfo
   ): Promise<HTMLImageElement> {
     const characterImage = new Image();
     return new Promise((resolve, reject) => {
@@ -57,44 +61,17 @@ function subscribe(notifyReact: () => void) {
   };
 }
 
-type ImageInfo =
-  | { loaded: false }
-  | { loaded: true; width: number; height: number };
-
 export default function useImageCache(imageUrl: string) {
   const image = useSyncExternalStore(subscribe, () => cache.get(imageUrl));
-  const imageInfo: ImageInfo =
-    image === null
-      ? { loaded: false }
-      : { loaded: true, width: image.width, height: image.height };
 
-  const processImage = useCallback(
-    (imageCallback: (image: HTMLImageElement) => void) => {
-      const info: MutableNotifierInfo = { notify: true };
-      const cleanup = () => {
-        info.notify = false;
-      };
+  const loadImage = useCallback((newImageUrl: string) => {
+    const info: MutableNotificationInfo = { notify: true };
+    cache.loadImage(newImageUrl, info);
 
-      const cachedImage = cache.get(imageUrl);
-      if (cachedImage !== null) {
-        imageCallback(cachedImage);
-        return cleanup;
-      }
-
-      cache.loadImage(imageUrl, info).then((image) => {
-        if (info.notify) {
-          imageCallback(image);
-        }
-      });
-
-      return cleanup;
-    },
-    [imageUrl]
-  );
-
-  const loadNewImage = useCallback((newImageUrl: string) => {
-    return cache.loadImage(newImageUrl);
+    return () => {
+      info.notify = false;
+    };
   }, []);
 
-  return { imageInfo, processImage, loadNewImage } as const;
+  return { image, loadImage } as const;
 }

@@ -31,7 +31,7 @@ export default function Editor() {
             />
 
             <CharacterPreview
-              selectedCharacter={editorController.derived.selectedCharacter}
+              character={editorController.derived.selectedCharacter}
               colors={editorController.editor.colors}
             />
 
