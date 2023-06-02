@@ -10,11 +10,6 @@ export default function Editor() {
   const editorController = useEditorController();
   const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
 
-  const selectedCharacter =
-    editorController.gameData?.characters.find(
-      (char) => char.id === editorController.editor.selectedId
-    ) ?? null;
-
   return (
     <div className="h-full">
       {!introAnimationFinished && (
@@ -29,14 +24,14 @@ export default function Editor() {
           <div className="flex h-full w-full flex-grow flex-row items-center justify-between gap-x-10">
             <CharacterMenus
               selectedCharacterId={editorController.editor.selectedId}
-              characters={editorController.gameData.characters}
-              classOrderings={editorController.gameData.classOrderings}
+              characters={editorController.server.characters}
+              classOrderings={editorController.server.classOrderings}
               onCharacterChange={editorController.editor.changeCharacter}
               randomizeCharacter={editorController.editor.selectRandomCharacter}
             />
 
             <CharacterPreview
-              selectedCharacter={selectedCharacter}
+              selectedCharacter={editorController.derived.selectedCharacter}
               colors={editorController.editor.colors}
             />
 
