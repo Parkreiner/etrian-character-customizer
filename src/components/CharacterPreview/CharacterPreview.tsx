@@ -35,14 +35,12 @@ export default function CharacterPreview({
   const { image, loadImage } = useLazyImageLoading(selectedCharacter.imgUrl);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Logic is definitely janky. Probably need to split this up into two
-  // effects – one that just renders any images already cached, and one that
-  // handles loading and caching new images
   useLayoutEffect(() => {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
     if (previewContext === null || image === null) return;
 
     renderCharacter(previewContext, image, colors, selectedCharacter.paths);
+
     return () => {
       previewContext.fillStyle = "#000000";
       previewContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
