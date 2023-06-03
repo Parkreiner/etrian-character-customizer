@@ -25,10 +25,6 @@ class ImageCache {
     error: null,
   } as const satisfies ReactSnapshot;
 
-  #setImage(imgUrl: string, image: HTMLImageElement): void {
-    this.#mutableCache.set(imgUrl, image);
-  }
-
   #notifySubscribers(): void {
     this.#subscriptions.forEach((cb) => cb());
   }
@@ -36,7 +32,7 @@ class ImageCache {
   async #onRequest(imgUrl: string, image: HTMLImageElement): Promise<void> {
     const newBitmap = await window.createImageBitmap(image);
 
-    this.#setImage(imgUrl, image);
+    this.#mutableCache.set(imgUrl, image);
     this.#immutableSnapshots.set(imgUrl, {
       status: "loading",
       bitmap: newBitmap,
