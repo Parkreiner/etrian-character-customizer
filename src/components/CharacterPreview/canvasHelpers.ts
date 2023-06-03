@@ -1,4 +1,4 @@
-import { CanvasPathEntry } from "@/typesConstants/gameData";
+import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
 
 const PLACEHOLDER_FILL = "#ff00ff";
@@ -9,13 +9,13 @@ export function renderCharacter(
   canvasContext: CanvasRenderingContext2D,
   charBitmap: ImageBitmap,
   colors: CharacterColors,
-  pathEntries: readonly CanvasPathEntry[]
+  character: Character
 ): void {
-  const sortedSvgs = [...pathEntries].sort((entry1, entry2) => {
+  const sortedPaths = [...character.paths].sort((entry1, entry2) => {
     return entry1.layerIndex - entry2.layerIndex;
   });
 
-  for (const entry of sortedSvgs) {
+  for (const entry of sortedPaths) {
     const { path: pathData, category, categoryIndex } = entry;
     const pathNode = new Path2D(pathData);
     const fillColor = colors[category][categoryIndex] ?? PLACEHOLDER_FILL;
@@ -30,7 +30,7 @@ export function renderCharacter(
 export function imageToDataUrl(
   charBitmap: ImageBitmap,
   colors: CharacterColors,
-  pathEntries: readonly CanvasPathEntry[]
+  character: Character
 ): string {
   const outputCanvas = document.createElement("canvas");
   outputCanvas.width = charBitmap.width;
@@ -43,6 +43,6 @@ export function imageToDataUrl(
     );
   }
 
-  renderCharacter(outputContext, charBitmap, colors, pathEntries);
+  renderCharacter(outputContext, charBitmap, colors, character);
   return outputCanvas.toDataURL();
 }

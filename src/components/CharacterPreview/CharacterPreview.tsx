@@ -36,13 +36,13 @@ export default function CharacterPreview({ character, colors }: Props) {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
     if (previewContext === null || bitmap === null) return;
 
-    renderCharacter(previewContext, bitmap, colors, character.paths);
+    renderCharacter(previewContext, bitmap, colors, character);
 
     return () => {
       previewContext.fillStyle = "#000000";
       previewContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     };
-  }, [bitmap, colors, character.paths]);
+  }, [bitmap, colors, character]);
 
   useEffect(() => {
     if (bitmap !== null) return;
@@ -53,30 +53,27 @@ export default function CharacterPreview({ character, colors }: Props) {
   // Note: the download functionality can't work right now, because the mock
   // images are being hosted on a separate source (Imgur). Browsers will treat
   // the canvas as "tainted" until the image comes from a same-source server
-  const downloadAllImages = () => {
+  const downloadAllImages = async () => {
     if (bitmap === null) return;
     setIsDownloading(true);
 
-    Promise.resolve().then(() => {
-      try {
-        const dataUrl = imageToDataUrl(
-          bitmap,
-          character.initialColors,
-          character.paths
-        );
+    // This looks hokey, but it ensures that the first state update finishes
+    // before the rest of this function (which is expensive) is allowed to start
+    await Promise.resolve();
 
-        const newFilename = `${character.class}${character.id}`;
-        downloadCharacter(newFilename, dataUrl);
-      } catch (err) {
-        handleError(err);
-      }
+    try {
+      const dataUrl = imageToDataUrl(bitmap, colors, character);
+      const newFilename = `${character.class}${character.id}`;
+      downloadCharacter(newFilename, dataUrl);
+    } catch (err) {
+      handleError(err);
+    }
 
-      window.alert(
-        "Basic download functionality not in place just yet; need to resolve issues with cross-site image sources."
-      );
+    window.alert(
+      "Basic download functionality not in place just yet; need to resolve issues with cross-site image sources."
+    );
 
-      setIsDownloading(false);
-    });
+    setIsDownloading(false);
   };
 
   const downloadsDisabled =
