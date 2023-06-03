@@ -20,6 +20,11 @@ export type Character = {
 
   initialColors: CharacterColors;
   totalColors: number;
+
+  xStart: number;
+  xEnd: number;
+  yStart: number;
+  yEnd: number;
 };
 
 /**

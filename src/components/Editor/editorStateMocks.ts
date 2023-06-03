@@ -60,6 +60,12 @@ const characters: readonly Omit<Character, "id">[] = [
     imgUrl: "https://i.imgur.com/gUP2q9Z.png",
     paths: sharedPathInfo,
     totalColors: 8,
+
+    xStart: 95,
+    xEnd: 953,
+    yStart: 195,
+    yEnd: 1188,
+
     initialColors: {
       skin: ["#fcf0d7", "#c08c7c"],
       hair: ["#f8d79a", "#f8d79a"],
@@ -75,6 +81,12 @@ const characters: readonly Omit<Character, "id">[] = [
     imgUrl: "https://i.imgur.com/kFRBqKf.png",
     paths: sharedPathInfo,
     totalColors: 8,
+
+    xStart: 88,
+    xEnd: 892,
+    yStart: 182,
+    yEnd: 1183,
+
     initialColors: {
       skin: ["#fffde4", "#cf9280"],
       hair: ["#fae4a3", "#dd6f56"],
@@ -90,6 +102,12 @@ const characters: readonly Omit<Character, "id">[] = [
     imgUrl: "https://i.imgur.com/JgiPmIr.png",
     paths: sharedPathInfo,
     totalColors: 8,
+
+    xStart: 79,
+    xEnd: 937,
+    yStart: 103,
+    yEnd: 1181,
+
     initialColors: {
       skin: ["#fffde2", "#cb917f"],
       hair: ["#f1a172", "#b5534e"],
@@ -105,6 +123,12 @@ const characters: readonly Omit<Character, "id">[] = [
     imgUrl: "https://i.imgur.com/g4uNxbA.png",
     paths: sharedPathInfo,
     totalColors: 8,
+
+    xStart: 87,
+    xEnd: 719,
+    yStart: 180,
+    yEnd: 1183,
+
     initialColors: {
       skin: ["#d3a697", "#77524b"],
       hair: ["#f19a96", "#a95f57"],
@@ -120,6 +144,12 @@ const characters: readonly Omit<Character, "id">[] = [
     imgUrl: "https://i.imgur.com/2eiuAIn.png",
     paths: sharedPathInfo,
     totalColors: 8,
+
+    xStart: 166,
+    xEnd: 894,
+    yStart: 0,
+    yEnd: 1280,
+
     initialColors: {
       skin: ["#f4dac5", "#cb988f"],
       hair: ["#da7c48", "#814246"],
@@ -132,15 +162,62 @@ const characters: readonly Omit<Character, "id">[] = [
     game: "eo1",
     class: "medic",
     displayId: "5",
-    imgUrl: "https://i.imgur.com/CzJePxE.png",
+    imgUrl: "https://i.imgur.com/20qTHXw.png",
     paths: sharedPathInfo,
     totalColors: 8,
+
+    xStart: 282,
+    xEnd: 813,
+    yStart: 176,
+    yEnd: 1191,
+
     initialColors: {
       skin: ["#ffe7cb", "#dc8781"],
       hair: ["#4f4052", "#e1e7c2"],
       leftEye: ["#cec3e7", "#524152"],
       rightEye: ["#cec3e7", "#524152"],
       misc: [],
+    },
+  },
+
+  {
+    game: "eo2",
+    class: "guest",
+    displayId: "1",
+    imgUrl: "https://i.imgur.com/H9DdfNY.png",
+
+    paths: [
+      ...sharedPathInfo,
+      {
+        category: "misc",
+        categoryIndex: 0,
+        layerIndex: 0,
+        path: "M20 500 h 50 v 50 h -50 Z",
+      },
+      {
+        category: "misc",
+        categoryIndex: 1,
+        layerIndex: 0,
+        path: "M20 560 h 50 v 50 h -50 Z",
+      },
+    ],
+
+    // The Demi-Fiend actually has only 1 color per eye, so the total is
+    // supposed should be 8, not 10. First example of why I need to update the
+    // colors to be arrays and not fixed-length tuples
+    totalColors: 8,
+
+    xStart: 192,
+    xEnd: 841,
+    yStart: 223,
+    yEnd: 1236,
+
+    initialColors: {
+      skin: ["#e5d6c1", "#8d6d78"],
+      hair: ["#5f5b69", "#000000"],
+      leftEye: ["#eadd01", "#ffffff"],
+      rightEye: ["#eadd01", "#ffffff"],
+      misc: ["#32353c", "#c7fff3"],
     },
   },
 ];
