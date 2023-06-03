@@ -105,7 +105,7 @@ export default function ControlsContainer<T extends string>({
         <div className="h-full overflow-y-hidden rounded-md bg-teal-600 py-4 pl-4 pr-3">
           <div
             ref={scrollContainerRef}
-            className={`${styles.scrollbar} h-full overflow-y-scroll pr-3`}
+            className={`${styles.scrollbar} h-full overflow-y-auto pr-3`}
           >
             {tabs.map((tab, index) => (
               <Tabs.Content<T> key={index} value={tab.value}>
