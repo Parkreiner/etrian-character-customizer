@@ -56,21 +56,26 @@ const basePathMocks: Character["paths"] = [
   },
 ];
 
-const mocksWithMisc: readonly CanvasPathEntry[] = [
-  ...basePathMocks,
-  {
-    category: "misc",
-    categoryIndex: 0,
-    layerIndex: 0,
-    path: "M20 500 h 50 v 50 h -50 Z",
-  },
-  {
-    category: "misc",
-    categoryIndex: 1,
-    layerIndex: 0,
-    path: "M20 560 h 50 v 50 h -50 Z",
-  },
-];
+const misc1: CanvasPathEntry = {
+  category: "misc",
+  categoryIndex: 0,
+  layerIndex: 0,
+  path: "M20 500 h 50 v 50 h -50 Z",
+};
+
+const misc2: CanvasPathEntry = {
+  category: "misc",
+  categoryIndex: 1,
+  layerIndex: 0,
+  path: "M20 560 h 50 v 50 h -50 Z",
+};
+
+const misc3: CanvasPathEntry = {
+  category: "misc",
+  categoryIndex: 2,
+  layerIndex: 0,
+  path: "M20 620 h 50 v 50 h -50 Z",
+};
 
 const characters: readonly Omit<Character, "id">[] = [
   {
@@ -205,7 +210,7 @@ const characters: readonly Omit<Character, "id">[] = [
     class: "guest",
     displayId: "1",
     imgUrl: "https://i.imgur.com/H9DdfNY.png",
-    paths: mocksWithMisc,
+    paths: [...basePathMocks, misc1, misc2],
 
     // The Demi-Fiend actually has only 1 color per eye, so the total is
     // supposed should be 8, not 10. First example of why I need to update the
@@ -230,7 +235,7 @@ const characters: readonly Omit<Character, "id">[] = [
     class: "gunner",
     displayId: "5",
     imgUrl: "https://i.imgur.com/Kuhvorj.png",
-    paths: mocksWithMisc,
+    paths: [...basePathMocks, misc1, misc2],
 
     // Gunner also only has one eye color - at least, as far as I can tell with
     // all the image compression going on in the base image
@@ -247,6 +252,75 @@ const characters: readonly Omit<Character, "id">[] = [
       leftEye: ["#4f3f63", "#ffffff"],
       rightEye: ["#4f3f63", "#ffffff"],
       misc: ["#392f3c", "#781d29"],
+    },
+  },
+  {
+    game: "eo1",
+    class: "guest",
+    displayId: "1",
+    imgUrl: "https://i.imgur.com/7K56GfS.png",
+    paths: [...basePathMocks, misc1],
+    totalColors: 9,
+
+    xStart: 41,
+    xEnd: 936,
+    yStart: 257,
+    yEnd: 1280,
+
+    initialColors: {
+      skin: ["#ffe0bd", "#b5878f"],
+      hair: ["#685e5d", "#2e2c2e"],
+      leftEye: ["#7394c3", "#364258"],
+      rightEye: ["#7394c3", "#364258"],
+      misc: ["#810c0d"],
+    },
+  },
+  {
+    game: "eo1",
+    class: "guest",
+    displayId: "2",
+    imgUrl: "https://i.imgur.com/ZJP7e1r.png",
+    paths: [...basePathMocks, misc1, misc2, misc3],
+    totalColors: 11,
+
+    xStart: 67,
+    xEnd: 830,
+    yStart: 168,
+    yEnd: 1109,
+
+    // There are actually a ton of shades of green in Ringo's portrait, and the
+    // image compression will make editing them harder than it should be.
+    // Leaning towards only letting you customize the hair, not the jacket
+    initialColors: {
+      skin: ["#ffefd6", "#ce9389"],
+      hair: ["#e1e9c6", "#9ca678"],
+      leftEye: ["#ff96ff", "#c86786"],
+      rightEye: ["#ff96ff", "#c86786"],
+      misc: ["#ffff00", "#7bdb18", "#088c91"],
+    },
+  },
+  {
+    game: "eo3",
+    class: "guest",
+    displayId: "2",
+    imgUrl: "https://i.imgur.com/1MkXJFr.png",
+    paths: [...basePathMocks, misc1, misc2],
+    totalColors: 11,
+
+    xStart: 535,
+    xEnd: 1459,
+    yStart: 504,
+    yEnd: 1769,
+
+    // There are actually a ton of shades of green in this portrait, and the
+    // image compression will make editing them harder than it should be.
+    // Leaning towards only letting you customize the hair, not the jacket
+    initialColors: {
+      skin: ["#ffe9d0", "#c88d8c"],
+      hair: ["#ece884", "#a57b55"],
+      leftEye: ["#8ecfcb", "#5d9291"],
+      rightEye: ["#8ecfcb", "#5d9291"],
+      misc: ["#cb2a33", "#841010"],
     },
   },
 ];
