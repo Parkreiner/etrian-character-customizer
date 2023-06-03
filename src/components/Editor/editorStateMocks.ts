@@ -1,7 +1,11 @@
-import { Character, ClassOrderings } from "@/typesConstants/gameData";
+import {
+  CanvasPathEntry,
+  Character,
+  ClassOrderings,
+} from "@/typesConstants/gameData";
 import { ApiResponse } from "@/hooks/useGameInfoFetch";
 
-const sharedPathInfo: Character["paths"] = [
+const basePathMocks: Character["paths"] = [
   {
     category: "skin",
     categoryIndex: 0,
@@ -52,13 +56,29 @@ const sharedPathInfo: Character["paths"] = [
   },
 ];
 
+const mocksWithMisc: readonly CanvasPathEntry[] = [
+  ...basePathMocks,
+  {
+    category: "misc",
+    categoryIndex: 0,
+    layerIndex: 0,
+    path: "M20 500 h 50 v 50 h -50 Z",
+  },
+  {
+    category: "misc",
+    categoryIndex: 1,
+    layerIndex: 0,
+    path: "M20 560 h 50 v 50 h -50 Z",
+  },
+];
+
 const characters: readonly Omit<Character, "id">[] = [
   {
     game: "eo1",
     class: "protector",
     displayId: "1",
     imgUrl: "https://i.imgur.com/gUP2q9Z.png",
-    paths: sharedPathInfo,
+    paths: basePathMocks,
     totalColors: 8,
 
     xStart: 95,
@@ -79,7 +99,7 @@ const characters: readonly Omit<Character, "id">[] = [
     class: "protector",
     displayId: "2",
     imgUrl: "https://i.imgur.com/kFRBqKf.png",
-    paths: sharedPathInfo,
+    paths: basePathMocks,
     totalColors: 8,
 
     xStart: 88,
@@ -100,7 +120,7 @@ const characters: readonly Omit<Character, "id">[] = [
     class: "protector",
     displayId: "3",
     imgUrl: "https://i.imgur.com/JgiPmIr.png",
-    paths: sharedPathInfo,
+    paths: basePathMocks,
     totalColors: 8,
 
     xStart: 79,
@@ -121,7 +141,7 @@ const characters: readonly Omit<Character, "id">[] = [
     class: "protector",
     displayId: "4",
     imgUrl: "https://i.imgur.com/g4uNxbA.png",
-    paths: sharedPathInfo,
+    paths: basePathMocks,
     totalColors: 8,
 
     xStart: 87,
@@ -142,7 +162,7 @@ const characters: readonly Omit<Character, "id">[] = [
     class: "protector",
     displayId: "5",
     imgUrl: "https://i.imgur.com/2eiuAIn.png",
-    paths: sharedPathInfo,
+    paths: basePathMocks,
     totalColors: 8,
 
     xStart: 166,
@@ -163,7 +183,7 @@ const characters: readonly Omit<Character, "id">[] = [
     class: "medic",
     displayId: "5",
     imgUrl: "https://i.imgur.com/20qTHXw.png",
-    paths: sharedPathInfo,
+    paths: basePathMocks,
     totalColors: 8,
 
     xStart: 282,
@@ -185,22 +205,7 @@ const characters: readonly Omit<Character, "id">[] = [
     class: "guest",
     displayId: "1",
     imgUrl: "https://i.imgur.com/H9DdfNY.png",
-
-    paths: [
-      ...sharedPathInfo,
-      {
-        category: "misc",
-        categoryIndex: 0,
-        layerIndex: 0,
-        path: "M20 500 h 50 v 50 h -50 Z",
-      },
-      {
-        category: "misc",
-        categoryIndex: 1,
-        layerIndex: 0,
-        path: "M20 560 h 50 v 50 h -50 Z",
-      },
-    ],
+    paths: mocksWithMisc,
 
     // The Demi-Fiend actually has only 1 color per eye, so the total is
     // supposed should be 8, not 10. First example of why I need to update the
@@ -218,6 +223,30 @@ const characters: readonly Omit<Character, "id">[] = [
       leftEye: ["#eadd01", "#ffffff"],
       rightEye: ["#eadd01", "#ffffff"],
       misc: ["#32353c", "#c7fff3"],
+    },
+  },
+  {
+    game: "eo2",
+    class: "gunner",
+    displayId: "5",
+    imgUrl: "https://i.imgur.com/Kuhvorj.png",
+    paths: mocksWithMisc,
+
+    // Gunner also only has one eye color - at least, as far as I can tell with
+    // all the image compression going on in the base image
+    totalColors: 8,
+
+    xStart: 218,
+    xEnd: 824,
+    yStart: 154,
+    yEnd: 1180,
+
+    initialColors: {
+      skin: ["#fce5cb", "#eca29c"],
+      hair: ["#4f3f63", "#31283e"],
+      leftEye: ["#4f3f63", "#ffffff"],
+      rightEye: ["#4f3f63", "#ffffff"],
+      misc: ["#392f3c", "#781d29"],
     },
   },
 ];
