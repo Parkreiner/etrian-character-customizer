@@ -7,7 +7,7 @@ export const CANVAS_HEIGHT = 960;
 
 export function renderCharacter(
   canvasContext: CanvasRenderingContext2D,
-  characterImage: HTMLImageElement,
+  charBitmap: ImageBitmap,
   colors: CharacterColors,
   pathEntries: readonly CanvasPathEntry[]
 ): void {
@@ -23,18 +23,18 @@ export function renderCharacter(
     canvasContext.fill(pathNode);
   }
 
-  const height = CANVAS_WIDTH * (characterImage.height / characterImage.width);
-  canvasContext.drawImage(characterImage, 0, 0, CANVAS_WIDTH, height);
+  const height = CANVAS_WIDTH * (charBitmap.height / charBitmap.width);
+  canvasContext.drawImage(charBitmap, 0, 0, CANVAS_WIDTH, height);
 }
 
 export function imageToDataUrl(
-  image: HTMLImageElement,
+  charBitmap: ImageBitmap,
   colors: CharacterColors,
   pathEntries: readonly CanvasPathEntry[]
 ): string {
   const outputCanvas = document.createElement("canvas");
-  outputCanvas.width = image.width;
-  outputCanvas.height = image.height;
+  outputCanvas.width = charBitmap.width;
+  outputCanvas.height = charBitmap.height;
 
   const outputContext = outputCanvas.getContext("2d");
   if (outputContext === null) {
@@ -43,6 +43,6 @@ export function imageToDataUrl(
     );
   }
 
-  renderCharacter(outputContext, image, colors, pathEntries);
+  renderCharacter(outputContext, charBitmap, colors, pathEntries);
   return outputCanvas.toDataURL();
 }

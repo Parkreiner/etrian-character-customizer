@@ -4,23 +4,86 @@
  */
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 
+const MAX_RETRY_COUNT = 3;
+
 type NotificationInfo = { mutable_notifyAfterLoad: boolean };
+
 type ReactSnapshot = Readonly<
-  | { status: "idle" | "loading"; image: null; error: null }
-  | { status: "error"; image: null; error: Error }
-  | { status: "success"; image: HTMLImageElement; error: null }
+  | { status: "idle"; bitmap: null; error: null }
+  | { status: "loading" | "success"; bitmap: ImageBitmap; error: null }
+  | { status: "error"; bitmap: null; error: Error }
 >;
 
-const defaultSnapshot = {
-  status: "idle",
-  image: null,
-  error: null,
-} as const satisfies ReactSnapshot;
-
 class ImageCache {
-  #cache = new Map<string, HTMLImageElement>();
-  #snapshots = new WeakMap<HTMLImageElement, ReactSnapshot>();
-  #subscriptions = [] as (() => void)[];
+  #mutableCache = new Map<string, HTMLImageElement>();
+  #immutableSnapshots = new Map<string, ReactSnapshot>();
+  #subscriptions: (() => void)[] = [];
+
+  static defaultSnapshot = {
+    status: "idle",
+    bitmap: null,
+    error: null,
+  } as const satisfies ReactSnapshot;
+
+  #cloneImage(image: HTMLImageElement): HTMLImageElement {
+    const cloned = image.cloneNode() as HTMLImageElement;
+    cloned.src = image.src;
+    return cloned;
+  }
+
+  #setImage(imgUrl: string, image: HTMLImageElement): void {
+    this.#mutableCache.set(imgUrl, image);
+  }
+
+  #notifySubscribers(): void {
+    this.#subscriptions.forEach((cb) => cb());
+  }
+
+  async #onRequest(imgUrl: string, image: HTMLImageElement): Promise<void> {
+    const newBitmap = await window.createImageBitmap(image);
+
+    this.#setImage(imgUrl, image);
+    this.#immutableSnapshots.set(imgUrl, {
+      status: "loading",
+      bitmap: newBitmap,
+      error: null,
+    });
+
+    this.#notifySubscribers();
+  }
+
+  async #onSuccess(
+    imgUrl: string,
+    image: HTMLImageElement,
+    notifyAfterAdd = true
+  ) {
+    const newBitmap = await window.createImageBitmap(image);
+
+    this.#immutableSnapshots.set(imgUrl, {
+      status: "success",
+      bitmap: newBitmap,
+      error: null,
+    });
+
+    if (notifyAfterAdd) {
+      this.#notifySubscribers();
+    }
+  }
+
+  #onError(imgUrl: string, errorValue: unknown): void {
+    const parsedError =
+      errorValue instanceof Error
+        ? errorValue
+        : new Error(`Non-error value ${JSON.stringify(errorValue)} thrown`);
+
+    this.#immutableSnapshots.set(imgUrl, {
+      status: "error",
+      bitmap: null,
+      error: parsedError,
+    });
+
+    this.#notifySubscribers();
+  }
 
   addSubscription(callback: () => void): void {
     this.#subscriptions.push(callback);
@@ -30,79 +93,56 @@ class ImageCache {
     this.#subscriptions = this.#subscriptions.filter((cb) => cb !== callback);
   }
 
-  notifySubscribers(): void {
-    this.#subscriptions.forEach((cb) => cb());
-  }
-
   getImage(imgUrl: string): HTMLImageElement | null {
-    return this.#cache.get(imgUrl) ?? null;
+    return this.#mutableCache.get(imgUrl) ?? null;
   }
 
   getSnapshot(imgUrl: string): ReactSnapshot {
-    const image = this.getImage(imgUrl);
-    return image === null
-      ? defaultSnapshot
-      : this.#snapshots.get(image) ?? defaultSnapshot;
+    return this.#immutableSnapshots.get(imgUrl) ?? ImageCache.defaultSnapshot;
   }
 
-  addSnapshot(image: HTMLImageElement, snapshot: ReactSnapshot): void {
-    this.#snapshots.set(image, snapshot);
-    this.notifySubscribers();
-  }
-
-  addImage(
+  requestImage(
     imgUrl: string,
-    newImage: HTMLImageElement,
-    notifyAfterAdd = true
-  ): void {
-    this.#cache.set(imgUrl, newImage);
-
-    this.#snapshots.set(newImage, {
-      status: "success",
-      image: newImage,
-      error: null,
-    });
-
-    if (notifyAfterAdd) {
-      this.notifySubscribers();
-    }
-  }
-
-  fetchImage(
-    imageUrl: string,
     info: NotificationInfo
   ): Promise<HTMLImageElement> {
-    const prevImage = this.getImage(imageUrl);
-    if (prevImage !== null) {
+    const prevImage = this.getImage(imgUrl);
+    const prevSnapshot = this.getSnapshot(imgUrl);
+
+    const canReuseImage =
+      prevImage !== null && prevSnapshot.status === "success";
+
+    if (canReuseImage) {
       return Promise.resolve(prevImage);
     }
 
     const newImage = new Image();
-    this.addSnapshot(newImage, { status: "loading", image: null, error: null });
+    let retryCount = 0;
 
-    return new Promise((resolve, reject) => {
+    const setupImageWithRetries = (
+      resolve: (image: HTMLImageElement) => void,
+      reject: (err: unknown) => void
+    ) => {
+      this.#onRequest(imgUrl, newImage);
+
       newImage.onload = () => {
-        this.addImage(imageUrl, newImage, info.mutable_notifyAfterLoad);
+        this.#onSuccess(imgUrl, newImage, info.mutable_notifyAfterLoad);
         resolve(newImage);
       };
 
       newImage.onerror = (err) => {
-        const parsedError =
-          err instanceof Error
-            ? err
-            : new Error(`Non-error ${JSON.stringify(err)} thrown`);
+        this.#onError(imgUrl, err);
+        reject(err);
 
-        this.addSnapshot(newImage, {
-          status: "error",
-          image: null,
-          error: parsedError,
-        });
-
-        reject(parsedError);
+        retryCount++;
+        if (retryCount <= MAX_RETRY_COUNT) {
+          new Promise(setupImageWithRetries);
+        }
       };
 
-      newImage.src = imageUrl;
-    });
+      newImage.src = imgUrl;
+    };
+
+    return new Promise(setupImageWithRetries);
   }
 }
 
@@ -113,9 +153,9 @@ function subscribe(notifyReact: () => void) {
   return () => cache.removeSubscription(notifyReact);
 }
 
-export default function useLazyImageLoading(imageUrl: string) {
-  const { image, status, error } = useSyncExternalStore(subscribe, () =>
-    cache.getSnapshot(imageUrl)
+export default function useLazyImageLoading(imgUrl: string) {
+  const { bitmap, status, error } = useSyncExternalStore(subscribe, () =>
+    cache.getSnapshot(imgUrl)
   );
 
   useEffect(() => {
@@ -123,10 +163,10 @@ export default function useLazyImageLoading(imageUrl: string) {
     console.error(error);
   }, [error]);
 
-  const loadImage = useCallback((newImageUrl: string) => {
+  const loadImage = useCallback((newImgUrl: string) => {
     const info: NotificationInfo = { mutable_notifyAfterLoad: true };
 
-    const promise = cache.fetchImage(newImageUrl, info);
+    const promise = cache.requestImage(newImgUrl, info);
     const abort = () => {
       info.mutable_notifyAfterLoad = false;
     };
@@ -134,5 +174,5 @@ export default function useLazyImageLoading(imageUrl: string) {
     return { promise, abort } as const;
   }, []);
 
-  return { image, status, loadImage } as const;
+  return { bitmap, status, loadImage } as const;
 }

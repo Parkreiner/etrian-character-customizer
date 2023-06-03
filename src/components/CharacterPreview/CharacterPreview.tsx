@@ -27,7 +27,11 @@ function downloadCharacter(filename: string, dataUrl: string): void {
 
 export default function CharacterPreview({ character, colors }: Props) {
   const [downloading, setDownloading] = useState(false);
-  const { image, status, loadImage } = useLazyImageLoading(character.imgUrl);
+  const {
+    bitmap: image,
+    status,
+    loadImage,
+  } = useLazyImageLoading(character.imgUrl);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useLayoutEffect(() => {
@@ -84,7 +88,8 @@ export default function CharacterPreview({ character, colors }: Props) {
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
       >
-        A preview of a {character.class} from {character.game}
+        <img src="http://cool.cool.cocol" alt="Blah" />A preview of a{" "}
+        {character.class} from {character.game}
       </canvas>
 
       <div className="mx-auto flex max-w-fit flex-row flex-nowrap items-center gap-x-4 pt-6">
