@@ -3,9 +3,6 @@ import { CharacterColors, ColorCategory } from "./colors";
 export const gameOrigins = ["eo1", "eo2", "eo3"] as const;
 export type GameOrigin = (typeof gameOrigins)[number];
 
-export type CharacterGroup = Map<string, readonly Character[]>;
-export type CharsGroupedByGame = Map<GameOrigin, CharacterGroup>;
-
 export type CanvasPathEntry = Readonly<{
   path: string;
   layerIndex: number;
@@ -23,6 +20,11 @@ export type Character = {
 
   initialColors: CharacterColors;
   totalColors: number;
+
+  xStart: number;
+  xEnd: number;
+  yStart: number;
+  yEnd: number;
 };
 
 /**
