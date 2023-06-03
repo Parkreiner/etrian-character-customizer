@@ -30,6 +30,8 @@ type ExternalProps = {
 
 type CoreProps = Omit<ExternalProps, "characterKey">;
 
+const defaultColor = "#ff00ff";
+
 function ColorMenusCore({ colors, onColorChange }: CoreProps) {
   const { state, updaters } = useColorMenusState(colors);
   const activeColorArray = colors[state.activeCategory];
@@ -255,7 +257,29 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
       tabText: "Misc.",
       tabIcon: tabIcons.misc,
       accessibleTabLabel: "Miscellaneous Categories",
-      tabView: <p>You shouldn&apos;t be able to see this yet!</p>,
+      tabView: (
+        <MenuViewLayout
+          tab="misc"
+          activeHex={activeHexColor}
+          onHexChange={onHexChange}
+          selectHexPreset={selectHexPreset}
+        >
+          <div className="flex flex-row justify-center gap-x-3">
+            {colors.misc.map((color, index) => (
+              <ColorButton
+                key={color}
+                primaryHex={colors.misc[index] ?? defaultColor}
+                onClick={() => updaters.changeSelectedFill("misc", index)}
+                selected={
+                  state.activeCategory === "misc" && activeIndex === index
+                }
+              >
+                {index + 1}
+              </ColorButton>
+            ))}
+          </div>
+        </MenuViewLayout>
+      ),
     },
   ];
 
