@@ -25,12 +25,6 @@ class ImageCache {
     error: null,
   } as const satisfies ReactSnapshot;
 
-  #cloneImage(image: HTMLImageElement): HTMLImageElement {
-    const cloned = image.cloneNode() as HTMLImageElement;
-    cloned.src = image.src;
-    return cloned;
-  }
-
   #setImage(imgUrl: string, image: HTMLImageElement): void {
     this.#mutableCache.set(imgUrl, image);
   }
