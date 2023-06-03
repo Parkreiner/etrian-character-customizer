@@ -9,8 +9,8 @@ const MAX_RETRY_COUNT = 3;
 type NotificationInfo = { mutable_notifyAfterLoad: boolean };
 
 type ReactSnapshot = Readonly<
-  | { status: "idle"; bitmap: null; error: null }
-  | { status: "loading" | "success"; bitmap: ImageBitmap; error: null }
+  | { status: "idle" | "loading"; bitmap: null; error: null }
+  | { status: "success"; bitmap: ImageBitmap; error: null }
   | { status: "error"; bitmap: null; error: Error }
 >;
 
@@ -29,35 +29,15 @@ class ImageCache {
     this.#subscriptions.forEach((cb) => cb());
   }
 
-  async #onRequest(imgUrl: string, image: HTMLImageElement): Promise<void> {
-    const newBitmap = await window.createImageBitmap(image);
-
+  #onRequest(imgUrl: string, image: HTMLImageElement): void {
     this.#mutableCache.set(imgUrl, image);
     this.#immutableSnapshots.set(imgUrl, {
       status: "loading",
-      bitmap: newBitmap,
+      bitmap: null,
       error: null,
     });
 
     this.#notifySubscribers();
-  }
-
-  async #onSuccess(
-    imgUrl: string,
-    image: HTMLImageElement,
-    notifyAfterAdd = true
-  ) {
-    const newBitmap = await window.createImageBitmap(image);
-
-    this.#immutableSnapshots.set(imgUrl, {
-      status: "success",
-      bitmap: newBitmap,
-      error: null,
-    });
-
-    if (notifyAfterAdd) {
-      this.#notifySubscribers();
-    }
   }
 
   #onError(imgUrl: string, errorValue: unknown): void {
@@ -73,6 +53,30 @@ class ImageCache {
     });
 
     this.#notifySubscribers();
+  }
+
+  async #onSuccess(
+    imgUrl: string,
+    image: HTMLImageElement,
+    notifyAfterAdd = true
+  ): Promise<void> {
+    if (image.src === "" || !image.complete) {
+      return;
+    }
+
+    // Await operation should have no risks of throwing as long as the previous
+    // checks are in place
+    const newBitmap = await window.createImageBitmap(image);
+
+    this.#immutableSnapshots.set(imgUrl, {
+      status: "success",
+      bitmap: newBitmap,
+      error: null,
+    });
+
+    if (notifyAfterAdd) {
+      this.#notifySubscribers();
+    }
   }
 
   addSubscription(callback: () => void): void {

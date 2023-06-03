@@ -27,42 +27,38 @@ function downloadCharacter(filename: string, dataUrl: string): void {
 
 export default function CharacterPreview({ character, colors }: Props) {
   const [downloading, setDownloading] = useState(false);
-  const {
-    bitmap: image,
-    status,
-    loadImage,
-  } = useLazyImageLoading(character.imgUrl);
+  const { bitmap, status, loadImage } = useLazyImageLoading(character.imgUrl);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useLayoutEffect(() => {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
-    if (previewContext === null || image === null) return;
+    if (previewContext === null || bitmap === null) return;
 
-    renderCharacter(previewContext, image, colors, character.paths);
+    renderCharacter(previewContext, bitmap, colors, character.paths);
 
     return () => {
       previewContext.fillStyle = "#000000";
       previewContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     };
-  }, [image, colors, character.paths]);
+  }, [bitmap, colors, character.paths]);
 
   useEffect(() => {
-    if (image !== null) return;
+    if (bitmap !== null) return;
     const { abort } = loadImage(character.imgUrl);
     return () => abort();
-  }, [image, character.imgUrl, loadImage]);
+  }, [bitmap, character.imgUrl, loadImage]);
 
   // Note: the download functionality can't work right now, because the mock
   // images are being hosted on a separate source (Imgur). Browsers will treat
   // the canvas as "tainted" until the image comes from a same-source server
   const downloadAllImages = () => {
-    if (image === null) return;
+    if (bitmap === null) return;
     setDownloading(true);
 
     Promise.resolve().then(() => {
       try {
         const dataUrl = imageToDataUrl(
-          image,
+          bitmap,
           character.initialColors,
           character.paths
         );
