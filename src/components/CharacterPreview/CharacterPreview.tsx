@@ -11,6 +11,7 @@ import {
 
 import GuideButton from "./GuideButton";
 import useLazyImageLoading from "@/hooks/useLazyImageLoading";
+import { useErrorLoggingCallback } from "@/hooks/useErrorLogging";
 
 type Props = {
   character: Character;
@@ -26,9 +27,11 @@ function downloadCharacter(filename: string, dataUrl: string): void {
 }
 
 export default function CharacterPreview({ character, colors }: Props) {
-  const [downloading, setDownloading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const { bitmap, status, loadImage } = useLazyImageLoading(character.imgUrl);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  const logError = useErrorLoggingCallback();
 
   useLayoutEffect(() => {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
@@ -53,7 +56,7 @@ export default function CharacterPreview({ character, colors }: Props) {
   // the canvas as "tainted" until the image comes from a same-source server
   const downloadAllImages = () => {
     if (bitmap === null) return;
-    setDownloading(true);
+    setIsDownloading(true);
 
     Promise.resolve().then(() => {
       try {
@@ -66,15 +69,15 @@ export default function CharacterPreview({ character, colors }: Props) {
         const newFilename = `${character.class}${character.id}`;
         downloadCharacter(newFilename, dataUrl);
       } catch (err) {
-        console.error(err);
+        logError(err);
       }
 
-      setDownloading(false);
+      setIsDownloading(false);
     });
   };
 
   const downloadsDisabled =
-    downloading || status === "error" || status === "loading";
+    isDownloading || status === "error" || status === "loading";
 
   return (
     <div className="flex h-full flex-col flex-nowrap justify-center pt-6">

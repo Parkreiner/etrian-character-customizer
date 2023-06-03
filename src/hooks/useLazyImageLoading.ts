@@ -2,7 +2,8 @@
  * @file Provides a very dumb, lo-fi way of lazy-loading images, while making
  * info about the images themselves available as state throughout the React app.
  */
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
+import { useErrorLoggingEffect } from "@/hooks/useErrorLogging";
 
 const MAX_RETRY_COUNT = 3;
 
@@ -152,10 +153,7 @@ export default function useLazyImageLoading(imgUrl: string) {
     cache.getSnapshot(imgUrl)
   );
 
-  useEffect(() => {
-    if (error === null) return;
-    console.error(error);
-  }, [error]);
+  useErrorLoggingEffect(error);
 
   const loadImage = useCallback((newImgUrl: string) => {
     const info: NotificationInfo = { mutable_notifyAfterLoad: true };

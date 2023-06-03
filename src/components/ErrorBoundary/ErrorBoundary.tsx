@@ -1,4 +1,5 @@
 import { PropsWithChildren, Component, ErrorInfo } from "react";
+import { handleError } from "@/utils/errors";
 
 type Props = PropsWithChildren<{
   fallback: JSX.Element;
@@ -15,8 +16,8 @@ export default class ErrorBoundary extends Component<Props, State> {
     return { errored: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error(error, errorInfo);
+  componentDidCatch(runtimeError: Error, componentErrorInfo: ErrorInfo): void {
+    handleError(runtimeError, componentErrorInfo);
   }
 
   render() {
