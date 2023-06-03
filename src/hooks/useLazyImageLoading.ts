@@ -3,7 +3,7 @@
  * info about the images themselves available as state throughout the React app.
  */
 import { useCallback, useSyncExternalStore } from "react";
-import { useErrorLoggingEffect } from "@/hooks/useErrorLogging";
+import useErrorLoggingEffect from "@/hooks/useErrorLoggingEffect";
 
 const MAX_RETRY_COUNT = 3;
 
