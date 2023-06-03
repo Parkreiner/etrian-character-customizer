@@ -71,6 +71,10 @@ export default function CharacterPreview({ character, colors }: Props) {
         handleError(err);
       }
 
+      window.alert(
+        "Basic download functionality not in place just yet; need to resolve issues with cross-site image sources."
+      );
+
       setIsDownloading(false);
     });
   };
@@ -119,6 +123,17 @@ export default function CharacterPreview({ character, colors }: Props) {
           Baba-booey Baba-booey
         </GuideButton>
       </fieldset>
+
+      <p className="mx-auto mt-4 w-fit rounded-full bg-yellow-100 px-4 py-2 text-center text-sm font-medium text-yellow-900">
+        Work in progress.{" "}
+        <a
+          className="underline"
+          href="https://github.com/Parkreiner/etrian-character-customizer"
+        >
+          Check the GitHub page
+        </a>{" "}
+        for updates.
+      </p>
     </section>
   );
 }
