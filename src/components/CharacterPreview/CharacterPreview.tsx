@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
@@ -11,7 +12,7 @@ import {
 
 import GuideButton from "./GuideButton";
 import useLazyImageLoading from "@/hooks/useLazyImageLoading";
-import { useErrorLoggingCallback } from "@/hooks/useErrorLogging";
+import { handleError } from "@/utils/errors";
 
 type Props = {
   character: Character;
@@ -30,8 +31,6 @@ export default function CharacterPreview({ character, colors }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
   const { bitmap, status, loadImage } = useLazyImageLoading(character.imgUrl);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-
-  const logError = useErrorLoggingCallback();
 
   useLayoutEffect(() => {
     const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
@@ -69,7 +68,7 @@ export default function CharacterPreview({ character, colors }: Props) {
         const newFilename = `${character.class}${character.id}`;
         downloadCharacter(newFilename, dataUrl);
       } catch (err) {
-        logError(err);
+        handleError(err);
       }
 
       setIsDownloading(false);
@@ -80,18 +79,21 @@ export default function CharacterPreview({ character, colors }: Props) {
     isDownloading || status === "error" || status === "loading";
 
   return (
-    <div className="flex h-full flex-col flex-nowrap justify-center pt-6">
+    <section className="flex h-full flex-grow flex-col flex-nowrap justify-center pt-6">
       <canvas
         ref={previewCanvasRef}
         className="mx-auto w-[450px] grow-0 border-2 border-teal-700"
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
       >
-        <img src="http://cool.cool.cocol" alt="Blah" />A preview of a{" "}
-        {character.class} from {character.game}
+        A preview of a {character.class} from {character.game}
       </canvas>
 
-      <div className="mx-auto flex max-w-fit flex-row flex-nowrap items-center gap-x-4 pt-6">
+      <fieldset className="mx-auto flex max-w-fit flex-row flex-nowrap items-center gap-x-4 pt-6">
+        <legend>
+          <VisuallyHidden.Root>Main app button controls</VisuallyHidden.Root>
+        </legend>
+
         <GuideButton
           buttonText="Help"
           modalTitle="Help"
@@ -101,6 +103,7 @@ export default function CharacterPreview({ character, colors }: Props) {
         </GuideButton>
 
         <button
+          type="button"
           className="select-none rounded-full bg-teal-800 px-7 py-3 text-xl font-medium text-teal-50 shadow-md transition-colors"
           disabled={downloadsDisabled}
           onClick={downloadAllImages}
@@ -115,7 +118,7 @@ export default function CharacterPreview({ character, colors }: Props) {
         >
           Baba-booey Baba-booey
         </GuideButton>
-      </div>
-    </div>
+      </fieldset>
+    </section>
   );
 }
