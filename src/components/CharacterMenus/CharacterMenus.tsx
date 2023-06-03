@@ -92,9 +92,7 @@ export default function CharacterMenus({
       </section>
 
       <fieldset className="flex-grow overflow-y-hidden pl-6 pr-5 pt-5">
-        <div
-          className={`${styles.scrollbar} h-full overflow-y-scroll pb-1 pr-5`}
-        >
+        <div className={`${styles.scrollbar} h-full overflow-y-auto pb-1 pr-5`}>
           <legend>
             <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
           </legend>
