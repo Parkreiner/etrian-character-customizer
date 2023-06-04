@@ -34,7 +34,7 @@ function groupCharacters(
 ): Map<GameOrigin, readonly GroupEntry[]> {
   const sortedChars = [...characters].sort((char1, char2) => {
     if (char1.displayId === char2.displayId) return 0;
-    return char1.id < char2.id ? -1 : 1;
+    return char1.displayId < char2.displayId ? -1 : 1;
   });
 
   type Entries = readonly [keyof ClassOrderings, readonly string[]][];
