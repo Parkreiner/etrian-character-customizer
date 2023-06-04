@@ -1,16 +1,16 @@
-import { memo, useMemo, useState } from "react";
+import { useMemo } from "react";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+
 import {
   Character,
   ClassOrderings,
   GameOrigin,
-  gameOrigins,
 } from "@/typesConstants/gameData";
 
-import CharacterClassPanel from "./CharacterClassPanel";
-import Button from "@/components/Button";
-import ControlsContainer, {
-  TabInfoArray,
-} from "@/components/ControlsContainer";
+import Card from "@/components/Card";
+import CharacterClassSection from "./CharacterClassPanel";
+import styles from "@/components/ControlsContainer/scrollbar.module.css";
+import HeaderProvider, { useCurrentHeader } from "@/contexts/HeaderLevels";
 
 type Props = {
   characters: readonly Character[];
@@ -20,74 +20,102 @@ type Props = {
   randomizeCharacter: () => void;
 };
 
+type GroupEntry = { class: string; characters: readonly Character[] };
+
 const nameAliases = {
   eo1: "Etrian Odyssey",
-  eo2: "Etrian Odyssey II: Heroes of Lagaard",
-  eo3: "Etrian Odyssey III: The Drowned City",
+  eo2: "Etrian Odyssey II",
+  eo3: "Etrian Odyssey III",
 } as const satisfies Record<GameOrigin, string>;
 
-export default memo(function CharacterMenus({
+function groupCharacters(
+  characters: readonly Character[],
+  classOrderings: ClassOrderings
+): Map<GameOrigin, readonly GroupEntry[]> {
+  const sortedChars = [...characters].sort((char1, char2) => {
+    if (char1.displayId === char2.displayId) return 0;
+    return char1.id < char2.id ? -1 : 1;
+  });
+
+  type Entries = readonly [keyof ClassOrderings, readonly string[]][];
+  const entries = Object.entries(classOrderings).sort((entry1, entry2) => {
+    if (entry1[0] === entry2[0]) return 0;
+    return entry1[0] < entry2[0] ? -1 : 1;
+  }) as Entries;
+
+  // Using a Map to guarantee insertion order is respected
+  const grouped = new Map<GameOrigin, readonly GroupEntry[]>();
+
+  const filterChars = (game: GameOrigin, gameClass: string) => {
+    return sortedChars.filter((char) => {
+      return char.game === game && char.class === gameClass;
+    });
+  };
+
+  for (const [game, charClasses] of entries) {
+    const entriesByGame = charClasses.map((className): GroupEntry => {
+      return { class: className, characters: filterChars(game, className) };
+    });
+
+    grouped.set(game, entriesByGame);
+  }
+
+  return grouped;
+}
+
+export default function CharacterMenus({
   selectedCharacterId,
   characters,
   classOrderings,
   onCharacterChange,
   randomizeCharacter,
 }: Props) {
-  const [selectedGame, setSelectedGame] = useState<GameOrigin>("eo1");
-  const sortedCharacters = useMemo(() => {
-    return [...characters].sort((char1, char2) => {
-      if (char1.id === char2.id) return 0;
-      return char1.id < char2.id ? -1 : 1;
-    });
-  }, [characters]);
-
-  const charsByGame = sortedCharacters.filter(
-    (char) => char.game === selectedGame
+  const HeaderTag = useCurrentHeader();
+  const grouped = useMemo(
+    () => groupCharacters(characters, classOrderings),
+    [characters, classOrderings]
   );
-
-  const selectedGameContent = (
-    <div className="grid w-full grid-cols-2 gap-3">
-      {classOrderings[selectedGame].map((gameClass) => (
-        <CharacterClassPanel
-          key={gameClass}
-          gameClass={gameClass}
-          characters={charsByGame.filter((char) => char.class === gameClass)}
-          selectedCharacterId={selectedCharacterId}
-          onCharacterChange={onCharacterChange}
-        />
-      ))}
-    </div>
-  );
-
-  const tabInfo: TabInfoArray<GameOrigin> = gameOrigins.map((game) => {
-    return {
-      value: game,
-      accessibleTabLabel: nameAliases[game],
-      tabView: game === selectedGame ? selectedGameContent : null,
-      tabText: (
-        <abbr title={nameAliases[game]} className="uppercase">
-          {game}
-        </abbr>
-      ),
-    };
-  });
 
   return (
-    <fieldset className="relative">
-      <ControlsContainer<GameOrigin>
-        tabs={tabInfo}
-        selectedTabValue={selectedGame}
-        onTabChange={(newSelection) => setSelectedGame(newSelection)}
-        tabGroupLabel="Select a game"
-      />
+    <section className="flex h-full w-[430px] flex-col flex-nowrap bg-teal-600 pb-1.5">
+      <section className="flex flex-nowrap items-baseline justify-between bg-teal-100 py-3 pl-7 pr-5">
+        <HeaderTag className="text-base font-medium italic text-teal-950">
+          Etrian Character Customizer
+        </HeaderTag>
 
-      <div className="absolute mx-auto mt-1.5 w-full">
-        <div className="mx-auto max-w-fit">
-          <Button intent="secondary" size="small" onClick={randomizeCharacter}>
-            Click to randomize
-          </Button>
+        <button
+          className="block max-w-fit rounded-full border-[1px] border-teal-900/70 bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 transition-colors hover:bg-teal-200"
+          onClick={randomizeCharacter}
+        >
+          Randomize
+        </button>
+      </section>
+
+      <fieldset className="flex-grow overflow-y-hidden pl-6 pr-5 pt-5">
+        <div className={`${styles.scrollbar} h-full overflow-y-auto pb-1 pr-5`}>
+          <legend>
+            <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
+          </legend>
+
+          <HeaderProvider>
+            {Array.from(grouped, ([game, gameEntries]) => (
+              <div key={game} className="mt-5 [&:nth-child(2)]:mt-0">
+                <Card title={nameAliases[game]} striped gapSize="small">
+                  {gameEntries.map((entry) => (
+                    <CharacterClassSection
+                      key={entry.class}
+                      gameClass={entry.class}
+                      selectedCharacterId={selectedCharacterId}
+                      characters={entry.characters}
+                      onCharacterChange={onCharacterChange}
+                    />
+                  ))}
+                </Card>
+              </div>
+            ))}
+          </HeaderProvider>
         </div>
-      </div>
-    </fieldset>
+      </fieldset>
+    </section>
   );
-});
+}

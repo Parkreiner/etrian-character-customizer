@@ -1,6 +1,5 @@
 import { PropsWithChildren } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import Button from "@/components/Button";
 
 type Props = PropsWithChildren<{
   buttonText: string;
@@ -8,7 +7,7 @@ type Props = PropsWithChildren<{
   modalDescription: string;
 }>;
 
-export default function EditorModalButton({
+export default function GuideButton({
   children,
   buttonText,
   modalTitle,
@@ -17,15 +16,15 @@ export default function EditorModalButton({
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <Button intent="secondary" size="medium">
+        <button className="w-24 rounded-full border-[1px] border-teal-900/70 px-4 py-1 text-sm font-medium text-teal-950 transition-colors hover:bg-teal-200">
           {buttonText}
-        </Button>
+        </button>
       </Dialog.Trigger>
 
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed top-0 left-0 h-full w-full backdrop-blur-sm" />
+        <Dialog.Overlay className="fixed left-0 top-0 h-full w-full backdrop-blur-sm" />
 
-        <div className="fixed top-0 left-0 flex h-full w-full items-center justify-center">
+        <div className="fixed left-0 top-0 flex h-full w-full items-center justify-center">
           <Dialog.Content className="relative min-h-[400px] w-full max-w-prose rounded-md bg-white p-10 shadow-md">
             <Dialog.Title className="text-2xl font-bold">
               {modalTitle}

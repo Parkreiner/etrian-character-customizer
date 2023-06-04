@@ -1,4 +1,4 @@
-import { cva } from "class-variance-authority";
+import classNames from "classnames";
 
 type Props = React.ComponentPropsWithoutRef<"button"> & {
   primaryHex: string;
@@ -9,15 +9,6 @@ type Props = React.ComponentPropsWithoutRef<"button"> & {
   selected?: boolean;
 };
 
-const divStyles = cva("rounded-lg border-2 w-fit", {
-  variants: {
-    selected: {
-      true: "border-teal-200",
-      false: "border-teal-900",
-    },
-  },
-});
-
 export default function ColorButton({
   primaryHex,
   secondaryHex,
@@ -26,7 +17,12 @@ export default function ColorButton({
   ...delegated
 }: Props) {
   return (
-    <div className={divStyles({ selected })}>
+    <div
+      className={classNames(
+        "w-fit rounded-lg border-2",
+        selected ? "border-teal-200" : "border-teal-900"
+      )}
+    >
       <button
         className="relative h-10 min-w-[80px] basis-[80px] overflow-y-hidden rounded-md border-2 border-black"
         style={{ backgroundColor: primaryHex }}

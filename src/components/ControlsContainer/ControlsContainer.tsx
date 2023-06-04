@@ -92,7 +92,7 @@ export default function ControlsContainer<T extends string>({
     <Tabs.Root<T>
       value={selectedTabValue}
       onValueChange={onTabChange}
-      className="min-w-[400px] self-stretch"
+      className="flex h-full min-w-[430px] flex-col flex-nowrap self-stretch"
     >
       <Tabs.List<T>
         className="flex gap-x-1 px-4 leading-none"
@@ -101,11 +101,11 @@ export default function ControlsContainer<T extends string>({
         {tabs.map(toTabsTrigger)}
       </Tabs.List>
 
-      <div className="mt-2 h-[400px] shadow-md">
+      <div className="mt-2 h-[700px] shadow-md">
         <div className="h-full overflow-y-hidden rounded-md bg-teal-600 py-4 pl-4 pr-3">
           <div
             ref={scrollContainerRef}
-            className={`${styles.scrollbar} h-full overflow-y-scroll pr-3`}
+            className={`${styles.scrollbar} h-full overflow-y-auto pr-3`}
           >
             {tabs.map((tab, index) => (
               <Tabs.Content<T> key={index} value={tab.value}>

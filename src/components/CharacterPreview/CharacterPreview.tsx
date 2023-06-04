@@ -1,64 +1,138 @@
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+
 import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
-import Button from "@/components/Button";
+import {
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  renderCharacter,
+  imageToDataUrl,
+} from "./canvasHelpers";
 
-import DebugSquare from "./DebugSquare";
-import { downloadCharacter } from "./downloadCharacter";
-import useLiveCanvas from "./useLiveCanvas";
+import GuideButton from "./GuideButton";
+import useLazyImageLoading from "@/hooks/useLazyImageLoading";
+import { handleError } from "@/utils/errors";
 
 type Props = {
-  selectedCharacter: Character | null;
+  character: Character;
   colors: CharacterColors;
 };
 
-export default function CharacterPreview({ selectedCharacter, colors }: Props) {
-  const canvasRef = useLiveCanvas(selectedCharacter, colors);
+function downloadCharacter(filename: string, dataUrl: string): void {
+  const fakeAnchor = document.createElement("a");
+  fakeAnchor.download = filename;
+  fakeAnchor.href = dataUrl;
+
+  fakeAnchor.click();
+}
+
+export default function CharacterPreview({ character, colors }: Props) {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const { bitmap, status, loadImage } = useLazyImageLoading(character.imgUrl);
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  useLayoutEffect(() => {
+    const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
+    if (previewContext === null || bitmap === null) return;
+
+    renderCharacter(previewContext, bitmap, colors, character);
+
+    return () => {
+      previewContext.fillStyle = "#000000";
+      previewContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    };
+  }, [bitmap, colors, character]);
+
+  useEffect(() => {
+    if (bitmap !== null) return;
+    const { abort } = loadImage(character.imgUrl);
+    return () => abort();
+  }, [bitmap, character.imgUrl, loadImage]);
+
+  // Note: the download functionality can't work right now, because the mock
+  // images are being hosted on a separate source (Imgur). Browsers will treat
+  // the canvas as "tainted" until the image comes from a same-source server
+  const downloadAllImages = async () => {
+    if (bitmap === null) return;
+    setIsDownloading(true);
+
+    // This looks hokey, but it ensures that the first state update finishes
+    // before the rest of this function (which is expensive) is allowed to start
+    await Promise.resolve();
+
+    try {
+      const dataUrl = imageToDataUrl(bitmap, colors, character);
+      const newFilename = `${character.class}${character.id}`;
+      downloadCharacter(newFilename, dataUrl);
+    } catch (err) {
+      handleError(err);
+    }
+
+    window.alert(
+      "Basic download functionality not in place just yet; need to resolve issues with cross-site image sources."
+    );
+
+    setIsDownloading(false);
+  };
+
+  const downloadsDisabled =
+    isDownloading || status === "error" || status === "loading";
 
   return (
-    <div className="flex flex-grow flex-col flex-nowrap justify-center self-stretch p-6">
-      <div className="my-4 flex flex-row flex-wrap gap-4 justify-self-center">
-        <DebugSquare color={colors.skin[0]}>Skin 1</DebugSquare>
-        <DebugSquare color={colors.skin[1]}>Skin 2</DebugSquare>
+    <section className="flex h-full flex-grow flex-col flex-nowrap justify-center pt-6">
+      <canvas
+        ref={previewCanvasRef}
+        className="mx-auto w-[450px] grow-0 border-2 border-teal-700"
+        width={CANVAS_WIDTH}
+        height={CANVAS_HEIGHT}
+      >
+        A preview of a {character.class} from {character.game}
+      </canvas>
 
-        <DebugSquare color={colors.hair[0]}>Hair 1</DebugSquare>
-        <DebugSquare color={colors.hair[1]}>Hair 2</DebugSquare>
+      <fieldset className="mx-auto flex max-w-fit flex-row flex-nowrap items-center gap-x-4 pt-6">
+        <legend>
+          <VisuallyHidden.Root>Main app button controls</VisuallyHidden.Root>
+        </legend>
 
-        <DebugSquare color={colors.leftEye[0]}>L. Eye 1</DebugSquare>
-        <DebugSquare color={colors.leftEye[1]}>L. Eye 2</DebugSquare>
+        <GuideButton
+          buttonText="Help"
+          modalTitle="Help"
+          modalDescription="How to use this application"
+        >
+          Baba-booey Baba-booey
+        </GuideButton>
 
-        <DebugSquare color={colors.rightEye[0]}>R. Eye 1</DebugSquare>
-        <DebugSquare color={colors.rightEye[1]}>R. Eye 2</DebugSquare>
-
-        {colors.misc.map((color, index) => (
-          <DebugSquare key={index} color={color}>
-            Misc {index + 1}
-          </DebugSquare>
-        ))}
-      </div>
-
-      <div>
-        <canvas ref={canvasRef} className="bg-black">
-          A preview of
-          {selectedCharacter === null && "no character"}
-          {selectedCharacter !== null &&
-            `a ${selectedCharacter.class} from ${selectedCharacter.game} (ID ${selectedCharacter.id})`}
-        </canvas>
-      </div>
-
-      <div className="mx-auto max-w-fit pt-6">
-        <Button
-          intent="primary"
-          size="large"
-          disabled={selectedCharacter === null}
-          onClick={() => {
-            if (selectedCharacter !== null) {
-              downloadCharacter(selectedCharacter.id, colors);
-            }
-          }}
+        <button
+          type="button"
+          className="select-none rounded-full bg-teal-800 px-7 py-3 text-xl font-medium text-teal-50 shadow-md transition-colors"
+          disabled={downloadsDisabled}
+          onClick={downloadAllImages}
         >
           Download
-        </Button>
-      </div>
-    </div>
+        </button>
+
+        <GuideButton
+          buttonText="Credits"
+          modalTitle="Credits"
+          modalDescription="Credits and colophon"
+        >
+          Baba-booey Baba-booey
+        </GuideButton>
+      </fieldset>
+
+      <p className="mx-auto mt-4 w-fit rounded-full bg-yellow-100 px-4 py-2 text-center text-sm font-medium text-yellow-900">
+        Work in progress.{" "}
+        <a
+          className="underline"
+          href="https://github.com/Parkreiner/etrian-character-customizer"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Check the GitHub page
+        </a>{" "}
+        for updates.
+      </p>
+    </section>
   );
 }

@@ -49,7 +49,7 @@ export function reduceEditorState(
     return {
       initialized: true,
       selectedCharacterId: startingCharacter.id,
-      colors: startingCharacter.colors,
+      colors: startingCharacter.initialColors,
     };
   }
 
@@ -61,7 +61,7 @@ export function reduceEditorState(
       return {
         ...state,
         selectedCharacterId: newCharacter.id,
-        colors: newCharacter.colors,
+        colors: newCharacter.initialColors,
       };
     }
 
@@ -84,7 +84,7 @@ export function reduceEditorState(
       return {
         ...state,
         selectedCharacterId: currentCharacter.id,
-        colors: currentCharacter.colors,
+        colors: currentCharacter.initialColors,
       };
     }
 
@@ -116,8 +116,9 @@ export default function useEditorController() {
   // fall victim to singleton behavior. Do not replace with useEffect
   if (!state.initialized && data !== undefined) {
     const startingCharacter =
-      data.characters.find((char) => char.class === "protector") ??
-      data.characters[0];
+      data.characters.find(
+        (char) => char.class === "protector" && char.displayId === "5"
+      ) ?? data.characters[0];
 
     if (startingCharacter) {
       dispatch({
@@ -151,6 +152,16 @@ export default function useEditorController() {
     return { initialized: false } as const;
   }
 
+  const selectedCharacter = characters.find(
+    (char) => char.id === state.selectedCharacterId
+  );
+
+  if (selectedCharacter === undefined) {
+    throw new Error(
+      "Unable to find selected character in array after initialization"
+    );
+  }
+
   return {
     /**
      * Inidicates whether the rest of the editor has been initialized.
@@ -169,7 +180,13 @@ export default function useEditorController() {
      * handling cases for data being undefined, instead of having that logic be
      * resolved in one spot (Editor).
      */
-    gameData: { characters, classOrderings },
+    server: { characters, classOrderings },
+
+    /**
+     * Represents derived values that should be available to any component
+     * consuming this hook. No state should go in here.
+     */
+    derived: { selectedCharacter },
 
     /**
      * State specific to the editor. Values are read/write, but values can only
