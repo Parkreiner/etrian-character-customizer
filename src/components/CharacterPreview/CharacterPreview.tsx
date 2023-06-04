@@ -126,6 +126,8 @@ export default function CharacterPreview({ character, colors }: Props) {
         <a
           className="underline"
           href="https://github.com/Parkreiner/etrian-character-customizer"
+          target="_blank"
+          rel="noreferrer"
         >
           Check the GitHub page
         </a>{" "}
