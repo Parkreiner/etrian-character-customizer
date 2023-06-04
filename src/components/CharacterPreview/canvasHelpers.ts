@@ -2,15 +2,30 @@ import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
 
 const PLACEHOLDER_FILL = "#ff00ff";
-export const CANVAS_WIDTH = 600;
-export const CANVAS_HEIGHT = 960;
+
+export function getCanvasContext(
+  canvas: HTMLCanvasElement
+): CanvasRenderingContext2D {
+  const context = canvas.getContext("2d");
+  if (context === null) {
+    throw new Error(
+      "Rendering context is null. This should only be possible if you accidentally set up multiple contexts for the same canvas"
+    );
+  }
+
+  return context;
+}
 
 export function renderCharacter(
-  canvasContext: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement,
   charBitmap: ImageBitmap,
   colors: CharacterColors,
   character: Character
 ): void {
+  const canvasContext = getCanvasContext(canvas);
+  const width = canvas.width;
+  const height = canvas.height;
+
   const sortedPaths = [...character.paths].sort((entry1, entry2) => {
     return entry1.layerIndex - entry2.layerIndex;
   });
@@ -23,8 +38,7 @@ export function renderCharacter(
     canvasContext.fill(pathNode);
   }
 
-  const height = CANVAS_WIDTH * (charBitmap.height / charBitmap.width);
-  canvasContext.drawImage(charBitmap, 0, 0, CANVAS_WIDTH, height);
+  canvasContext.drawImage(charBitmap, 0, 0, width, height);
 }
 
 export function imageToDataUrl(
@@ -36,13 +50,6 @@ export function imageToDataUrl(
   outputCanvas.width = charBitmap.width;
   outputCanvas.height = charBitmap.height;
 
-  const outputContext = outputCanvas.getContext("2d");
-  if (outputContext === null) {
-    throw new Error(
-      "outputCanvas declared with multiple rendering contexts - this should be physically impossible"
-    );
-  }
-
-  renderCharacter(outputContext, charBitmap, colors, character);
+  renderCharacter(outputCanvas, charBitmap, colors, character);
   return outputCanvas.toDataURL();
 }
