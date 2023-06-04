@@ -1,18 +1,14 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
-import {
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-  renderCharacter,
-  imageToDataUrl,
-} from "./canvasHelpers";
+import { imageToDataUrl } from "./canvasHelpers";
 
 import GuideButton from "./GuideButton";
 import useLazyImageLoading from "@/hooks/useLazyImageLoading";
 import { handleError } from "@/utils/errors";
+import usePreview from "./usePreview";
 
 type Props = {
   character: Character;
@@ -30,19 +26,7 @@ function downloadCharacter(filename: string, dataUrl: string): void {
 export default function CharacterPreview({ character, colors }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
   const { bitmap, status, loadImage } = useLazyImageLoading(character.imgUrl);
-  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-
-  useLayoutEffect(() => {
-    const previewContext = previewCanvasRef.current?.getContext("2d") ?? null;
-    if (previewContext === null || bitmap === null) return;
-
-    renderCharacter(previewContext, bitmap, colors, character);
-
-    return () => {
-      previewContext.fillStyle = "#000000";
-      previewContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    };
-  }, [bitmap, colors, character]);
+  const { containerRef, canvasRef } = usePreview(bitmap, colors, character);
 
   useEffect(() => {
     if (bitmap !== null) return;
@@ -54,7 +38,8 @@ export default function CharacterPreview({ character, colors }: Props) {
   // images are being hosted on a separate source (Imgur). Browsers will treat
   // the canvas as "tainted" until the image comes from a same-source server
   const downloadAllImages = async () => {
-    if (bitmap === null) return;
+    const canvas = canvasRef.current;
+    if (bitmap === null || canvas === null) return;
     setIsDownloading(true);
 
     // This looks hokey, but it ensures that the first state update finishes
@@ -80,15 +65,17 @@ export default function CharacterPreview({ character, colors }: Props) {
     isDownloading || status === "error" || status === "loading";
 
   return (
-    <section className="flex h-full flex-grow flex-col flex-nowrap justify-center pt-6">
-      <canvas
-        ref={previewCanvasRef}
-        className="mx-auto w-[450px] grow-0 border-2 border-teal-700"
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT}
-      >
-        A preview of a {character.class} from {character.game}
-      </canvas>
+    <section className="flex h-full flex-grow flex-col flex-nowrap justify-center py-8">
+      <div ref={containerRef} className="w-full flex-grow py-4">
+        {/*
+         * Reminder: You cannot set any CSS properties on a canvas that would
+         * change its size. You have to update the HTML directly (doing the
+         * math for it), or else the canvas output will distort
+         */}
+        <canvas ref={canvasRef} className="mx-auto">
+          A preview of a {character.class} from {character.game}
+        </canvas>
+      </div>
 
       <fieldset className="mx-auto flex max-w-fit flex-row flex-nowrap items-center gap-x-4 pt-6">
         <legend>
