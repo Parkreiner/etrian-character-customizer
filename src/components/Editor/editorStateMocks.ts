@@ -78,11 +78,12 @@ const misc3: CanvasPathEntry = {
 };
 
 const characters: readonly Omit<Character, "id">[] = [
+  // EO1 Protector 1
   {
     game: "eo1",
     class: "protector",
     displayId: "1",
-    imgUrl: "https://i.imgur.com/gUP2q9Z.png",
+    imgUrl: "https://i.imgur.com/7I1k2X2.png",
     paths: basePathMocks,
     totalColors: 8,
 
@@ -99,11 +100,13 @@ const characters: readonly Omit<Character, "id">[] = [
       misc: [],
     },
   },
+
+  // EO1 Teach
   {
     game: "eo1",
     class: "protector",
     displayId: "2",
-    imgUrl: "https://i.imgur.com/kFRBqKf.png",
+    imgUrl: "https://i.imgur.com/xfqdPUn.png",
     paths: basePathMocks,
     totalColors: 8,
 
@@ -120,11 +123,13 @@ const characters: readonly Omit<Character, "id">[] = [
       misc: [],
     },
   },
+
+  // EO1 protector 3
   {
     game: "eo1",
     class: "protector",
     displayId: "3",
-    imgUrl: "https://i.imgur.com/JgiPmIr.png",
+    imgUrl: "https://i.imgur.com/8AAoLIK.png",
     paths: basePathMocks,
     totalColors: 8,
 
@@ -141,11 +146,13 @@ const characters: readonly Omit<Character, "id">[] = [
       misc: [],
     },
   },
+
+  // EO1 protector 4
   {
     game: "eo1",
     class: "protector",
     displayId: "4",
-    imgUrl: "https://i.imgur.com/g4uNxbA.png",
+    imgUrl: "https://i.imgur.com/eAA3iZP.png",
     paths: basePathMocks,
     totalColors: 8,
 
@@ -162,11 +169,13 @@ const characters: readonly Omit<Character, "id">[] = [
       misc: [],
     },
   },
+
+  // New protector (EO1 version)
   {
     game: "eo1",
     class: "protector",
     displayId: "5",
-    imgUrl: "https://i.imgur.com/2eiuAIn.png",
+    imgUrl: "https://i.imgur.com/nkNMx5E.png",
     paths: basePathMocks,
     totalColors: 8,
 
@@ -183,11 +192,13 @@ const characters: readonly Omit<Character, "id">[] = [
       misc: [],
     },
   },
+
+  // New medic (EO1 version)
   {
     game: "eo1",
     class: "medic",
     displayId: "5",
-    imgUrl: "https://i.imgur.com/20qTHXw.png",
+    imgUrl: "https://i.imgur.com/K4Y78kh.png",
     paths: basePathMocks,
     totalColors: 8,
 
@@ -205,15 +216,16 @@ const characters: readonly Omit<Character, "id">[] = [
     },
   },
 
+  // Demi-Fiend (EO2)
   {
     game: "eo2",
     class: "guest",
     displayId: "1",
-    imgUrl: "https://i.imgur.com/H9DdfNY.png",
+    imgUrl: "https://i.imgur.com/5jTaytn.png",
     paths: [...basePathMocks, misc1, misc2],
 
     // The Demi-Fiend actually has only 1 color per eye, so the total is
-    // supposed should be 8, not 10. First example of why I need to update the
+    // supposed to be 8, not 10. First example of why I need to update the
     // colors to be arrays and not fixed-length tuples
     totalColors: 8,
 
@@ -230,11 +242,13 @@ const characters: readonly Omit<Character, "id">[] = [
       misc: ["#32353c", "#c7fff3"],
     },
   },
+
+  // New Gunner
   {
     game: "eo2",
     class: "gunner",
     displayId: "5",
-    imgUrl: "https://i.imgur.com/Kuhvorj.png",
+    imgUrl: "https://i.imgur.com/mW4fl9G.png",
     paths: [...basePathMocks, misc1, misc2],
 
     // Gunner also only has one eye color - at least, as far as I can tell with
@@ -254,11 +268,13 @@ const characters: readonly Omit<Character, "id">[] = [
       misc: ["#392f3c", "#781d29"],
     },
   },
+
+  // Joker (EO1)
   {
     game: "eo1",
     class: "guest",
     displayId: "1",
-    imgUrl: "https://i.imgur.com/7K56GfS.png",
+    imgUrl: "https://i.imgur.com/bWSsXTM.png",
     paths: [...basePathMocks, misc1],
     totalColors: 9,
 
@@ -275,11 +291,13 @@ const characters: readonly Omit<Character, "id">[] = [
       misc: ["#810c0d"],
     },
   },
+
+  // Ringo (EO1)
   {
     game: "eo1",
     class: "guest",
     displayId: "2",
-    imgUrl: "https://i.imgur.com/ZJP7e1r.png",
+    imgUrl: "https://i.imgur.com/NVSUUHt.png",
     paths: [...basePathMocks, misc1, misc2, misc3],
     totalColors: 11,
 
@@ -299,11 +317,13 @@ const characters: readonly Omit<Character, "id">[] = [
       misc: ["#ffff00", "#7bdb18", "#088c91"],
     },
   },
+
+  // Aigis (EO3)
   {
     game: "eo3",
     class: "guest",
     displayId: "2",
-    imgUrl: "https://i.imgur.com/1MkXJFr.png",
+    imgUrl: "https://i.imgur.com/M57BmSu.png",
     paths: [...basePathMocks, misc1, misc2],
     totalColors: 11,
 
