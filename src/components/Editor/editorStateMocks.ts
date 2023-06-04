@@ -206,9 +206,9 @@ const characters: readonly Omit<Character, "id">[] = [
   },
 
   {
-    game: "eo2",
+    game: "eo1",
     class: "guest",
-    displayId: "1",
+    displayId: "3",
     imgUrl: "https://i.imgur.com/H9DdfNY.png",
     paths: [...basePathMocks, misc1, misc2],
 
@@ -300,9 +300,9 @@ const characters: readonly Omit<Character, "id">[] = [
     },
   },
   {
-    game: "eo3",
+    game: "eo1",
     class: "guest",
-    displayId: "2",
+    displayId: "4",
     imgUrl: "https://i.imgur.com/1MkXJFr.png",
     paths: [...basePathMocks, misc1, misc2],
     totalColors: 11,
