@@ -29,13 +29,15 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
         {/* Min/max are a little funky to make hue wrap-arounds easier */}
         <input
           id={textId}
-          className="no-arrow h-16 bg-teal-900 text-right text-[64px] font-bold"
           type="number"
           min="-1"
           max="360"
           step="1"
           value={hue}
           onChange={(e) => onHueChange(wrapHue(e.target.valueAsNumber))}
+          // All the extra width properties are meant to help with a Firefox-
+          // specific sizing issue when tring to style text inputs
+          className="no-arrow block h-16 w-fit min-w-0 max-w-[170px] bg-teal-900 text-right text-[64px] font-bold"
         />
         <span className="h-fit select-none text-[48px] font-medium">°</span>
       </div>
