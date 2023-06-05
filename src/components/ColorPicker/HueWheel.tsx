@@ -25,7 +25,7 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
         Hue
       </label>
 
-      <div className="flex -translate-y-0.5 align-top text-[48px] leading-none">
+      <div className="flex -translate-y-0.5 align-top leading-none">
         {/* Min/max are a little funky to make hue wrap-arounds easier */}
         <input
           id={textId}
@@ -37,7 +37,7 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
           value={hue}
           onChange={(e) => onHueChange(wrapHue(e.target.valueAsNumber))}
         />
-        <span className="h-fit select-none font-medium">°</span>
+        <span className="h-fit select-none text-[48px] font-medium">°</span>
       </div>
 
       <button
