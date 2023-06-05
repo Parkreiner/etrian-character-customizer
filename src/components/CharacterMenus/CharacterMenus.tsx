@@ -77,7 +77,7 @@ export default function CharacterMenus({
   );
 
   return (
-    <section className="flex h-full w-[430px] flex-col flex-nowrap bg-teal-600 pb-1.5">
+    <section className="flex h-full w-[430px] shrink-0 flex-col flex-nowrap bg-teal-600 pb-1.5">
       <section className="flex flex-nowrap items-baseline justify-between bg-teal-100 py-3 pl-7 pr-5">
         <HeaderTag className="text-base font-medium italic text-teal-950">
           Etrian Character Customizer
