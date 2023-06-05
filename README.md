@@ -4,6 +4,10 @@ A character portrait generator for the PC releases of the first three Etrian Ody
 
 The games will be releasing in North America on June 1, 2023.
 
+## Relevant links
+
+[Here is a demo version of the client-side app deployed to Vercel](https://etrian-character-customizer.vercel.app/). It is set up to update automatically when the main branch for this repo changes.
+
 ## Background
 
 Starting with 2016's Etrian Odyssey V and continuing with 2018's Etrian Odyssey Nexus, players have been able to customize their characters' appearances – their skin color, their eye color (you can even give them heterochromia), and their hair color. The feature has been well-received by fans worldwide.
@@ -61,3 +65,8 @@ This project will be built with:
 - PostgreSQL + Prisma
 
 \* Backend framework TBD
+
+## Special thanks
+
+- The Coding and Datamining community within the Etrian Odyssey Discord server (community currently closed to invites), for putting up with all my annoying questions about how Unity works with texture files
+- [Josh Comeau's](https://www.joshwcomeau.com/) Discord community for his course platforms (especially Josh and [Bonnie Schulkin](https://bonnie.dev/)), for helping me out with cementing my React knowledge and helping me debug weird, browser-specific CSS issues. (Community is only open to course students – sorry!)
