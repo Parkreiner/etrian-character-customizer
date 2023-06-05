@@ -43,7 +43,8 @@ export default function ChannelInput({
 
       <div className="flex grow flex-row flex-nowrap items-center justify-center px-1">
         <input
-          className="no-arrow grow bg-inherit text-center font-medium"
+          // Max width in place to prevent Firefox-specific styling issues
+          className="no-arrow max-w-[50px] grow bg-inherit text-center font-medium"
           type="number"
           id={numberInputId}
           value={value}
