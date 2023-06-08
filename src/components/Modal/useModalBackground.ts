@@ -5,18 +5,12 @@ export default function useModalBackground() {
   const backgroundRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const content = contentRef.current;
-    if (content === null) return;
-
-    const syncBackgroundWithContent: ResizeObserverCallback = (entries) => {
+    const syncBackgroundWithContent = () => {
       const content = contentRef.current;
       const background = backgroundRef.current;
       if (content === null || background === null) return;
 
-      const sizeInfo = entries[0]?.borderBoxSize[0];
-      if (sizeInfo === undefined) return;
-
-      const containerWidth = sizeInfo.inlineSize;
+      const containerWidth = content.offsetWidth;
       const viewportWidth = window.innerWidth;
       const height = window.innerHeight;
 
@@ -32,8 +26,13 @@ export default function useModalBackground() {
       background.style.transform = `rotate(${bgRotation}deg)`;
     };
 
+    // Can't observe content element itself, because it'll stop triggering the
+    // observer callback if you keep resizing the window after the content has
+    // hits its max width. At the same time, can't read the observed values
+    // through the callback parameters, or else you'll have data on the body,
+    // not the content
     const observer = new ResizeObserver(syncBackgroundWithContent);
-    observer.observe(content);
+    observer.observe(document.body, { box: "border-box" });
     return () => observer.disconnect();
   }, []);
 
