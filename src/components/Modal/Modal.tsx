@@ -1,66 +1,27 @@
-import { PropsWithChildren, useLayoutEffect, useRef } from "react";
+import { PropsWithChildren } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 
-type Props = PropsWithChildren<{
+import useModalBackground from "./useModalBackground";
+
+type ModalProps = PropsWithChildren<{
   buttonText: string;
   modalTitle: string;
   modalDescription: string;
 }>;
 
-function useModalBackground() {
-  const contentRef = useRef<HTMLDivElement>(null);
-  const backgroundRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const content = contentRef.current;
-    if (content === null) return;
-
-    const syncBgWithContent: ResizeObserverCallback = (observedEntries) => {
-      const content = contentRef.current;
-      const background = backgroundRef.current;
-      if (content === null || background === null) return;
-
-      const sizeInfo = observedEntries[0]?.borderBoxSize[0];
-      if (sizeInfo === undefined) return;
-
-      const containerWidth = sizeInfo.inlineSize;
-      const viewportWidth = window.innerWidth;
-      const height = window.innerHeight;
-
-      const heightSq = height ** 2;
-      const bgWidth = Math.round(Math.sqrt(containerWidth ** 2 + heightSq));
-      const bgHeight = Math.round(Math.sqrt(viewportWidth ** 2 + heightSq));
-
-      // Need to figure out actual formula
-      const bgRotation = -35;
-
-      background.style.width = `${bgWidth}px`;
-      background.style.height = `${bgHeight}px`;
-      background.style.transform = `rotate(${bgRotation}deg)`;
-    };
-
-    const observer = new ResizeObserver(syncBgWithContent);
-    observer.observe(content);
-    return () => observer.disconnect();
-  }, []);
-
-  return { contentRef, backgroundRef } as const;
-}
+type CoreProps = Omit<ModalProps, "buttonText">;
 
 /**
  * Have to split the content up as a separate component, because the mounting
  * hooks need to run fresh every single time Radix conditionally renders this
  * to the portal.
  *
- * The effect hook only ever runs once on mount, but if it were called in the
- * parent, it would be called for HTML elements that the parent wouldn't be
- * rendering yet. And so, there would be no ref values for the effect to read
+ * Can't put the effect in the parent, because Radix will default to not
+ * rendering the content when it mounts. Because of that, there won't be any DOM
+ * nodes that the refs will be attached to at first, so the effects will have no
+ * values to read from.
  */
-function CoreContent({
-  children,
-  modalTitle,
-  modalDescription,
-}: Omit<Props, "buttonText">) {
+function CoreContent({ children, modalTitle, modalDescription }: CoreProps) {
   const { contentRef, backgroundRef } = useModalBackground();
 
   return (
@@ -107,7 +68,7 @@ function CoreContent({
   );
 }
 
-export default function GuideButton({ buttonText, ...delegated }: Props) {
+function Modal({ buttonText, ...delegated }: ModalProps) {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
@@ -123,3 +84,53 @@ export default function GuideButton({ buttonText, ...delegated }: Props) {
     </Dialog.Root>
   );
 }
+
+type SubheaderProps = {
+  children: string;
+};
+
+Modal.Subheader = function ModalSubheader({ children }: SubheaderProps) {
+  return <h3>{children}</h3>;
+};
+
+type ParagraphProps = PropsWithChildren<{
+  italicized?: boolean;
+}>;
+
+Modal.Paragraph = function ModalParagraph({
+  children,
+  italicized = false,
+}: ParagraphProps) {
+  return <p className={`${italicized ? "italic" : ""}`}>{children}</p>;
+};
+
+type ListProps = PropsWithChildren<{
+  ordered?: boolean;
+}>;
+
+Modal.List = function ModalNumberedList({
+  children,
+  ordered = false,
+}: ListProps) {
+  const ListTag = ordered ? "ol" : "ul";
+  return <ListTag>{children}</ListTag>;
+};
+
+Modal.ListItem = function ModalListItem({ children }: PropsWithChildren) {
+  return <li>{children}</li>;
+};
+
+type LinkProps = {
+  href: string;
+  children: string;
+};
+
+Modal.Link = function ModalLink({ href, children }: LinkProps) {
+  return (
+    <a href={href} target="_blank" rel="noreferrer">
+      {children}
+    </a>
+  );
+};
+
+export default Modal;

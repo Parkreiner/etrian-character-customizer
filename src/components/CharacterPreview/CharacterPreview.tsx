@@ -5,10 +5,11 @@ import { Character } from "@/typesConstants/gameData";
 import { CharacterColors } from "@/typesConstants/colors";
 import { imageToDataUrl } from "./canvasHelpers";
 
-import GuideButton from "./GuideButton";
-import useLazyImageLoading from "@/hooks/useLazyImageLoading";
 import { handleError } from "@/utils/errors";
+import useLazyImageLoading from "@/hooks/useLazyImageLoading";
 import usePreview from "./usePreview";
+import CreditsButton from "./CreditsButton";
+import HelpButton from "./HelpButton";
 
 type Props = {
   character: Character;
@@ -83,13 +84,7 @@ export default function CharacterPreview({ character, colors }: Props) {
             <VisuallyHidden.Root>Main app button controls</VisuallyHidden.Root>
           </legend>
 
-          <GuideButton
-            buttonText="Help"
-            modalTitle="Help"
-            modalDescription="How to use this application"
-          >
-            Baba-booey Baba-booey
-          </GuideButton>
+          <HelpButton />
 
           <button
             type="button"
@@ -100,13 +95,7 @@ export default function CharacterPreview({ character, colors }: Props) {
             Download
           </button>
 
-          <GuideButton
-            buttonText="Credits"
-            modalTitle="Credits"
-            modalDescription="Credits and colophon"
-          >
-            Baba-booey Baba-booey
-          </GuideButton>
+          <CreditsButton />
         </fieldset>
 
         <p className="mx-auto mt-4 w-fit rounded-full bg-yellow-100 px-4 py-2 text-center text-sm font-medium text-yellow-900">
