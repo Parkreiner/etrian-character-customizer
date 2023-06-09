@@ -7,7 +7,7 @@ type Props = PropsWithChildren<{
 }>;
 
 const buttonStyles = cva(
-  "h-full w-full rounded-md text-center font-bold text-teal-50 text-sm",
+  "h-full w-full rounded-md text-center font-bold text-teal-50 text-sm transition-colors duration-150 ease-in-out",
   {
     variants: {
       selected: {
