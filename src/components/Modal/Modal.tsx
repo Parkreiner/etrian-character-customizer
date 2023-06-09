@@ -46,10 +46,10 @@ type CoreProps = Omit<ModalProps, "buttonText">;
  * restructure the HTML without losing all the necessary containers for my
  * needlessly fancy styling
  */
-const CoreContent = forwardRef<
-  HTMLHeadingElement | HTMLParagraphElement,
-  CoreProps
->(function CoreContent({ children, modalTitle, modalDescription }, radixRef) {
+const CoreContent = forwardRef(function CoreContent(
+  { children, modalTitle, modalDescription }: CoreProps,
+  radixRef?: React.ForwardedRef<HTMLHeadingElement | HTMLParagraphElement>
+) {
   const { contentRef, topBgRef, bottomBgRef } = useModalBackground();
 
   return (
@@ -85,7 +85,7 @@ const CoreContent = forwardRef<
 
           <Dialog.Close asChild>
             <button
-              className="block flex-shrink-0 self-start rounded-full border-2 border-teal-100 bg-teal-900 p-4 outline outline-4 outline-teal-900 lg:absolute lg:right-12 lg:top-10"
+              className="block flex-shrink-0 self-start rounded-full border-2 border-teal-100 bg-teal-900 stroke-teal-100 p-4 outline outline-4 outline-teal-900 transition-colors duration-150 hover:bg-teal-800 hover:outline-teal-800 lg:absolute lg:right-12 lg:top-10"
               aria-label="Close modal"
             >
               <svg
@@ -93,7 +93,6 @@ const CoreContent = forwardRef<
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
-                stroke="rgb(204 251 241)"
                 className="h-6 w-6"
               >
                 <path
