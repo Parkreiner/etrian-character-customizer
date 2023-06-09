@@ -7,7 +7,7 @@ export default function HelpButton() {
       modalTitle="Help"
       modalDescription="How to use this application"
     >
-      Baba-booey Baba-booey
+      Instructions coming soon!
     </Modal>
   );
 }
