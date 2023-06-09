@@ -1,7 +1,20 @@
+/**
+ * @file Defines core modal component functionality, and handles imports for
+ * all other sub-components.
+ *
+ * Originally had them all in one file, but the dot syntax for Modal was
+ * causing hot-module reloading to break. The syntax is still here, but because
+ * the source components are each in their own module, things shouldn't break.
+ */
 import { PropsWithChildren } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 
 import useModalBackground from "./useModalBackground";
+import ModalLink from "./ModalLink";
+import ModalListItem from "./ModalListItem";
+import ModalList from "./ModalList";
+import ModalParagraph from "./ModalParagraph";
+import ModalSubsection from "./ModalSubsection";
 
 type ModalProps = PropsWithChildren<{
   buttonText: string;
@@ -30,13 +43,13 @@ function CoreContent({ children, modalTitle, modalDescription }: CoreProps) {
 
       <Dialog.Content
         ref={contentRef}
-        className="z-20 h-full w-full max-w-prose overflow-y-auto bg-teal-950 p-10 shadow-md"
+        className="z-20 h-full w-full max-w-prose overflow-y-auto bg-teal-950 p-10 pb-2 shadow-md"
       >
-        <Dialog.Title className="mb-1 text-4xl font-extralight italic opacity-80">
+        <Dialog.Title className="mb-1 text-4xl font-extralight italic text-teal-100 opacity-[85%]">
           {modalTitle}
         </Dialog.Title>
 
-        <Dialog.Description className="mb-4 pb-1 italic opacity-80">
+        <Dialog.Description className="mb-6 border-b-2 border-teal-200 pb-3 italic text-teal-100">
           {modalDescription}
         </Dialog.Description>
 
@@ -85,52 +98,14 @@ function Modal({ buttonText, ...delegated }: ModalProps) {
   );
 }
 
-type SubheaderProps = {
-  children: string;
-};
-
-Modal.Subheader = function ModalSubheader({ children }: SubheaderProps) {
-  return <h3>{children}</h3>;
-};
-
-type ParagraphProps = PropsWithChildren<{
-  italicized?: boolean;
-}>;
-
-Modal.Paragraph = function ModalParagraph({
-  children,
-  italicized = false,
-}: ParagraphProps) {
-  return <p className={`${italicized ? "italic" : ""}`}>{children}</p>;
-};
-
-type ListProps = PropsWithChildren<{
-  ordered?: boolean;
-}>;
-
-Modal.List = function ModalNumberedList({
-  children,
-  ordered = false,
-}: ListProps) {
-  const ListTag = ordered ? "ol" : "ul";
-  return <ListTag>{children}</ListTag>;
-};
-
-Modal.ListItem = function ModalListItem({ children }: PropsWithChildren) {
-  return <li>{children}</li>;
-};
-
-type LinkProps = {
-  href: string;
-  children: string;
-};
-
-Modal.Link = function ModalLink({ href, children }: LinkProps) {
-  return (
-    <a href={href} target="_blank" rel="noreferrer">
-      {children}
-    </a>
-  );
-};
+// Really wanted to have these function components all in the same file,
+// because none of them are that big, but when I did that, I broke Vite's hot-
+// module reloading for the dev environment. I don't think it would ever cause a
+// problem in production, but better to be safe than sorry
+Modal.Subsection = ModalSubsection;
+Modal.Paragraph = ModalParagraph;
+Modal.List = ModalList;
+Modal.ListItem = ModalListItem;
+Modal.Link = ModalLink;
 
 export default Modal;
