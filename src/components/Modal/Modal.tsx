@@ -6,7 +6,7 @@
  * causing hot-module reloading to break. The syntax is still here, but because
  * the source components are each in their own module, things shouldn't break.
  */
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, forwardRef } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 
 import useModalBackground from "./useModalBackground";
@@ -33,8 +33,23 @@ type CoreProps = Omit<ModalProps, "buttonText">;
  * rendering the content when it mounts. Because of that, there won't be any DOM
  * nodes that the refs will be attached to at first, so the effects will have no
  * values to read from.
+ *
+ * ---
+ *
+ * 2023-06-09: Had to turn this component into a forwarded-ref version because
+ * it looks like Radix expects you to pass Dialog.Title and Dialog.Paragraph as
+ * direct children of Dialog.Content. It looks like Dialog.Content passes a ref
+ * to every single child it receives, and without this being a forward-ref
+ * component, you keep getting errors in the console.
+ *
+ * Had to wire up the Radix ref manually because I couldn't find a good way to
+ * restructure the HTML without losing all the necessary containers for my
+ * needlessly fancy styling
  */
-function CoreContent({ children, modalTitle, modalDescription }: CoreProps) {
+const CoreContent = forwardRef<
+  HTMLHeadingElement | HTMLParagraphElement,
+  CoreProps
+>(function CoreContent({ children, modalTitle, modalDescription }, radixRef) {
   const { contentRef, topBgRef, bottomBgRef } = useModalBackground();
 
   return (
@@ -42,22 +57,35 @@ function CoreContent({ children, modalTitle, modalDescription }: CoreProps) {
       <div ref={bottomBgRef} className="fixed z-10 bg-teal-200" />
       <div ref={topBgRef} className="fixed z-10 bg-teal-950" />
 
-      <Dialog.Content
+      <article
         ref={contentRef}
         className="z-20 h-full w-full max-w-prose overflow-y-auto bg-teal-950 p-10 pb-2 shadow-md"
       >
-        <section>
-          <Dialog.Title className="mb-1 text-4xl font-extralight italic text-teal-100 opacity-[85%]">
-            {modalTitle}
-          </Dialog.Title>
+        {/*
+         * Container makes sures that the close button goes from being fixed to
+         * part of the content container (without covering up any text) when
+         * the window gets small enough
+         */}
+        <div className="relative mb-6 flex flex-row gap-x-3 border-b-2 pb-3 lg:static">
+          <section className="flex-grow">
+            <Dialog.Title
+              className="mb-0.5 text-4xl font-extralight italic leading-snug text-teal-100 opacity-[85%]"
+              ref={radixRef}
+            >
+              {modalTitle}
+            </Dialog.Title>
 
-          <Dialog.Description className="mb-6 border-b-2 border-teal-200 pb-3 italic text-teal-100">
-            {modalDescription}
-          </Dialog.Description>
+            <Dialog.Description
+              className="border-teal-200 italic text-teal-100"
+              ref={radixRef}
+            >
+              {modalDescription}
+            </Dialog.Description>
+          </section>
 
           <Dialog.Close asChild>
             <button
-              className="absolute right-12 top-10 block rounded-full border-2 border-teal-100 bg-teal-900 p-4 outline outline-4 outline-teal-900"
+              className="block flex-shrink-0 self-start rounded-full border-2 border-teal-100 bg-teal-900 p-4 outline outline-4 outline-teal-900 lg:absolute lg:right-12 lg:top-10"
               aria-label="Close modal"
             >
               <svg
@@ -76,13 +104,13 @@ function CoreContent({ children, modalTitle, modalDescription }: CoreProps) {
               </svg>
             </button>
           </Dialog.Close>
-        </section>
+        </div>
 
-        <div className="overflow-y-auto">{children}</div>
-      </Dialog.Content>
+        <section className="overflow-y-auto">{children}</section>
+      </article>
     </div>
   );
-}
+});
 
 function Modal({ buttonText, ...delegated }: ModalProps) {
   return (
@@ -95,7 +123,9 @@ function Modal({ buttonText, ...delegated }: ModalProps) {
 
       <Dialog.Portal>
         <Dialog.Overlay className="fixed left-0 top-0 h-full w-full backdrop-blur-md" />
-        <CoreContent {...delegated} />
+        <Dialog.Content>
+          <CoreContent {...delegated} />
+        </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   );
