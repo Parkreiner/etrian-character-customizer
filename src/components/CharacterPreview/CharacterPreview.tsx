@@ -93,7 +93,7 @@ export default function CharacterPreview({ character, colors }: Props) {
 
           <button
             type="button"
-            className="select-none rounded-full bg-teal-800 px-7 py-3 text-xl font-medium text-teal-50 shadow-md transition-colors"
+            className="select-none rounded-full bg-teal-800 px-7 py-3 text-xl font-medium text-teal-50 shadow-md shadow-sky-700/30 transition-colors duration-200 ease-in-out hover:bg-teal-700"
             disabled={downloadsDisabled}
             onClick={downloadAllImages}
           >
