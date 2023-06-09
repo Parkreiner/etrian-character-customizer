@@ -2,13 +2,18 @@ import { useLayoutEffect, useRef } from "react";
 
 export default function useModalBackground() {
   const contentRef = useRef<HTMLDivElement>(null);
-  const backgroundRef = useRef<HTMLDivElement>(null);
+  const topBgRef = useRef<HTMLDivElement>(null);
+  const bottomBgRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const syncBackgroundWithContent = () => {
       const content = contentRef.current;
-      const background = backgroundRef.current;
-      if (content === null || background === null) return;
+      const topBg = topBgRef.current;
+      const bottomBg = bottomBgRef.current;
+
+      if (content === null || topBg === null || bottomBg === null) {
+        return;
+      }
 
       const containerWidth = content.offsetWidth;
       const viewportWidth = window.innerWidth;
@@ -18,12 +23,17 @@ export default function useModalBackground() {
       const bgWidth = Math.round(Math.sqrt(containerWidth ** 2 + heightSq));
       const bgHeight = Math.round(Math.sqrt(viewportWidth ** 2 + heightSq));
 
-      // Need to figure out actual formula
-      const bgRotation = -35;
+      // Need to figure out actual formula for bg1Rotation
+      const bg1Rotation = -35;
+      const bg2Rotation = Math.max(-90, bg1Rotation - 7);
 
-      background.style.width = `${bgWidth}px`;
-      background.style.height = `${bgHeight}px`;
-      background.style.transform = `rotate(${bgRotation}deg)`;
+      topBg.style.width = `${bgWidth}px`;
+      topBg.style.height = `${bgHeight}px`;
+      topBg.style.transform = `rotate(${bg1Rotation}deg)`;
+
+      bottomBg.style.width = `${bgWidth}px`;
+      bottomBg.style.height = `${bgHeight}px`;
+      bottomBg.style.transform = `rotate(${bg2Rotation}deg)`;
     };
 
     // Can't observe content element itself, because it'll stop triggering the
@@ -36,5 +46,5 @@ export default function useModalBackground() {
     return () => observer.disconnect();
   }, []);
 
-  return { contentRef, backgroundRef } as const;
+  return { contentRef, topBgRef, bottomBgRef } as const;
 }

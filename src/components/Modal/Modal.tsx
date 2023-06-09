@@ -35,47 +35,50 @@ type CoreProps = Omit<ModalProps, "buttonText">;
  * values to read from.
  */
 function CoreContent({ children, modalTitle, modalDescription }: CoreProps) {
-  const { contentRef, backgroundRef } = useModalBackground();
+  const { contentRef, topBgRef, bottomBgRef } = useModalBackground();
 
   return (
     <div className="fixed left-0 top-0 flex h-full w-full flex-col items-center justify-center text-teal-50">
-      <div ref={backgroundRef} className="fixed z-10 bg-teal-950" />
+      <div ref={bottomBgRef} className="fixed z-10 bg-teal-200" />
+      <div ref={topBgRef} className="fixed z-10 bg-teal-950" />
 
       <Dialog.Content
         ref={contentRef}
         className="z-20 h-full w-full max-w-prose overflow-y-auto bg-teal-950 p-10 pb-2 shadow-md"
       >
-        <Dialog.Title className="mb-1 text-4xl font-extralight italic text-teal-100 opacity-[85%]">
-          {modalTitle}
-        </Dialog.Title>
+        <section>
+          <Dialog.Title className="mb-1 text-4xl font-extralight italic text-teal-100 opacity-[85%]">
+            {modalTitle}
+          </Dialog.Title>
 
-        <Dialog.Description className="mb-6 border-b-2 border-teal-200 pb-3 italic text-teal-100">
-          {modalDescription}
-        </Dialog.Description>
+          <Dialog.Description className="mb-6 border-b-2 border-teal-200 pb-3 italic text-teal-100">
+            {modalDescription}
+          </Dialog.Description>
+
+          <Dialog.Close asChild>
+            <button
+              className="absolute right-12 top-10 block rounded-full border-2 border-teal-100 bg-teal-900 p-4 outline outline-4 outline-teal-900"
+              aria-label="Close modal"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="rgb(204 251 241)"
+                className="h-6 w-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </Dialog.Close>
+        </section>
 
         <div className="overflow-y-auto">{children}</div>
-
-        <Dialog.Close asChild>
-          <button
-            className="absolute right-12 top-10 block rounded-full border-2 border-teal-100 bg-teal-900 p-4 outline outline-4 outline-teal-900"
-            aria-label="Close modal"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="rgb(204 251 241)"
-              className="h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </Dialog.Close>
       </Dialog.Content>
     </div>
   );
