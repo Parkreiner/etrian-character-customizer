@@ -23,7 +23,11 @@ export default function useModalBackground() {
       const bgWidth = Math.round(Math.sqrt(containerWidth ** 2 + heightSq));
       const bgHeight = Math.round(Math.sqrt(viewportWidth ** 2 + heightSq));
 
-      // Need to figure out actual formula for bg1Rotation
+      /**
+       * @todo Hard-coded -35 degrees seems to work well for most sizes, but
+       * really need to figure out the right formula to ensure rotation is as
+       * accurate as possible
+       */
       const bg1Rotation = -35;
       const bg2Rotation = Math.max(-90, bg1Rotation - 7);
 

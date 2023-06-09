@@ -43,7 +43,7 @@ type CoreProps = Omit<ModalProps, "buttonText">;
  * component, you keep getting errors in the console.
  *
  * Had to wire up the Radix ref manually because I couldn't find a good way to
- * restructure the HTML without losing all the necessary containers for my
+ * restructure the HTML without losing all the containers necessary for my
  * needlessly fancy styling
  */
 const CoreContent = forwardRef(function CoreContent(
@@ -66,7 +66,7 @@ const CoreContent = forwardRef(function CoreContent(
          * part of the content container (without covering up any text) when
          * the window gets small enough
          */}
-        <div className="relative mb-6 flex flex-row gap-x-3 border-b-2 pb-3 lg:static">
+        <div className="relative mb-6 flex flex-row gap-x-3 border-b-2 border-teal-200 pb-3 lg:static">
           <section className="flex-grow">
             <Dialog.Title
               className="mb-0.5 text-4xl font-extralight italic leading-snug text-teal-100 opacity-[85%]"
@@ -85,7 +85,7 @@ const CoreContent = forwardRef(function CoreContent(
 
           <Dialog.Close asChild>
             <button
-              className="block flex-shrink-0 self-start rounded-full border-2 border-teal-100 bg-teal-900 stroke-teal-100 p-4 outline outline-4 outline-teal-900 transition-colors duration-150 hover:bg-teal-800 hover:outline-teal-800 lg:absolute lg:right-12 lg:top-10"
+              className="block flex-shrink-0 self-start rounded-full border-2 border-teal-100 bg-teal-950 stroke-teal-100 p-4 outline outline-4 outline-teal-950 transition-colors duration-150 hover:bg-teal-900 hover:outline-teal-900 lg:absolute lg:right-12 lg:top-10"
               aria-label="Close modal"
             >
               <svg
