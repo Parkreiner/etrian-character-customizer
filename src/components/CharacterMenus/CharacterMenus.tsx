@@ -91,29 +91,50 @@ export default function CharacterMenus({
         </button>
       </section>
 
-      <fieldset className="flex-grow overflow-y-hidden pl-6 pr-5 pt-5">
-        <div className={`${styles.scrollbar} h-full overflow-y-auto pb-1 pr-5`}>
-          <legend>
-            <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
-          </legend>
+      {/*
+       * 2023-06-09 - This is a really weird trick to avoid a strange CSS bug
+       * specific to Chrome. (Firefox did not have this issue.)
+       *
+       * You would hope that the relative/absolute positioning, along with the
+       * overflows, wouldn't be necessary, but alas.
+       *
+       * Basically, Chrome would freak out whenever you would try to have
+       * overflow on a container with interactive elements (like the buttons).
+       * The content would be *visually* clipped wherever it should be, but
+       * Chrome would still act as if though it were taking up space in the
+       * layout and would cause weird element stretching.
+       *
+       * The weird thing is, it would behave normally as long as you were only
+       * hiding non-interactive elements (like plain text).
+       *
+       * The most surefire way to fix this was by removing the container from
+       * the flow altogether.
+       */}
+      <fieldset className="relative flex-grow">
+        <div className="absolute h-full w-full overflow-y-hidden pb-0.5 pl-6 pr-4 pt-5">
+          <div className={`${styles.scrollbar} h-full overflow-y-auto pr-4`}>
+            <legend>
+              <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
+            </legend>
 
-          <HeaderProvider>
-            {Array.from(grouped, ([game, gameEntries]) => (
-              <div key={game} className="mt-5 [&:nth-child(2)]:mt-0">
-                <Card title={nameAliases[game]} striped gapSize="small">
-                  {gameEntries.map((entry) => (
-                    <CharacterClassSection
-                      key={entry.class}
-                      gameClass={entry.class}
-                      selectedCharacterId={selectedCharacterId}
-                      characters={entry.characters}
-                      onCharacterChange={onCharacterChange}
-                    />
-                  ))}
-                </Card>
-              </div>
-            ))}
-          </HeaderProvider>
+            <HeaderProvider>
+              {Array.from(grouped, ([game, gameEntries]) => (
+                <div key={game} className="mt-5 [&:nth-child(2)]:mt-0">
+                  <Card title={nameAliases[game]} striped gapSize="small">
+                    {gameEntries.map((entry) => (
+                      <CharacterClassSection
+                        key={entry.class}
+                        gameClass={entry.class}
+                        selectedCharacterId={selectedCharacterId}
+                        characters={entry.characters}
+                        onCharacterChange={onCharacterChange}
+                      />
+                    ))}
+                  </Card>
+                </div>
+              ))}
+            </HeaderProvider>
+          </div>
         </div>
       </fieldset>
     </section>
