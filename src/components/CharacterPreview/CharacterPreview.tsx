@@ -6,7 +6,7 @@ import { CharacterColors } from "@/typesConstants/colors";
 import { imageToDataUrl } from "./canvasHelpers";
 
 import { handleError } from "@/utils/errors";
-import useLazyImageLoading from "@/hooks/useLazyImageLoading";
+import useBitmapManager from "@/hooks/useBitmapManager";
 import usePreview from "./usePreview";
 import CreditsButton from "./CreditsButton";
 import HelpButton from "./HelpButton";
@@ -26,7 +26,7 @@ function downloadCharacter(filename: string, dataUrl: string): void {
 
 export default function CharacterPreview({ character, colors }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const { bitmap, status, loadImage } = useLazyImageLoading(character.imgUrl);
+  const { bitmap, status, loadImage } = useBitmapManager(character.imgUrl);
   const { containerRef, canvasRef } = usePreview(bitmap, colors, character);
 
   useEffect(() => {

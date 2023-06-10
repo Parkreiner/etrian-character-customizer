@@ -148,23 +148,29 @@ function subscribe(notifyReact: () => void) {
   return () => cache.removeSubscription(notifyReact);
 }
 
-export default function useLazyImageLoading(imgUrl: string) {
-  const { bitmap, status, error } = useSyncExternalStore(subscribe, () =>
-    cache.getSnapshot(imgUrl)
-  );
-
-  useErrorLoggingEffect(error);
-
-  const loadImage = useCallback((newImgUrl: string) => {
+export function useLazyImageLoader() {
+  const loadImage = useCallback((imgUrl: string) => {
+    console.log("Loader");
     const info: NotificationInfo = { mutable_notifyAfterLoad: true };
 
-    const promise = cache.requestImage(newImgUrl, info);
+    const promise = cache.requestImage(imgUrl, info);
     const abort = () => {
       info.mutable_notifyAfterLoad = false;
     };
 
     return { promise, abort } as const;
   }, []);
+
+  return loadImage;
+}
+
+export default function useBitmapManager(imgUrl: string) {
+  const { bitmap, status, error } = useSyncExternalStore(subscribe, () =>
+    cache.getSnapshot(imgUrl)
+  );
+
+  const loadImage = useLazyImageLoader();
+  useErrorLoggingEffect(error);
 
   return { bitmap, status, loadImage } as const;
 }
