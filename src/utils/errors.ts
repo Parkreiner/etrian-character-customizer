@@ -10,18 +10,18 @@ export function parseError(value: unknown): Error {
     return value;
   }
 
+  if (value === undefined) {
+    return new Error("undefined thrown as error");
+  }
+
   let newError: Error;
   try {
     newError = new Error(`Non-error value ${JSON.stringify(value)} thrown`);
+    newError.cause = value;
   } catch (_) {
-    if (value === undefined) {
-      newError = new Error("undefined thrown as error");
-    } else {
-      newError = new Error("Unparseable value thrown as error");
-    }
+    newError = new Error("Received error value that is not JSON-serializable");
   }
 
-  newError.cause = value;
   return newError;
 }
 
