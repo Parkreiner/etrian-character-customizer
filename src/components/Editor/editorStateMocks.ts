@@ -10,49 +10,49 @@ const basePathMocks: Character["paths"] = [
     category: "skin",
     categoryIndex: 0,
     layerIndex: 0,
-    path: "M20 20 h 50 v 50 h -50 Z",
+    path: "M0 0 h 50 v 50 h -50 Z",
   },
   {
     category: "skin",
     categoryIndex: 1,
     layerIndex: 0,
-    path: "M20 80 h 50 v 50 h -50 Z",
+    path: "M0 60 h 50 v 50 h -50 Z",
   },
   {
     category: "hair",
     categoryIndex: 0,
     layerIndex: 0,
-    path: "M20 140 h 50 v 50 h -50 Z",
+    path: "M0 120 h 50 v 50 h -50 Z",
   },
   {
     category: "hair",
     categoryIndex: 1,
     layerIndex: 0,
-    path: "M20 200 h 50 v 50 h -50 Z",
+    path: "M0 180 h 50 v 50 h -50 Z",
   },
   {
     category: "leftEye",
     categoryIndex: 0,
     layerIndex: 0,
-    path: "M20 260 h 50 v 50 h -50 Z",
+    path: "M0 240 h 50 v 50 h -50 Z",
   },
   {
     category: "leftEye",
     categoryIndex: 1,
     layerIndex: 0,
-    path: "M20 320 h 50 v 50 h -50 Z",
+    path: "M0 300 h 50 v 50 h -50 Z",
   },
   {
     category: "rightEye",
     categoryIndex: 0,
     layerIndex: 0,
-    path: "M20 380 h 50 v 50 h -50 Z",
+    path: "M0 360 h 50 v 50 h -50 Z",
   },
   {
     category: "rightEye",
     categoryIndex: 1,
     layerIndex: 0,
-    path: "M20 440 h 50 v 50 h -50 Z",
+    path: "M0 420 h 50 v 50 h -50 Z",
   },
 ];
 
@@ -60,21 +60,21 @@ const misc1: CanvasPathEntry = {
   category: "misc",
   categoryIndex: 0,
   layerIndex: 0,
-  path: "M20 500 h 50 v 50 h -50 Z",
+  path: "M0 480 h 50 v 50 h -50 Z",
 };
 
 const misc2: CanvasPathEntry = {
   category: "misc",
   categoryIndex: 1,
   layerIndex: 0,
-  path: "M20 560 h 50 v 50 h -50 Z",
+  path: "M0 540 h 50 v 50 h -50 Z",
 };
 
 const misc3: CanvasPathEntry = {
   category: "misc",
   categoryIndex: 2,
   layerIndex: 0,
-  path: "M20 620 h 50 v 50 h -50 Z",
+  path: "M0 600 h 50 v 50 h -50 Z",
 };
 
 const characters: readonly Omit<Character, "id">[] = [
