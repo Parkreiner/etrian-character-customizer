@@ -59,7 +59,7 @@ const CoreContent = forwardRef(function CoreContent(
 
       <article
         ref={contentRef}
-        className="z-20 h-full w-full max-w-prose overflow-y-auto bg-teal-950 p-10 pb-2 shadow-md"
+        className="z-20 h-full w-full max-w-prose overflow-y-auto bg-teal-950 p-10 pb-2"
       >
         {/*
          * Container makes sures that the close button goes from being fixed to
