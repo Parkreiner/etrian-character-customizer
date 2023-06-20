@@ -1,5 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 
+const RADIANS_TO_DEGREES = 180 / Math.PI;
+
 export default function useModalBackground() {
   const contentRef = useRef<HTMLDivElement>(null);
   const topBgRef = useRef<HTMLDivElement>(null);
@@ -23,12 +25,8 @@ export default function useModalBackground() {
       const bgWidth = Math.round(Math.sqrt(containerWidth ** 2 + heightSq));
       const bgHeight = Math.round(Math.sqrt(viewportWidth ** 2 + heightSq));
 
-      /**
-       * @todo Hard-coded -35 degrees seems to work well for most sizes, but
-       * really need to figure out the right formula to ensure rotation is as
-       * accurate as possible
-       */
-      const bg1Rotation = -35;
+      const offset = RADIANS_TO_DEGREES * Math.atan(viewportWidth / height);
+      const bg1Rotation = -90 + offset;
       const bg2Rotation = Math.max(-90, bg1Rotation - 7);
 
       topBg.style.width = `${bgWidth}px`;
