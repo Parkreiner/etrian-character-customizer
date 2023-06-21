@@ -21,28 +21,32 @@ export default function ColorSlider({
   const handlers = useHeldInputHandlers(value, onChannelValueChange);
 
   const { displayText, fullName, max, unit } = allChannelInfo[channel];
-  const numberInputId = `${hookId}-${channel}`;
+  const sliderLabelId = `${hookId}-${channel}`;
 
   return (
     <div className="flex w-full p-1 align-bottom first:mb-1">
       <TooltipTemplate labelText={fullName}>
-        <label
-          htmlFor={numberInputId}
+        {/*
+         * Wanted to use <label>, but it causes an a11y violation, because Radix
+         * doesn't use any <input> elements internally.
+         */}
+        <div
+          id={sliderLabelId}
           className="mr-3 block w-2 basis-6 text-center font-bold text-teal-50"
         >
           <VisuallyHidden.Root>
-            Number input for {fullName} (
+            Slider input for {fullName} (
           </VisuallyHidden.Root>
 
           {displayText}
 
           <VisuallyHidden.Root>)</VisuallyHidden.Root>
-        </label>
+        </div>
       </TooltipTemplate>
 
       <Slider.Root
+        aria-labelledby={sliderLabelId}
         className="relative flex grow touch-none select-none items-center"
-        aria-label={`Slider for ${fullName}`}
         value={[value]}
         min={0}
         max={max}
