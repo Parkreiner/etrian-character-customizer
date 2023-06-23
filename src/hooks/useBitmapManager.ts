@@ -62,6 +62,12 @@ class ImageCache {
     notifyAfterAdd = true
   ): Promise<void> {
     if (image.src === "" || !image.complete) {
+      this.#immutableSnapshots.set(imgUrl, {
+        status: "error",
+        bitmap: null,
+        error: new Error("Image load succeeded, but no data available"),
+      });
+
       return;
     }
 
@@ -106,11 +112,27 @@ class ImageCache {
     const canReuseImage =
       prevImage !== null && prevSnapshot.status === "success";
 
+    /**
+     * @todo It feels like there's a logic issue here where if a request gets
+     * sent for an image has a pending request already, there's no logic to
+     * consolidate those requests. The newer request just completely overrides
+     * the previous one.
+     *
+     * It hasn't been a problem so far, but I could see this breaking things.
+     * Maybe not, though? Even if there are independent Promises, they should
+     * each fulfill simultaneously once the same, shared image loads, maybe?
+     * It's screwy, and it breaks my mind, though, so I'd rather do more than
+     * just pray that the micro-task queue bails me out
+     */
     if (canReuseImage) {
       return Promise.resolve(prevImage);
     }
 
     const newImage = new Image();
+    if ("fetchPriority" in newImage) {
+      newImage.fetchPriority = info.mutable_notifyAfterLoad ? "high" : "low";
+    }
+
     let retryCount = 0;
 
     const setupImageWithRetries = (
@@ -143,15 +165,11 @@ class ImageCache {
 
 const cache = new ImageCache();
 
-function subscribe(notifyReact: () => void) {
-  cache.addSubscription(notifyReact);
-  return () => cache.removeSubscription(notifyReact);
-}
-
 export function useLazyImageLoader() {
-  const loadImage = useCallback((imgUrl: string) => {
-    console.log("Loader");
-    const info: NotificationInfo = { mutable_notifyAfterLoad: true };
+  return useCallback((imgUrl: string, notifyAfterLoad = true) => {
+    const info: NotificationInfo = {
+      mutable_notifyAfterLoad: notifyAfterLoad,
+    };
 
     const promise = cache.requestImage(imgUrl, info);
     const abort = () => {
@@ -160,13 +178,17 @@ export function useLazyImageLoader() {
 
     return { promise, abort } as const;
   }, []);
+}
 
-  return loadImage;
+function subscribeReactToCache(notifyReact: () => void) {
+  cache.addSubscription(notifyReact);
+  return () => cache.removeSubscription(notifyReact);
 }
 
 export default function useBitmapManager(imgUrl: string) {
-  const { bitmap, status, error } = useSyncExternalStore(subscribe, () =>
-    cache.getSnapshot(imgUrl)
+  const { bitmap, status, error } = useSyncExternalStore(
+    subscribeReactToCache,
+    () => cache.getSnapshot(imgUrl)
   );
 
   const loadImage = useLazyImageLoader();
