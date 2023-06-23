@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 import {
@@ -11,6 +11,7 @@ import Card from "@/components/Card";
 import CharacterClassSection from "./CharacterClassPanel";
 import styles from "@/components/ControlsContainer/scrollbar.module.css";
 import HeaderProvider, { useCurrentHeader } from "@/contexts/HeaderLevels";
+import { useLazyImageLoader } from "@/hooks/useBitmapManager";
 
 type Props = {
   characters: readonly Character[];
@@ -63,6 +64,22 @@ function groupCharacters(
   return grouped;
 }
 
+function moveToFront<T extends { id: string }>(
+  list: readonly T[],
+  targetId: string
+): readonly T[] {
+  const moveIndex = list.findIndex((item) => item.id === targetId);
+  if (moveIndex === -1 || moveIndex === 0) {
+    return list;
+  }
+
+  const copy = [...list];
+  const plucked = copy.splice(moveIndex, 1);
+  copy.splice(0, 0, ...plucked);
+
+  return copy;
+}
+
 export default function CharacterMenus({
   selectedCharacterId,
   characters,
@@ -71,10 +88,56 @@ export default function CharacterMenus({
   randomizeCharacter,
 }: Props) {
   const HeaderTag = useCurrentHeader();
+  const loadImage = useLazyImageLoader();
+
   const grouped = useMemo(
     () => groupCharacters(characters, classOrderings),
     [characters, classOrderings]
   );
+
+  const loadAllImagesFromSameClass = (requestedCharacter: Character) => {
+    // Code assumes that if you click a button for one class, you're more likely
+    // to want to see the characters from the same class.
+    const characterList = grouped
+      .get(requestedCharacter.game)
+      ?.find((entry) => entry.class === requestedCharacter.class)?.characters;
+
+    if (characterList === undefined) {
+      return;
+    }
+
+    // Reordering here is a hack because most browsers don't support the
+    // fetchPriority property for images. For those browsers, the best you can
+    // do is make sure your main image is the very first one processed
+    const reordered = moveToFront(characterList, requestedCharacter.id);
+
+    const abortControllers = reordered.map((char) => {
+      const updateAfterLoad = char.id === requestedCharacter.id;
+      return loadImage(char.imgUrl, updateAfterLoad).abort;
+    });
+
+    return function abortAll() {
+      abortControllers.forEach((abort) => abort());
+    };
+  };
+
+  // Tried defining all this stuff lower in the component tree, but the problem
+  // was that the mount-only effect would run for each individual class, which
+  // absolutely isn't what I need. One effect total, on mount only.
+  const veryHackyOnMountRef = useRef(() => {
+    const initialCharacter = characters.find(
+      (char) => char.id === selectedCharacterId
+    );
+
+    if (initialCharacter !== undefined) {
+      return loadAllImagesFromSameClass(initialCharacter);
+    }
+  });
+
+  useEffect(() => {
+    const abortAll = veryHackyOnMountRef.current();
+    return () => abortAll?.();
+  }, []);
 
   return (
     <section className="flex h-full w-[430px] shrink-0 flex-col flex-nowrap bg-teal-600 pb-1.5">
@@ -127,7 +190,10 @@ export default function CharacterMenus({
                         gameClass={entry.class}
                         selectedCharacterId={selectedCharacterId}
                         characters={entry.characters}
-                        onCharacterChange={onCharacterChange}
+                        onCharacterChange={(char) => {
+                          loadAllImagesFromSameClass(char);
+                          onCharacterChange(char);
+                        }}
                       />
                     ))}
                   </Card>
