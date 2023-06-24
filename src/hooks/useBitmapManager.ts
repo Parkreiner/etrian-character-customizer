@@ -98,7 +98,8 @@ class ImageCache {
     return this.#mutableCache.get(imgUrl) ?? null;
   }
 
-  getSnapshot(imgUrl: string): ReactSnapshot {
+  getSnapshot(imgUrl: string | null): ReactSnapshot {
+    if (imgUrl === null) return ImageCache.defaultSnapshot;
     return this.#immutableSnapshots.get(imgUrl) ?? ImageCache.defaultSnapshot;
   }
 
@@ -185,7 +186,7 @@ function subscribeReactToCache(notifyReact: () => void) {
   return () => cache.removeSubscription(notifyReact);
 }
 
-export default function useBitmapManager(imgUrl: string) {
+export default function useBitmapManager(imgUrl: string | null) {
   const { bitmap, status, error } = useSyncExternalStore(
     subscribeReactToCache,
     () => cache.getSnapshot(imgUrl)

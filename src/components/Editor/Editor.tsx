@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useEditorController from "./useEditorController";
+import useInitialViewStatus from "./useInitialViewStatus";
 
 import CharacterPreview from "@/components/CharacterPreview";
 import LoadingIndicator from "@/components/LoadingIndicator";
@@ -7,14 +8,18 @@ import CharacterMenus from "@/components/CharacterMenus";
 import ColorMenus from "@/components/ColorMenus";
 
 export default function Editor() {
-  const editorController = useEditorController();
   const [introAnimationFinished, setIntroAnimationFinished] = useState(false);
+  const editorController = useEditorController();
+  const initialViewReady = useInitialViewStatus(
+    editorController.initialized,
+    editorController.derived?.selectedCharacter.imgUrl ?? null
+  );
 
   return (
     <div className="h-full">
       {!introAnimationFinished && (
         <LoadingIndicator
-          appLoaded={editorController.initialized}
+          appLoaded={initialViewReady}
           onAnimationCompletion={() => setIntroAnimationFinished(true)}
         />
       )}
