@@ -44,6 +44,7 @@ export default function Editor() {
               characterKey={editorController.editor.selectedId}
               colors={editorController.editor.colors}
               onColorChange={editorController.editor.replaceColors}
+              onColorsReset={editorController.editor.resetColorsToDefault}
             />
           </div>
         )}

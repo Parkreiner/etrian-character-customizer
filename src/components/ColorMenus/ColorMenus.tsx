@@ -26,13 +26,14 @@ type ExternalProps = {
 
   colors: CharacterColors;
   onColorChange: (newColors: CharacterColors) => void;
+  onColorsReset: () => void;
 };
 
 type CoreProps = Omit<ExternalProps, "characterKey">;
 
 const fallbackColor = "#ff00ff";
 
-function ColorMenusCore({ colors, onColorChange }: CoreProps) {
+function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
   const { state, updaters } = useColorMenusState(colors);
   const activeColorArray = colors[state.activeCategory];
   const activeIndex = state.activeIndices[state.activeCategory];
