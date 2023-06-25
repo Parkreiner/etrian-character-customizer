@@ -30,18 +30,19 @@ export default function usePreview(
 
   // Subscribe React to any changes in the container's dimensions
   useLayoutEffect(() => {
-    if (containerRef.current === null) return;
+    const container = containerRef.current;
+    if (container === null) return;
 
-    const observer = new ResizeObserver((observedEntries) => {
-      const sizeInfo = observedEntries[0]?.contentBoxSize[0];
-      const canvas = canvasRef.current;
+    const copySizeChangesToState: ResizeObserverCallback = (entries) => {
+      const sizeInfo = entries[0]?.contentBoxSize[0];
+      if (sizeInfo === undefined) return;
 
-      if (sizeInfo === undefined || canvas === null) return;
       setAvailableWidth(sizeInfo.inlineSize);
       setAvailableHeight(sizeInfo.blockSize);
-    });
+    };
 
-    observer.observe(containerRef.current);
+    const observer = new ResizeObserver(copySizeChangesToState);
+    observer.observe(container, { box: "border-box" });
     return () => observer.disconnect();
   }, []);
 
@@ -76,8 +77,6 @@ export default function usePreview(
   // Renders character to the canvas when image input changes
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas === null) return;
-
     const canRender =
       canvas !== null &&
       bitmap !== null &&

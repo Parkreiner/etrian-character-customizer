@@ -67,15 +67,38 @@ export default function CharacterPreview({ character, colors }: Props) {
 
   return (
     <section className="flex h-full flex-grow flex-col flex-nowrap justify-center gap-y-4 py-10">
-      <div ref={containerRef} className="w-full flex-shrink flex-grow py-4">
+      <div
+        ref={containerRef}
+        className="relative w-full flex-shrink flex-grow py-4"
+      >
         {/*
-         * Reminder: You cannot set any CSS properties on a canvas that would
-         * change its size. You have to update the HTML directly (doing the
-         * math for it), or else the canvas output will become distorted
+         * Extra container with absolute positioning is necessary to avoid
+         * unexpected behavior with ResizeObserver callback.
+         *
+         * Basically:
+         * 1. The canvas is supposed to fit itself to the container
+         * 2. But since the canvas can't have CSS properties on it, you can't
+         *    tell it to make its size dependent on its parent
+         * 3. Because of this, the container will be allowed to grow (and the
+         *    canvas will grow to match it), but it won't be allowed to shrink,
+         *    because then it would be cutting off the canvas.
+         * 4. Because the container is only allowed to grow, the resizer
+         *    callback only runs when you grow the container. It will never run
+         *    when you shrink it.
+         * 5. The only fix is to remove the element from the flow, but you can't
+         *    do the size changes on the canvas itself – because again, it might
+         *    warp.
          */}
-        <canvas ref={canvasRef} className="mx-auto">
-          A preview of a {character.class} from {character.game}
-        </canvas>
+        <div className="absolute h-full w-full">
+          {/*
+           * Reminder: You cannot set any CSS properties on a canvas that would
+           * change its size. You have to update the HTML directly (doing the
+           * math for it), or else the canvas output will become distorted
+           */}
+          <canvas ref={canvasRef} className="mx-auto block">
+            A preview of a {character.class} from {character.game}
+          </canvas>
+        </div>
       </div>
 
       <div>
