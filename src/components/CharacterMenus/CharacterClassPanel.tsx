@@ -2,6 +2,7 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 import { Character } from "@/typesConstants/gameData";
 import { range } from "@/utils/math";
+import { toTitleCase } from "@/utils/strings";
 import HeaderProvider, { useCurrentHeader } from "@/contexts/HeaderLevels";
 import CharacterButton from "./CharacterButton";
 
@@ -11,13 +12,6 @@ type Props = {
   selectedCharacterId: string;
   onCharacterChange: (newCharacter: Character) => void;
 };
-
-function formatClassName(className: string) {
-  return className
-    .split(/ +/g)
-    .map((word) => word.slice(0, 1).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
 
 export default function CharacterClassSection({
   gameClass,
@@ -31,7 +25,7 @@ export default function CharacterClassSection({
   return (
     <div className="mt-3 flex flex-row flex-nowrap items-center first:mt-1">
       <HeaderTag className="shrink-0 basis-[40%] text-base font-normal text-white opacity-80">
-        {formatClassName(gameClass)}
+        {toTitleCase(gameClass)}
       </HeaderTag>
 
       <HeaderProvider>

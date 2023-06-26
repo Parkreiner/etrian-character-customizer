@@ -77,3 +77,6 @@ export const SKIN_COLOR_PRESETS: readonly ColorTuple[] = [
   ["#88B36B", "#46685E"],
   ["#A686B1", "#5B4559"],
 ];
+
+// Deliberately left empty for now
+export const MISC_COLOR_PRESETS = [] as const;
