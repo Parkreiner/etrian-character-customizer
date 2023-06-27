@@ -186,20 +186,11 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
         </OverflowContainer.Header>
 
         <OverflowContainer.FlexContent>
-          <div className="w-full pb-4">
-            <button
-              className="mx-auto block w-fit rounded-full bg-teal-100 px-4 py-1 text-teal-950 transition-colors hover:bg-teal-50"
-              onClick={onColorsReset}
-            >
-              Reset all colors
-            </button>
-          </div>
-
           {/* Defines the buttons for changing active colors */}
           {uiTabs.map((tabValue) => (
             <Tabs.Content<UiTab> key={tabValue} value={tabValue}>
-              <div className="mb-3">
-                <Card title={`Swatches (${tabValue})`} striped>
+              <div className="mb-5">
+                <Card title={`Swatches (${tabValue})`} striped gapSize="small">
                   {tabValue !== "eyes" && (
                     <div className="flex flex-row justify-center gap-x-3">
                       {colors[tabValue].map((color, index) => (
@@ -228,7 +219,7 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
                       const displayNum = index + 1;
                       return (
                         <Fragment key={index}>
-                          <div className="mb-4 flex flex-row items-center justify-center gap-x-1.5">
+                          <div className="mb-4 flex flex-row items-center justify-center gap-x-1.5 first:mt-2 last:mb-1">
                             <ColorButton
                               primaryHex={leftEyeColor}
                               onClick={() =>
@@ -274,14 +265,14 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
           ))}
 
           {/* Luckily, the same ColorPicker can be reused for all tabs */}
-          <div className="mb-3">
+          <div className="mb-5">
             <ColorPicker hexColor={activeHexColor} onHexChange={onHexChange} />
           </div>
 
           {/* All the color presets associated with each tab */}
           {colorPresets[state.activeTab].length > 0 && (
             <div>
-              <Card title={`Presets (${state.activeTab})`} striped={true}>
+              <Card title={`Presets (${state.activeTab})`} striped>
                 <ul className="grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
                   {colorPresets[state.activeTab].map(([hex1, hex2], index) => (
                     <li key={index} className="mx-auto block">
@@ -297,6 +288,15 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
             </div>
           )}
         </OverflowContainer.FlexContent>
+
+        <div className="w-full pb-2.5 pt-3">
+          <button
+            className="mx-auto block w-fit rounded-full bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 transition-colors hover:bg-teal-50"
+            onClick={onColorsReset}
+          >
+            Reset all colors
+          </button>
+        </div>
       </Tabs.Root>
     </OverflowContainer.Root>
   );
