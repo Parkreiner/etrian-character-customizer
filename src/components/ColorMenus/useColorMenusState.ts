@@ -11,15 +11,22 @@ type MenusState = {
   activeTab: UiTab;
   activeCategory: ColorCategory;
   activeIndices: CategoryIndices;
-  eyeSet1Linked: boolean;
-  eyeSet2Linked: boolean;
   lastEyeSelection: "leftEye" | "rightEye";
+
+  /**
+   * Dynamic list of booleans indicating which pairs of colors between the
+   * left and right eyes currently have their state changes synced.
+   *
+   * (e.g., If index 0 is true, when changing left eye 1 will also change right
+   * eye 1. If it's false, changing left eye 1 updates only the left eye, unless
+   * the user is choosing a preset in some cases)
+   */
+  eyeLinkStatuses: readonly boolean[];
 };
 
 type MenusAction =
-  | { type: "eyeSet1Toggled" }
-  | { type: "eyeSet2Toggled" }
   | { type: "tabChanged"; payload: { newTab: UiTab } }
+  | { type: "eyeLinkToggled"; payload: { linkIndex: number } }
   | {
       type: "newColorFillSelected";
       payload:
@@ -27,12 +34,12 @@ type MenusAction =
         | { newCategory: "misc"; newIndex: number };
     };
 
-const initialState = {
+// Excludes eyeLinkStatuses because that has to be derived from the colors
+// being fed into the component instance
+const initialStateTemplate = {
   activeTab: "skin",
   activeCategory: "skin",
   lastEyeSelection: "leftEye",
-  eyeSet1Linked: true,
-  eyeSet2Linked: true,
 
   activeIndices: {
     skin: 0,
@@ -41,7 +48,7 @@ const initialState = {
     rightEye: 0,
     misc: 0,
   },
-} as const satisfies MenusState;
+} as const satisfies Omit<MenusState, "eyeLinkStatuses">;
 
 export function reduceMenusState(
   state: MenusState,
@@ -86,18 +93,26 @@ export function reduceMenusState(
       };
     }
 
-    case "eyeSet1Toggled": {
-      return { ...state, eyeSet1Linked: !state.eyeSet1Linked };
-    }
+    case "eyeLinkToggled": {
+      const { linkIndex } = action.payload;
+      const prevLink = state.eyeLinkStatuses[linkIndex];
 
-    case "eyeSet2Toggled": {
-      return { ...state, eyeSet2Linked: !state.eyeSet2Linked };
+      const linkCopy = [...state.eyeLinkStatuses];
+      linkCopy[linkIndex] = prevLink === undefined ? false : !prevLink;
+
+      return {
+        ...state,
+        eyeLinkStatuses: linkCopy,
+      };
     }
   }
 }
 
 export default function useColorMenusState(colors: CharacterColors) {
-  const [state, dispatch] = useReducer(reduceMenusState, initialState);
+  const [state, dispatch] = useReducer(reduceMenusState, null, () => {
+    const eyeLinkStatuses = colors.leftEye.map(() => true);
+    return { ...initialStateTemplate, eyeLinkStatuses };
+  });
 
   const changeSelectedFill = useCallback(
     (newCategory: ColorCategory, newIndex: number) => {
@@ -126,12 +141,8 @@ export default function useColorMenusState(colors: CharacterColors) {
     dispatch({ type: "tabChanged", payload: { newTab } });
   }, []);
 
-  const toggleEyeLink1 = useCallback(() => {
-    dispatch({ type: "eyeSet1Toggled" });
-  }, []);
-
-  const toggleEyeLink2 = useCallback(() => {
-    dispatch({ type: "eyeSet2Toggled" });
+  const toggleEyeLink = useCallback((linkIndex: number) => {
+    dispatch({ type: "eyeLinkToggled", payload: { linkIndex } });
   }, []);
 
   return {
@@ -139,8 +150,7 @@ export default function useColorMenusState(colors: CharacterColors) {
     updaters: {
       changeSelectedFill,
       changeTab,
-      toggleEyeLink1,
-      toggleEyeLink2,
+      toggleEyeLink,
     },
   } as const;
 }

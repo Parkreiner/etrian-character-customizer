@@ -69,39 +69,37 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
 
   // Really verbose function, but there's a lot it needs to do
   const onHexChange = (newHexColor: string) => {
-    const eyesSelected =
-      state.activeCategory === "leftEye" || state.activeCategory === "rightEye";
+    const updateBothEyes =
+      state.activeTab === "eyes" && state.eyeLinkStatuses[activeIndex];
 
-    const updateIsForSet1 =
-      eyesSelected && state.eyeSet1Linked && activeIndex === 0;
-
-    if (updateIsForSet1) {
+    if (updateBothEyes) {
       const needUpdate =
-        newHexColor !== colors.leftEye[0] || newHexColor !== colors.rightEye[0];
+        colors.leftEye[activeIndex] !== newHexColor &&
+        colors.rightEye[activeIndex] !== newHexColor;
 
       if (needUpdate) {
+        const updatedLeft = [...colors.leftEye];
+        updatedLeft[activeIndex] = newHexColor;
+
+        const updatedRight = [...colors.rightEye];
+        updatedRight[activeIndex] = newHexColor;
+
+        /**
+         * @todo Remove nasty type casts once app has had the ColorTuple type
+         * removed in favor of arbitrary-length arrays.
+         */
         onColorChange({
           ...colors,
-          leftEye: [newHexColor, colors.leftEye[1]],
-          rightEye: [newHexColor, colors.rightEye[1]],
-        });
-      }
 
-      return;
-    }
+          leftEye: colors.leftEye.map((hex, index) => {
+            if (index !== activeIndex) return hex;
+            return newHexColor;
+          }) as unknown as (typeof colors)["leftEye"],
 
-    const updateIsForSet2 =
-      eyesSelected && state.eyeSet2Linked && activeIndex === 1;
-
-    if (updateIsForSet2) {
-      const needUpdate =
-        newHexColor !== colors.leftEye[1] || newHexColor !== colors.rightEye[1];
-
-      if (needUpdate) {
-        onColorChange({
-          ...colors,
-          leftEye: [colors.leftEye[0], newHexColor],
-          rightEye: [colors.rightEye[0], newHexColor],
+          rightEye: colors.rightEye.map((hex, index) => {
+            if (index !== activeIndex) return hex;
+            return newHexColor;
+          }) as unknown as (typeof colors)["rightEye"],
         });
       }
 
@@ -127,9 +125,8 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
     }
 
     if (state.activeTab === "eyes") {
-      const updateBothEyes = state.eyeSet1Linked || state.eyeSet2Linked;
-
-      if (updateBothEyes) {
+      const updateAllEyes = state.eyeLinkStatuses.some((linked) => linked);
+      if (updateAllEyes) {
         const newTuple = [hex1, hex2] as const;
         return onColorChange({
           ...colors,
@@ -234,19 +231,9 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
                             </abbr>
                           </ColorButton>
 
-                          {/**
-                           * @todo This is a holdover from when I thought that
-                           * each character would only have two sets of eye
-                           * colors. That's not the case, so not only do the
-                           * props need to be updated, but the state management
-                           * needs to be updated, too.
-                           *
-                           * The app is guaranteed to be buggy until this is
-                           * resolved.
-                           */}
                           <LinkToggle
-                            active={state.eyeSet1Linked}
-                            toggleActive={updaters.toggleEyeLink1}
+                            active={state.eyeLinkStatuses[index] ?? false}
+                            toggleActive={() => updaters.toggleEyeLink(index)}
                             accessibleLabel={`Link L${displayNum}-R${displayNum}`}
                           />
 
