@@ -2,17 +2,26 @@
  * @file Contains the top-level component view for managing colors for a
  * character.
  */
-import { UiTab } from "./localTypes";
-import { tabIcons } from "./localConstants";
-import { CharacterColors } from "@/typesConstants/colors";
-import useColorMenusState from "./useColorMenusState";
+import { Fragment } from "react";
+import { cva } from "class-variance-authority";
+import { CharacterColors, MISC_COLOR_PRESETS } from "@/typesConstants/colors";
+import { toTitleCase } from "@/utils/strings";
+import {
+  ColorTuple,
+  HAIR_EYE_COLOR_PRESETS,
+  SKIN_COLOR_PRESETS,
+} from "@/typesConstants/colors";
 
-import LinkToggle from "./LinkToggle";
+import { UiTab, uiTabs } from "./localTypes";
+import useColorMenusState from "./useColorMenusState";
 import ColorButton from "./ColorButton";
-import ControlsContainer, {
-  TabInfoArray,
-} from "@/components/ControlsContainer";
-import MenuViewLayout from "./MenuViewLayout";
+import LinkToggle from "./LinkToggle";
+import TabIconWrapper from "./TabIconWrapper";
+
+import * as Tabs from "@/components/Tabs";
+import Card from "@/components/Card";
+import ColorPicker from "@/components/ColorPicker";
+import OverflowContainer from "../OverflowContainer/OverflowContainer";
 
 type ExternalProps = {
   /**
@@ -26,53 +35,72 @@ type ExternalProps = {
 
   colors: CharacterColors;
   onColorChange: (newColors: CharacterColors) => void;
+  onColorsReset: () => void;
 };
 
 type CoreProps = Omit<ExternalProps, "characterKey">;
 
+// Using super bright magenta to make visual errors more obvious
 const fallbackColor = "#ff00ff";
 
-function ColorMenusCore({ colors, onColorChange }: CoreProps) {
+const colorPresets = {
+  eyes: HAIR_EYE_COLOR_PRESETS,
+  hair: HAIR_EYE_COLOR_PRESETS,
+  skin: SKIN_COLOR_PRESETS,
+  misc: MISC_COLOR_PRESETS,
+} as const satisfies Record<UiTab, readonly ColorTuple[]>;
+
+const tabButtonStyles = cva(
+  "px-3.5 py-1 rounded-full text-sm flex flex-row flex-nowrap gap-x-1 items-center first:pl-4 last:pr-4",
+  {
+    variants: {
+      active: {
+        true: "text-opacity-100 text-teal-950 bg-teal-100 font-medium",
+        false: "text-opacity-95 text-teal-50 bg-teal-800",
+      } as const satisfies Record<`${boolean}`, string>,
+    },
+  }
+);
+
+function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
   const { state, updaters } = useColorMenusState(colors);
   const activeColorArray = colors[state.activeCategory];
   const activeIndex = state.activeIndices[state.activeCategory];
-  const activeHexColor = activeColorArray[activeIndex] ?? "#000000";
+  const activeHexColor = activeColorArray[activeIndex] ?? fallbackColor;
 
   // Really verbose function, but there's a lot it needs to do
   const onHexChange = (newHexColor: string) => {
-    const eyesSelected =
-      state.activeCategory === "leftEye" || state.activeCategory === "rightEye";
+    const updateBothEyes =
+      state.activeTab === "eyes" && state.eyeLinkStatuses[activeIndex] === true;
 
-    const updateIsForSet1 =
-      eyesSelected && state.eyeSet1Linked && activeIndex === 0;
-
-    if (updateIsForSet1) {
+    if (updateBothEyes) {
       const needUpdate =
-        newHexColor !== colors.leftEye[0] || newHexColor !== colors.rightEye[0];
+        colors.leftEye[activeIndex] !== newHexColor &&
+        colors.rightEye[activeIndex] !== newHexColor;
 
       if (needUpdate) {
+        const updatedLeft = [...colors.leftEye];
+        updatedLeft[activeIndex] = newHexColor;
+
+        const updatedRight = [...colors.rightEye];
+        updatedRight[activeIndex] = newHexColor;
+
+        /**
+         * @todo Remove nasty type casts once app has had the ColorTuple type
+         * removed in favor of arbitrary-length arrays.
+         */
         onColorChange({
           ...colors,
-          leftEye: [newHexColor, colors.leftEye[1]],
-          rightEye: [newHexColor, colors.rightEye[1]],
-        });
-      }
 
-      return;
-    }
+          leftEye: colors.leftEye.map((hex, index) => {
+            if (index !== activeIndex) return hex;
+            return newHexColor;
+          }) as unknown as (typeof colors)["leftEye"],
 
-    const updateIsForSet2 =
-      eyesSelected && state.eyeSet2Linked && activeIndex === 1;
-
-    if (updateIsForSet2) {
-      const needUpdate =
-        newHexColor !== colors.leftEye[1] || newHexColor !== colors.rightEye[1];
-
-      if (needUpdate) {
-        onColorChange({
-          ...colors,
-          leftEye: [colors.leftEye[0], newHexColor],
-          rightEye: [colors.rightEye[0], newHexColor],
+          rightEye: colors.rightEye.map((hex, index) => {
+            if (index !== activeIndex) return hex;
+            return newHexColor;
+          }) as unknown as (typeof colors)["rightEye"],
         });
       }
 
@@ -98,9 +126,8 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
     }
 
     if (state.activeTab === "eyes") {
-      const updateBothEyes = state.eyeSet1Linked || state.eyeSet2Linked;
-
-      if (updateBothEyes) {
+      const updateAllEyes = state.eyeLinkStatuses.some((linked) => linked);
+      if (updateAllEyes) {
         const newTuple = [hex1, hex2] as const;
         return onColorChange({
           ...colors,
@@ -120,178 +147,160 @@ function ColorMenusCore({ colors, onColorChange }: CoreProps) {
     });
   };
 
-  const tabs: TabInfoArray<UiTab> = [
-    {
-      value: "skin",
-      tabText: "Skin",
-      tabIcon: tabIcons.skin,
-      tabView: (
-        <MenuViewLayout
-          tab="skin"
-          activeHex={activeHexColor}
-          onHexChange={onHexChange}
-          selectHexPreset={selectHexPreset}
-        >
-          <div className="flex flex-row justify-center gap-x-3">
-            <ColorButton
-              primaryHex={colors.skin[0]}
-              onClick={() => updaters.changeSelectedFill("skin", 0)}
-              selected={state.activeCategory === "skin" && activeIndex === 0}
-            >
-              1
-            </ColorButton>
-
-            <ColorButton
-              primaryHex={colors.skin[1]}
-              onClick={() => updaters.changeSelectedFill("skin", 1)}
-              selected={state.activeCategory === "skin" && activeIndex === 1}
-            >
-              2
-            </ColorButton>
-          </div>
-        </MenuViewLayout>
-      ),
-    },
-
-    {
-      value: "hair",
-      tabText: "Hair",
-      tabIcon: tabIcons.hair,
-      tabView: (
-        <MenuViewLayout
-          tab="hair"
-          activeHex={activeHexColor}
-          onHexChange={onHexChange}
-          selectHexPreset={selectHexPreset}
-        >
-          <div className="flex flex-row justify-center gap-x-3">
-            <ColorButton
-              primaryHex={colors.hair[0]}
-              onClick={() => updaters.changeSelectedFill("hair", 0)}
-              selected={state.activeCategory === "hair" && activeIndex === 0}
-            >
-              1
-            </ColorButton>
-
-            <ColorButton
-              primaryHex={colors.hair[1]}
-              onClick={() => updaters.changeSelectedFill("hair", 1)}
-              selected={state.activeCategory === "hair" && activeIndex === 1}
-            >
-              2
-            </ColorButton>
-          </div>
-        </MenuViewLayout>
-      ),
-    },
-
-    {
-      value: "eyes",
-      tabText: "Eyes",
-      tabIcon: tabIcons.eyes,
-      tabView: (
-        <MenuViewLayout
-          tab="eyes"
-          activeHex={activeHexColor}
-          onHexChange={onHexChange}
-          selectHexPreset={selectHexPreset}
-        >
-          <div className="mb-4 flex flex-row items-center justify-center gap-x-1.5">
-            <ColorButton
-              primaryHex={colors.leftEye[0]}
-              onClick={() => updaters.changeSelectedFill("leftEye", 0)}
-              selected={state.activeCategory === "leftEye" && activeIndex === 0}
-            >
-              <abbr title="Left eye option 1">L1</abbr>
-            </ColorButton>
-
-            <LinkToggle
-              active={state.eyeSet1Linked}
-              toggleActive={updaters.toggleEyeLink1}
-              accessibleLabel="Link L1-R1"
-            />
-
-            <ColorButton
-              primaryHex={colors.rightEye[0]}
-              onClick={() => updaters.changeSelectedFill("rightEye", 0)}
-              selected={
-                state.activeCategory === "rightEye" && activeIndex === 0
-              }
-            >
-              <abbr title="Right eye option 1">R1</abbr>
-            </ColorButton>
-          </div>
-
-          <div className="flex flex-row items-center justify-center gap-x-1.5">
-            <ColorButton
-              primaryHex={colors.leftEye[1]}
-              onClick={() => updaters.changeSelectedFill("leftEye", 1)}
-              selected={state.activeCategory === "leftEye" && activeIndex === 1}
-            >
-              <abbr title="Left eye option 2">L2</abbr>
-            </ColorButton>
-
-            <LinkToggle
-              active={state.eyeSet2Linked}
-              toggleActive={updaters.toggleEyeLink2}
-              accessibleLabel="Link L2-R2"
-            />
-
-            <ColorButton
-              primaryHex={colors.rightEye[1]}
-              onClick={() => updaters.changeSelectedFill("rightEye", 1)}
-              selected={
-                state.activeCategory === "rightEye" && activeIndex === 1
-              }
-            >
-              <abbr title="Right eye option 2">R2</abbr>
-            </ColorButton>
-          </div>
-        </MenuViewLayout>
-      ),
-    },
-
-    {
-      visible: colors.misc.length > 0,
-      value: "misc",
-      tabText: "Misc.",
-      tabIcon: tabIcons.misc,
-      accessibleTabLabel: "Miscellaneous Categories",
-      tabView: (
-        <MenuViewLayout
-          tab="misc"
-          activeHex={activeHexColor}
-          onHexChange={onHexChange}
-          selectHexPreset={selectHexPreset}
-        >
-          <div className="flex flex-row justify-center gap-x-3">
-            {colors.misc.map((color, index) => (
-              <ColorButton
-                key={color}
-                primaryHex={colors.misc[index] ?? fallbackColor}
-                onClick={() => updaters.changeSelectedFill("misc", index)}
-                selected={
-                  state.activeCategory === "misc" && activeIndex === index
-                }
-              >
-                {index + 1}
-              </ColorButton>
-            ))}
-          </div>
-        </MenuViewLayout>
-      ),
-    },
-  ];
-
   return (
-    <fieldset>
-      <ControlsContainer<UiTab>
-        tabs={tabs}
-        selectedTabValue={state.activeTab}
-        onTabChange={updaters.changeTab}
-        tabGroupLabel="Select which part you want to customize"
-      />
-    </fieldset>
+    <OverflowContainer.Root>
+      <Tabs.Root<UiTab>
+        value={state.activeTab}
+        onValueChange={updaters.changeTab}
+        className="flex h-full min-w-[430px] flex-col flex-nowrap self-stretch"
+      >
+        {/* Defines the tabs for toggling between views */}
+        <OverflowContainer.Header>
+          <div className="flex h-[54px] w-full flex-col flex-nowrap justify-center bg-teal-900">
+            <Tabs.List<UiTab>
+              aria-label="Select which part you want to customize"
+              className="mx-auto flex w-fit flex-row justify-center gap-x-1 rounded-full bg-teal-800"
+            >
+              {uiTabs.map((tabValue) => {
+                const aliasedKey = tabValue === "eyes" ? "leftEye" : tabValue;
+                return (
+                  <Fragment key={tabValue}>
+                    {colors[aliasedKey].length > 0 && (
+                      <Tabs.Trigger<UiTab>
+                        value={tabValue}
+                        className={tabButtonStyles({
+                          active: tabValue === state.activeTab,
+                        })}
+                      >
+                        <TabIconWrapper tab={tabValue} />
+                        <span>{toTitleCase(tabValue)}</span>
+                      </Tabs.Trigger>
+                    )}
+                  </Fragment>
+                );
+              })}
+            </Tabs.List>
+          </div>
+        </OverflowContainer.Header>
+
+        <OverflowContainer.FlexContent>
+          {/* Defines the buttons for changing active colors */}
+          {uiTabs.map((tabValue) => (
+            <Tabs.Content<UiTab> key={tabValue} value={tabValue}>
+              <div className="mb-5">
+                <Card title={`Swatches (${tabValue})`} striped gapSize="small">
+                  {tabValue !== "eyes" && (
+                    <div className="flex flex-row justify-center gap-x-3">
+                      {colors[tabValue].map((color, index) => (
+                        <ColorButton
+                          key={index}
+                          primaryHex={color}
+                          selected={
+                            state.activeCategory === tabValue &&
+                            activeIndex === index
+                          }
+                          onClick={() => {
+                            updaters.changeSelectedFill(tabValue, index);
+                          }}
+                        >
+                          {index + 1}
+                        </ColorButton>
+                      ))}
+                    </div>
+                  )}
+
+                  {tabValue === "eyes" &&
+                    colors.leftEye.map((leftEyeColor, index) => {
+                      const rightEyeColor = colors.rightEye[index];
+                      if (rightEyeColor === undefined) return null;
+
+                      const displayNum = index + 1;
+                      return (
+                        <Fragment key={index}>
+                          <div className="mb-4 flex flex-row items-center justify-center gap-x-1.5 first:mt-2 last:mb-1">
+                            <ColorButton
+                              primaryHex={leftEyeColor}
+                              selected={
+                                state.activeCategory === "leftEye" &&
+                                activeIndex === index
+                              }
+                              onClick={() => {
+                                updaters.changeSelectedFill("leftEye", index);
+                              }}
+                            >
+                              <abbr title={`Left eye option ${displayNum}`}>
+                                L{displayNum}
+                              </abbr>
+                            </ColorButton>
+
+                            <LinkToggle
+                              active={state.eyeLinkStatuses[index] ?? false}
+                              toggleActive={() => updaters.toggleEyeLink(index)}
+                              accessibleLabel={`Link L${displayNum}-R${displayNum}`}
+                            />
+
+                            <ColorButton
+                              primaryHex={rightEyeColor}
+                              selected={
+                                state.activeCategory === "rightEye" &&
+                                activeIndex === index
+                              }
+                              onClick={() => {
+                                updaters.changeSelectedFill("rightEye", index);
+                              }}
+                            >
+                              <abbr title={`Right eye option ${displayNum}`}>
+                                R{displayNum}
+                              </abbr>
+                            </ColorButton>
+                          </div>
+                        </Fragment>
+                      );
+                    })}
+                </Card>
+              </div>
+            </Tabs.Content>
+          ))}
+
+          {/* Luckily, the same ColorPicker can be reused for all tabs */}
+          <div className="mb-5">
+            <ColorPicker hexColor={activeHexColor} onHexChange={onHexChange} />
+          </div>
+
+          {/* All the color presets associated with each tab */}
+          {colorPresets[state.activeTab].length > 0 && (
+            <div>
+              <Card
+                title={`Presets (${state.activeTab})`}
+                striped
+                gapSize="small"
+              >
+                <ul className="mt-1 grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
+                  {colorPresets[state.activeTab].map(([hex1, hex2], index) => (
+                    <li key={index} className="mx-auto block">
+                      <ColorButton
+                        primaryHex={hex1}
+                        secondaryHex={hex2}
+                        onClick={() => selectHexPreset(hex1, hex2)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </div>
+          )}
+        </OverflowContainer.FlexContent>
+
+        <div className="w-full pb-2.5 pt-3">
+          <button
+            className="mx-auto block w-fit rounded-full bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 transition-colors hover:bg-teal-50"
+            onClick={onColorsReset}
+          >
+            Reset all colors
+          </button>
+        </div>
+      </Tabs.Root>
+    </OverflowContainer.Root>
   );
 }
 

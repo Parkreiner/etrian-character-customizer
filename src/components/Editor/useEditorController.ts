@@ -148,15 +148,23 @@ export default function useEditorController() {
     dispatch({ type: "colorsReplaced", payload: { newColors } });
   }, []);
 
+  const selectedCharacter = !state.initialized
+    ? null
+    : characters.find((char) => char.id === state.selectedCharacterId) ?? null;
+
+  const resetColorsToDefault = useCallback(() => {
+    if (selectedCharacter === null) return;
+    dispatch({
+      type: "colorsReplaced",
+      payload: { newColors: selectedCharacter.initialColors },
+    });
+  }, [selectedCharacter]);
+
   if (!state.initialized) {
     return { initialized: false } as const;
   }
 
-  const selectedCharacter = characters.find(
-    (char) => char.id === state.selectedCharacterId
-  );
-
-  if (selectedCharacter === undefined) {
+  if (selectedCharacter === null) {
     throw new Error(
       "Unable to find selected character in array after initialization"
     );
@@ -183,8 +191,8 @@ export default function useEditorController() {
     server: { characters, classOrderings },
 
     /**
-     * Represents derived values that should be available to any component
-     * consuming this hook. No state should go in here.
+     * Provides derived values for convenience. Any values will be guaranteed to
+     * exist; no need to resolve undefined/null value cases
      */
     derived: { selectedCharacter },
 
@@ -198,6 +206,7 @@ export default function useEditorController() {
       changeCharacter,
       selectRandomCharacter,
       replaceColors,
+      resetColorsToDefault,
     },
   } as const;
 }

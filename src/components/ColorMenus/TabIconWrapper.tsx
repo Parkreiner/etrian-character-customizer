@@ -1,4 +1,9 @@
+import { cloneElement } from "react";
 import { UiTab } from "./localTypes";
+
+type Props = {
+  tab: UiTab;
+};
 
 /**
  * All tab icons courtesy of Heroicons (part of Tailwind Labs).
@@ -10,7 +15,6 @@ export const tabIcons = {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"
-      className="h-5 w-5"
     >
       <path
         fillRule="evenodd"
@@ -24,7 +28,6 @@ export const tabIcons = {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"
-      className="h-5 w-5"
     >
       <path
         fillRule="evenodd"
@@ -39,7 +42,6 @@ export const tabIcons = {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"
-      className="h-5 w-5"
     >
       <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
       <path
@@ -55,7 +57,6 @@ export const tabIcons = {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"
-      className="h-5 w-5"
     >
       <path
         fillRule="evenodd"
@@ -65,3 +66,17 @@ export const tabIcons = {
     </svg>
   ),
 } as const satisfies Record<UiTab, JSX.Element>;
+
+const visualCenterOffsets = {
+  skin: "-0.10em",
+  hair: "-0.06em",
+  eyes: "-0.06em",
+  misc: "-0.06em",
+} as const satisfies Record<UiTab, string>;
+
+export default function TabIconWrapper({ tab }: Props) {
+  return cloneElement(tabIcons[tab], {
+    className: "h-3.5 w-3.5 opacity-80",
+    style: { transform: `translateY(${visualCenterOffsets[tab]}` },
+  });
+}

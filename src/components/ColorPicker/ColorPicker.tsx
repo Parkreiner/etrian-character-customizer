@@ -83,9 +83,9 @@ export default function ColorPicker({ hexColor, onHexChange }: Props) {
   }
 
   return (
-    <Card title="Color Picker" striped>
+    <Card title="Color Picker" striped gapSize="small">
       <fieldset className="w-full">
-        <div className="mb-4 mt-2">
+        <div className="mb-6 mt-4">
           <HueWheel
             hue={hsv.hue}
             onHueChange={(newValue) => onHsvChannelChange("hue", newValue)}
