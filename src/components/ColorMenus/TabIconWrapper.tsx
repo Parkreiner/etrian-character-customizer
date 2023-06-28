@@ -68,10 +68,10 @@ export const tabIcons = {
 } as const satisfies Record<UiTab, JSX.Element>;
 
 const visualCenterOffsets = {
-  skin: "-0.04em",
-  hair: "-0.04em",
-  eyes: "-0.04em",
-  misc: "-0.12em",
+  skin: "-0.10em",
+  hair: "-0.06em",
+  eyes: "-0.06em",
+  misc: "-0.06em",
 } as const satisfies Record<UiTab, string>;
 
 export default function TabIconWrapper({ tab }: Props) {

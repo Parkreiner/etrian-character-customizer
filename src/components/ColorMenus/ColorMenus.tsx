@@ -56,7 +56,7 @@ const tabButtonStyles = cva(
     variants: {
       active: {
         true: "text-opacity-100 text-teal-950 bg-teal-100 font-medium",
-        false: "text-opacity-90 text-teal-50 bg-teal-800",
+        false: "text-opacity-95 text-teal-50 bg-teal-800",
       } as const satisfies Record<`${boolean}`, string>,
     },
   }
@@ -162,9 +162,7 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
               className="mx-auto flex w-fit flex-row justify-center gap-x-1 rounded-full bg-teal-800"
             >
               {uiTabs.map((tabValue) => {
-                const aliasedKey =
-                  tabValue === "eyes" ? state.lastEyeSelection : tabValue;
-
+                const aliasedKey = tabValue === "eyes" ? "leftEye" : tabValue;
                 return (
                   <Fragment key={tabValue}>
                     {colors[aliasedKey].length > 0 && (
@@ -222,13 +220,13 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
                           <div className="mb-4 flex flex-row items-center justify-center gap-x-1.5 first:mt-2 last:mb-1">
                             <ColorButton
                               primaryHex={leftEyeColor}
-                              onClick={() =>
-                                updaters.changeSelectedFill("leftEye", index)
-                              }
                               selected={
                                 state.activeCategory === "leftEye" &&
                                 activeIndex === index
                               }
+                              onClick={() => {
+                                updaters.changeSelectedFill("leftEye", index);
+                              }}
                             >
                               <abbr title={`Left eye option ${displayNum}`}>
                                 L{displayNum}
@@ -243,13 +241,13 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
 
                             <ColorButton
                               primaryHex={rightEyeColor}
-                              onClick={() =>
-                                updaters.changeSelectedFill("rightEye", index)
-                              }
                               selected={
                                 state.activeCategory === "rightEye" &&
                                 activeIndex === index
                               }
+                              onClick={() => {
+                                updaters.changeSelectedFill("rightEye", index);
+                              }}
                             >
                               <abbr title={`Right eye option ${displayNum}`}>
                                 R{displayNum}
@@ -272,8 +270,12 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
           {/* All the color presets associated with each tab */}
           {colorPresets[state.activeTab].length > 0 && (
             <div>
-              <Card title={`Presets (${state.activeTab})`} striped>
-                <ul className="grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
+              <Card
+                title={`Presets (${state.activeTab})`}
+                striped
+                gapSize="small"
+              >
+                <ul className="mt-1 grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
                   {colorPresets[state.activeTab].map(([hex1, hex2], index) => (
                     <li key={index} className="mx-auto block">
                       <ColorButton
