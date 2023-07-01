@@ -25,10 +25,12 @@ function downloadCharacter(filename: string, dataUrl: string): void {
 }
 
 export default function CharacterPreview({ character, colors }: Props) {
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadingOutput, setIsDownloadingOutput] = useState(false);
   const { bitmap, status, loadImage } = useBitmapManager(character.imgUrl);
   const { containerRef, canvasRef } = usePreview(bitmap, colors, character);
 
+  // Handles loading the selected character image if it isn't available by the
+  // time this component renders with the data
   useEffect(() => {
     if (bitmap !== null) return;
     const { abort } = loadImage(character.imgUrl);
@@ -41,9 +43,9 @@ export default function CharacterPreview({ character, colors }: Props) {
   const downloadAllImages = async () => {
     const canvas = canvasRef.current;
     if (bitmap === null || canvas === null) return;
-    setIsDownloading(true);
+    setIsDownloadingOutput(true);
 
-    // This looks hokey, but it ensures that the first state update finishes
+    // This looks hokey, but it ensures that the first state dispatch resolves
     // before the rest of this function (which is expensive) is allowed to start
     await Promise.resolve();
 
@@ -56,14 +58,14 @@ export default function CharacterPreview({ character, colors }: Props) {
     }
 
     window.alert(
-      "Basic download functionality not in place just yet; need to resolve issues with cross-site image sources."
+      "Download functionality unavailable; resolving issues with tainted canvas sources"
     );
 
-    setIsDownloading(false);
+    setIsDownloadingOutput(false);
   };
 
-  const downloadsDisabled =
-    isDownloading || status === "error" || status === "loading";
+  const imageNotAvailable = status !== "success";
+  const downloadsDisabled = isDownloadingOutput || imageNotAvailable;
 
   return (
     <section className="flex h-full flex-grow flex-col flex-nowrap justify-center gap-y-4 pt-10">
@@ -77,8 +79,9 @@ export default function CharacterPreview({ character, colors }: Props) {
          *
          * Basically:
          * 1. The canvas is supposed to fit itself to the container
-         * 2. But since the canvas can't have CSS properties on it, you can't
-         *    tell it to make its size dependent on its parent
+         * 2. But since the canvas can't have CSS properties on it without the
+         *    risk of warping the image, you can't tell it to make its size
+         *    dependent on its parent
          * 3. Because of this, the container will be allowed to grow (and the
          *    canvas will grow to match it), but it won't be allowed to shrink,
          *    because then it would be cutting off the canvas.
@@ -90,6 +93,22 @@ export default function CharacterPreview({ character, colors }: Props) {
          *    warp.
          */}
         <div className="absolute h-full w-full">
+          {imageNotAvailable && (
+            <div className="absolute flex h-full w-full flex-col flex-nowrap items-center justify-center">
+              <p className="w-fit rounded-full bg-teal-900 px-6 py-2 text-center text-teal-100">
+                {status === "loading" && "Loading image..."}
+
+                {status === "error" && (
+                  <>
+                    Image Error
+                    <br />
+                    Please try another character
+                  </>
+                )}
+              </p>
+            </div>
+          )}
+
           {/*
            * Reminder: You cannot set any CSS properties on a canvas that would
            * change its size. You have to update the HTML directly (doing the

@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "lint": "eslint --ext js,jsx,ts,tsx src",
+    "typecheck": "tsc --noEmit",
     "new": "new-component -l 'ts'"
   },
   "dependencies": {

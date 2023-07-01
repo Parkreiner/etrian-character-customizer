@@ -28,7 +28,9 @@ export default function useInitialViewStatus(
   }
 
   const editorAndImageReady =
-    editorInitialized && imageStatus !== "idle" && imageStatus !== "loading";
+    editorInitialized &&
+    imageStatus !== "unloaded" &&
+    imageStatus !== "loading";
 
   if (!ready && editorAndImageReady) {
     setReady(true);
