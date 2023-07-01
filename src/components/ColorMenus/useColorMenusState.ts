@@ -11,6 +11,11 @@ type MenusState = {
   activeTab: UiTab;
   activeCategory: ColorCategory;
   activeIndices: CategoryIndices;
+
+  /**
+   * Used to help the app remember which eye was last selected (left or right)
+   * if the user navigates to a different tab.
+   */
   lastEyeSelection: "leftEye" | "rightEye";
 
   /**

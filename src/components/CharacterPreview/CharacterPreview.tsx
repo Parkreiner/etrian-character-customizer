@@ -66,7 +66,7 @@ export default function CharacterPreview({ character, colors }: Props) {
     isDownloading || status === "error" || status === "loading";
 
   return (
-    <section className="flex h-full flex-grow flex-col flex-nowrap justify-center gap-y-4 py-10">
+    <section className="flex h-full flex-grow flex-col flex-nowrap justify-center gap-y-4 pt-10">
       <div
         ref={containerRef}
         className="relative w-full flex-shrink flex-grow py-4"
@@ -101,39 +101,24 @@ export default function CharacterPreview({ character, colors }: Props) {
         </div>
       </div>
 
-      <div>
-        <fieldset className="mx-auto flex max-w-fit flex-row flex-nowrap items-center gap-x-4">
-          <legend>
-            <VisuallyHidden.Root>Main app button controls</VisuallyHidden.Root>
-          </legend>
+      <fieldset className="mx-auto flex max-w-fit flex-row flex-nowrap items-center gap-x-4">
+        <legend>
+          <VisuallyHidden.Root>Main app button controls</VisuallyHidden.Root>
+        </legend>
 
-          <HelpButton />
+        <HelpButton />
 
-          <button
-            type="button"
-            className="select-none rounded-full bg-teal-800 px-7 py-3 text-xl font-medium text-teal-50 shadow-md shadow-sky-700/30 transition-colors duration-200 ease-in-out hover:bg-teal-700"
-            disabled={downloadsDisabled}
-            onClick={downloadAllImages}
-          >
-            Download
-          </button>
+        <button
+          type="button"
+          className="select-none rounded-full bg-teal-800 px-7 py-3 text-xl font-medium text-teal-50 shadow-md shadow-sky-700/30 transition-colors duration-200 ease-in-out hover:bg-teal-700"
+          disabled={downloadsDisabled}
+          onClick={downloadAllImages}
+        >
+          Download
+        </button>
 
-          <CreditsButton />
-        </fieldset>
-
-        <p className="mx-auto mt-4 w-fit rounded-full bg-yellow-100 px-4 py-2 text-center text-sm font-medium text-yellow-900">
-          Work in progress.{" "}
-          <a
-            className="underline"
-            href="https://github.com/Parkreiner/etrian-character-customizer"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Check the GitHub page
-          </a>{" "}
-          for updates.
-        </p>
-      </div>
+        <CreditsButton />
+      </fieldset>
     </section>
   );
 }

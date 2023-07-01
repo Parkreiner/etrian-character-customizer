@@ -56,7 +56,7 @@ const tabButtonStyles = cva(
     variants: {
       active: {
         true: "text-opacity-100 text-teal-950 bg-teal-100 font-medium",
-        false: "text-opacity-95 text-teal-50 bg-teal-800",
+        false: "text-opacity-95 text-teal-50 bg-teal-900",
       } as const satisfies Record<`${boolean}`, string>,
     },
   }
@@ -156,38 +156,36 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
       >
         {/* Defines the tabs for toggling between views */}
         <OverflowContainer.Header>
-          <div className="flex h-[54px] w-full flex-col flex-nowrap justify-center bg-teal-900">
-            <Tabs.List<UiTab>
-              aria-label="Select which part you want to customize"
-              className="mx-auto flex w-fit flex-row justify-center gap-x-1 rounded-full bg-teal-800"
-            >
-              {uiTabs.map((tabValue) => {
-                const aliasedKey = tabValue === "eyes" ? "leftEye" : tabValue;
-                return (
-                  <Fragment key={tabValue}>
-                    {colors[aliasedKey].length > 0 && (
-                      <Tabs.Trigger<UiTab>
-                        value={tabValue}
-                        className={tabButtonStyles({
-                          active: tabValue === state.activeTab,
-                        })}
-                      >
-                        <TabIconWrapper tab={tabValue} />
-                        <span>{toTitleCase(tabValue)}</span>
-                      </Tabs.Trigger>
-                    )}
-                  </Fragment>
-                );
-              })}
-            </Tabs.List>
-          </div>
+          <Tabs.List<UiTab>
+            aria-label="Select which part you want to customize"
+            className="mx-auto flex w-fit flex-row justify-center gap-x-1 rounded-full border-2 border-teal-900 bg-teal-900"
+          >
+            {uiTabs.map((tabValue) => {
+              const aliasedKey = tabValue === "eyes" ? "leftEye" : tabValue;
+              return (
+                <Fragment key={tabValue}>
+                  {colors[aliasedKey].length > 0 && (
+                    <Tabs.Trigger<UiTab>
+                      value={tabValue}
+                      className={tabButtonStyles({
+                        active: tabValue === state.activeTab,
+                      })}
+                    >
+                      <TabIconWrapper tab={tabValue} />
+                      <span>{toTitleCase(tabValue)}</span>
+                    </Tabs.Trigger>
+                  )}
+                </Fragment>
+              );
+            })}
+          </Tabs.List>
         </OverflowContainer.Header>
 
         <OverflowContainer.FlexContent>
           {/* Defines the buttons for changing active colors */}
           {uiTabs.map((tabValue) => (
             <Tabs.Content<UiTab> key={tabValue} value={tabValue}>
-              <div className="mb-5">
+              <div className="mb-3">
                 <Card title={`Swatches (${tabValue})`} striped gapSize="small">
                   {tabValue !== "eyes" && (
                     <div className="flex flex-row justify-center gap-x-3">
@@ -263,7 +261,7 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
           ))}
 
           {/* Luckily, the same ColorPicker can be reused for all tabs */}
-          <div className="mb-5">
+          <div className="mb-3">
             <ColorPicker hexColor={activeHexColor} onHexChange={onHexChange} />
           </div>
 
@@ -291,14 +289,9 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
           )}
         </OverflowContainer.FlexContent>
 
-        <div className="w-full pb-2.5 pt-3">
-          <button
-            className="mx-auto block w-fit rounded-full bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 transition-colors hover:bg-teal-50"
-            onClick={onColorsReset}
-          >
-            Reset all colors
-          </button>
-        </div>
+        <OverflowContainer.FooterButton onClick={onColorsReset}>
+          Reset all colors
+        </OverflowContainer.FooterButton>
       </Tabs.Root>
     </OverflowContainer.Root>
   );

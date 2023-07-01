@@ -37,7 +37,7 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
           onChange={(e) => onHueChange(wrapHue(e.target.valueAsNumber))}
           // All the extra width properties are meant to help with a Firefox-
           // specific sizing issue when tring to style text inputs
-          className="no-arrow block h-16 w-fit min-w-0 max-w-[170px] bg-teal-900 text-right text-[64px] font-bold"
+          className="no-arrow block h-16 w-fit min-w-0 max-w-[170px] bg-teal-900 text-right text-[64px] font-bold tracking-tight"
         />
         <span className="h-fit select-none text-[48px] font-medium">°</span>
       </div>
