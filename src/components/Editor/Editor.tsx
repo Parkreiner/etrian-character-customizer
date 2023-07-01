@@ -24,9 +24,9 @@ export default function Editor() {
         />
       )}
 
-      <main className="flex h-full w-full flex-col flex-nowrap px-12">
+      <main className="flex h-full w-full flex-col flex-nowrap px-8">
         {editorController.initialized && (
-          <div className="mb-6 flex h-full w-full flex-grow flex-row items-center justify-between gap-x-12">
+          <div className="mx-auto mb-6 flex h-full w-full max-w-[1700px] flex-grow flex-row items-center justify-between gap-x-8">
             <CharacterMenus
               selectedCharacterId={editorController.editor.selectedId}
               characters={editorController.server.characters}
@@ -49,7 +49,7 @@ export default function Editor() {
           </div>
         )}
 
-        <p className="-mx-12 bg-yellow-100 px-4 py-2 text-center text-sm font-medium text-yellow-900">
+        <p className="-mx-8 bg-yellow-100 px-4 py-2 text-center text-sm font-medium text-yellow-900">
           Work in progress.{" "}
           <a
             className="underline"
