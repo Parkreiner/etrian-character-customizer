@@ -7,12 +7,13 @@ import {
   GameOrigin,
 } from "@/typesConstants/gameData";
 
+import { groupCharacters, moveToFront } from "./localHelpers";
 import Card from "@/components/Card";
 import OverflowContainer from "@/components/OverflowContainer";
 import { useLazyImageLoader } from "@/hooks/useBitmapManager";
+import HeaderProvider, { useCurrentHeader } from "@/contexts/HeaderLevels";
 
 import CharacterClassSection from "./CharacterClassPanel";
-import HeaderProvider, { useCurrentHeader } from "@/contexts/HeaderLevels";
 
 type Props = {
   characters: readonly Character[];
@@ -22,64 +23,11 @@ type Props = {
   randomizeCharacter: () => void;
 };
 
-type GroupEntry = { class: string; characters: readonly Character[] };
-
 const nameAliases = {
   eo1: "Etrian Odyssey",
   eo2: "Etrian Odyssey II",
   eo3: "Etrian Odyssey III",
 } as const satisfies Record<GameOrigin, string>;
-
-function groupCharacters(
-  characters: readonly Character[],
-  classOrderings: ClassOrderings
-): Map<GameOrigin, readonly GroupEntry[]> {
-  const sortedChars = [...characters].sort((char1, char2) => {
-    if (char1.displayId === char2.displayId) return 0;
-    return char1.displayId < char2.displayId ? -1 : 1;
-  });
-
-  type Entries = readonly [keyof ClassOrderings, readonly string[]][];
-  const entries = Object.entries(classOrderings).sort((entry1, entry2) => {
-    if (entry1[0] === entry2[0]) return 0;
-    return entry1[0] < entry2[0] ? -1 : 1;
-  }) as Entries;
-
-  // Using a Map to guarantee insertion order is respected
-  const grouped = new Map<GameOrigin, readonly GroupEntry[]>();
-
-  const filterChars = (game: GameOrigin, gameClass: string) => {
-    return sortedChars.filter((char) => {
-      return char.game === game && char.class === gameClass;
-    });
-  };
-
-  for (const [game, charClasses] of entries) {
-    const entriesByGame = charClasses.map((className): GroupEntry => {
-      return { class: className, characters: filterChars(game, className) };
-    });
-
-    grouped.set(game, entriesByGame);
-  }
-
-  return grouped;
-}
-
-function moveToFront<T extends { id: string }>(
-  list: readonly T[],
-  targetId: string
-): readonly T[] {
-  const moveIndex = list.findIndex((item) => item.id === targetId);
-  if (moveIndex === -1 || moveIndex === 0) {
-    return list;
-  }
-
-  const copy = [...list];
-  const plucked = copy.splice(moveIndex, 1);
-  copy.splice(0, 0, ...plucked);
-
-  return copy;
-}
 
 export default function CharacterMenus({
   selectedCharacterId,
@@ -122,9 +70,9 @@ export default function CharacterMenus({
     };
   };
 
-  // Tried defining all this stuff lower in the component tree, but the problem
-  // was that the mount-only effect would run for each individual class, which
-  // absolutely isn't what I need. One effect total, on mount only.
+  // From here to the return statement, there's some screwy stuff happening to
+  // satisfy the dependency arrays while making sure that the on-mount effect
+  // only ever runs once
   const veryHackyOnMountRef = useRef(() => {
     const initialCharacter = characters.find(
       (char) => char.id === selectedCharacterId
@@ -141,30 +89,21 @@ export default function CharacterMenus({
   }, []);
 
   return (
-    <OverflowContainer.Root>
+    <OverflowContainer.Root inputGroup>
       <OverflowContainer.Header>
-        <section className="flex flex-nowrap items-baseline justify-between bg-teal-100 py-3 pl-7 pr-5">
-          <HeaderTag className="text-base font-medium italic text-teal-950">
-            Etrian Character Customizer
-          </HeaderTag>
-
-          <button
-            className="block max-w-fit rounded-full border-[1px] border-teal-900/70 bg-teal-100 px-4 py-1 text-sm font-medium text-teal-900 transition-colors hover:bg-teal-200"
-            onClick={randomizeCharacter}
-          >
-            Randomize
-          </button>
-        </section>
+        <HeaderTag className="mx-auto flex h-[32px] w-fit flex-col flex-nowrap justify-center rounded-full bg-teal-900 px-5 py-1 text-sm font-normal italic text-teal-100">
+          Etrian Character Customizer
+        </HeaderTag>
       </OverflowContainer.Header>
 
-      <OverflowContainer.FlexContent inputGroup>
-        <legend>
-          <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
-        </legend>
+      <HeaderProvider>
+        <OverflowContainer.FlexContent>
+          <legend>
+            <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
+          </legend>
 
-        <HeaderProvider>
           {Array.from(grouped, ([game, gameEntries]) => (
-            <div key={game} className="mt-5 [&:nth-child(2)]:mt-0">
+            <div key={game} className="mt-3 [&:nth-child(2)]:mt-0">
               <Card title={nameAliases[game]} striped gapSize="small">
                 {gameEntries.map((entry) => (
                   <CharacterClassSection
@@ -181,8 +120,12 @@ export default function CharacterMenus({
               </Card>
             </div>
           ))}
-        </HeaderProvider>
-      </OverflowContainer.FlexContent>
+        </OverflowContainer.FlexContent>
+
+        <OverflowContainer.FooterButton onClick={randomizeCharacter}>
+          Select random character
+        </OverflowContainer.FooterButton>
+      </HeaderProvider>
     </OverflowContainer.Root>
   );
 }

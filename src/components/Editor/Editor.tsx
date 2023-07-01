@@ -24,9 +24,9 @@ export default function Editor() {
         />
       )}
 
-      <main className="h-full w-full">
+      <main className="flex h-full w-full flex-col flex-nowrap px-12">
         {editorController.initialized && (
-          <div className="flex h-full w-full flex-grow flex-row items-center justify-between gap-x-10">
+          <div className="mb-6 flex h-full w-full flex-grow flex-row items-center justify-between gap-x-12">
             <CharacterMenus
               selectedCharacterId={editorController.editor.selectedId}
               characters={editorController.server.characters}
@@ -48,6 +48,19 @@ export default function Editor() {
             />
           </div>
         )}
+
+        <p className="-mx-12 bg-yellow-100 px-4 py-2 text-center text-sm font-medium text-yellow-900">
+          Work in progress.{" "}
+          <a
+            className="underline"
+            href="https://github.com/Parkreiner/etrian-character-customizer"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Check the GitHub page
+          </a>{" "}
+          for updates.
+        </p>
       </main>
     </div>
   );

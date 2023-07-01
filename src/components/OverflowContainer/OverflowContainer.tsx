@@ -1,28 +1,29 @@
 import { PropsWithChildren } from "react";
 import styles from "./scrollbar.module.css";
 
-type ContentProps = PropsWithChildren<{
+type ContainerProps = PropsWithChildren<{
   inputGroup?: boolean;
 }>;
 
-function OverflowContainer({ children }: PropsWithChildren) {
+function OverflowContainer({ children, inputGroup }: ContainerProps) {
+  const MainContainerElement = inputGroup ? "fieldset" : "section";
+
   return (
-    <section className="flex h-full w-[430px] shrink-0 flex-col flex-nowrap bg-teal-600 pb-1.5">
+    <MainContainerElement className="flex h-full w-[430px] shrink-0 flex-col flex-nowrap">
       {children}
-    </section>
+    </MainContainerElement>
   );
 }
 
 export function OverflowContainerHeader({ children }: PropsWithChildren) {
-  return <div className="h-[50px] shrink-0 bg-teal-600">{children}</div>;
+  return (
+    <div className="flex h-[70px] w-full shrink-0 flex-col flex-nowrap justify-center">
+      {children}
+    </div>
+  );
 }
 
-export function OverflowContainerContent({
-  children,
-  inputGroup,
-}: ContentProps) {
-  const MainContainerElement = inputGroup ? "fieldset" : "div";
-
+export function OverflowContainerContent({ children }: PropsWithChildren) {
   /*
    * 2023-06-09 - This is a really weird trick to avoid a strange CSS bug
    * specific to Chrome. (Firefox did not have this issue.)
@@ -43,17 +44,39 @@ export function OverflowContainerContent({
    * the flow altogether.
    */
   return (
-    <MainContainerElement className="relative flex-grow">
-      <div className="absolute h-full w-full overflow-y-hidden pb-0.5 pl-6 pr-4 pt-5">
-        <div className={`${styles.scrollbar} h-full overflow-y-scroll pr-4`}>
+    <div className="relative flex-grow rounded-lg bg-teal-600">
+      <div className="absolute h-full w-full overflow-y-hidden p-3">
+        <div className={`${styles.scrollbar} h-full overflow-y-scroll pr-3`}>
           {children}
         </div>
       </div>
-    </MainContainerElement>
+    </div>
+  );
+}
+
+type FooterButtonProps = {
+  children: string;
+  onClick: () => void;
+};
+
+export function OverflowContainerFooterButton({
+  children,
+  onClick,
+}: FooterButtonProps) {
+  return (
+    <div className="w-full pb-1 pt-1.5">
+      <button
+        className="mx-auto block w-fit text-sm font-medium text-teal-900 underline underline-offset-2 hover:no-underline"
+        onClick={onClick}
+      >
+        <span className="outline-4 outline-red-400">{children}</span>
+      </button>
+    </div>
   );
 }
 
 OverflowContainer.Root = OverflowContainer;
 OverflowContainer.Header = OverflowContainerHeader;
 OverflowContainer.FlexContent = OverflowContainerContent;
+OverflowContainer.FooterButton = OverflowContainerFooterButton;
 export default OverflowContainer;
