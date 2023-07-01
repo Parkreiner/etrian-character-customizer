@@ -10,7 +10,7 @@ const MAX_RETRY_COUNT = 3;
 type NotificationInfo = { mutable_notifyAfterLoad: boolean };
 
 type ReactSnapshot = Readonly<
-  | { status: "idle" | "loading"; bitmap: null; error: null }
+  | { status: "unloaded" | "loading"; bitmap: null; error: null }
   | { status: "success"; bitmap: ImageBitmap; error: null }
   | { status: "error"; bitmap: null; error: Error }
 >;
@@ -21,7 +21,7 @@ class ImageCache {
   #subscriptions: (() => void)[] = [];
 
   static defaultSnapshot = {
-    status: "idle",
+    status: "unloaded",
     bitmap: null,
     error: null,
   } as const satisfies ReactSnapshot;
