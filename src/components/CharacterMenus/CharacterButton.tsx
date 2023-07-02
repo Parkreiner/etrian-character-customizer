@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, forwardRef } from "react";
 import { cva } from "class-variance-authority";
 
 type Props = PropsWithChildren<{
@@ -19,13 +19,13 @@ const buttonStyles = cva(
   }
 );
 
-export default function CharacterButton({
-  selected,
-  onClick,
-  children,
-}: Props) {
+const CharacterButton = forwardRef(function CharacterButton(
+  { selected, onClick, children }: Props,
+  ref?: React.ForwardedRef<HTMLButtonElement>
+) {
   return (
     <button
+      ref={ref}
       type="button"
       className={buttonStyles({ selected })}
       onClick={onClick}
@@ -34,4 +34,6 @@ export default function CharacterButton({
       {children}
     </button>
   );
-}
+});
+
+export default CharacterButton;

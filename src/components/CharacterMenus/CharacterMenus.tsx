@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 import {
@@ -30,7 +30,7 @@ const nameAliases = {
   eo3: "Etrian Odyssey III",
 } as const satisfies Record<GameOrigin, string>;
 
-export default function CharacterMenus({
+const CharacterMenus = memo(function CharacterMenus({
   selectedCharacter,
   characters,
   classOrderings,
@@ -51,9 +51,18 @@ export default function CharacterMenus({
     onCharacterChange
   );
 
+  // Makes sure that if a character is selected off-screen, the UI scrolls into
+  // view so that you can still see it. scrollIntoView doesn't work, because it
+  // always tries to scroll the focused element all the way to the top of the
+  // UI, even if that means breaking parts of the container's overflow behavior
+  const activeButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    activeButtonRef.current?.focus();
+  }, [selectedCharacter]);
+
+  // Code assumes that if you click a button for one class, you're more likely
+  // to want to see the characters from the same class.
   const loadAllImagesFromSameClass = (requestedCharacter: Character) => {
-    // Code assumes that if you click a button for one class, you're more likely
-    // to want to see the characters from the same class.
     const characterList = grouped
       .get(requestedCharacter.game)
       ?.find((entry) => entry.class === requestedCharacter.class)?.characters;
@@ -109,6 +118,18 @@ export default function CharacterMenus({
                 <Card title={nameAliases[game]} striped gapSize="small">
                   {gameEntries.map((entry) => (
                     <CharacterClassSection
+                      /**
+                       * This is a little chaotic, but even though I'm passing
+                       * the same ref into every single CharacterClassSection,
+                       * when only one instance should ever use the ref at a
+                       * time, the logic further down the subtree will make sure
+                       * the ref doesn't get reused in multiple spots per
+                       * render. The best other alternative was putting an
+                       * effect on each individual character button, which
+                       * seemed disastrous if the UI ever hits its goal of 200+
+                       * characters
+                       */
+                      activeButtonRef={activeButtonRef}
                       key={entry.class}
                       gameClass={entry.class}
                       selectedCharacterId={selectedCharacter.id}
@@ -131,4 +152,6 @@ export default function CharacterMenus({
       </HeaderProvider>
     </OverflowContainer.Root>
   );
-}
+});
+
+export default CharacterMenus;
