@@ -184,7 +184,13 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
         <OverflowContainer.FlexContent>
           {/* Defines the buttons for changing active colors */}
           {uiTabs.map((tabValue) => (
-            <Tabs.Content<UiTab> key={tabValue} value={tabValue}>
+            /**
+             * By default, Radix takes each TabContent element and makes each
+             * container focusable, even if you only want parts of the children
+             * to have focus. Have to disable with tabIndex, but the buttons
+             * inside here can still receive focus no problem
+             */
+            <Tabs.Content<UiTab> key={tabValue} value={tabValue} tabIndex={-1}>
               <div className="mb-3">
                 <Card title={`Swatches (${tabValue})`} striped gapSize="small">
                   {tabValue !== "eyes" && (
