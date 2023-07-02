@@ -49,6 +49,7 @@ export default function ColorHueWheel({ hue, onHueChange }: Props) {
         style={{ backgroundColor }}
         tabIndex={0}
         aria-valuenow={hue}
+        title="Color hue slider"
       >
         <VisuallyHidden.Root>
           Click and drag to adjust hue value

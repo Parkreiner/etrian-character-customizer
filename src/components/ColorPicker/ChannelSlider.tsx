@@ -45,7 +45,6 @@ export default function ColorSlider({
       </TooltipTemplate>
 
       <Slider.Root
-        aria-labelledby={sliderLabelId}
         className="relative flex grow touch-none select-none items-center"
         value={[value]}
         min={0}
@@ -58,7 +57,10 @@ export default function ColorSlider({
         <Slider.Track className="relative h-[4px] grow rounded-full bg-black">
           <Slider.Range className="absolute h-full rounded-full bg-teal-200" />
         </Slider.Track>
-        <Slider.Thumb className="block h-5 w-2 rounded-sm bg-teal-50 shadow-[0_2px_10px] shadow-gray-900 hover:bg-teal-200 focus:shadow-[0_0_0_5px] focus:shadow-gray-800 focus:outline-none" />
+        <Slider.Thumb
+          aria-labelledby={sliderLabelId}
+          className="block h-5 w-2 rounded-sm bg-teal-50 shadow-[0_2px_10px] shadow-gray-900 hover:bg-teal-200 focus:shadow-[0_0_0_5px] focus:shadow-gray-800 focus:outline-none"
+        />
       </Slider.Root>
 
       <div className="text-md ml-4 flex w-32 flex-row items-center justify-between gap-x-2 text-center font-medium text-teal-100">
