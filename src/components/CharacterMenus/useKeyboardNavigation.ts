@@ -47,65 +47,51 @@ export function findNewCharacterFromInput(
     cachedGroupIterable = [...characterGroups.values()].flat();
   }
 
+  let targetEntry: GroupEntry | undefined;
   if (arrowKey === "ArrowUp") {
-    let prevEntry = cachedGroupIterable.at(0);
-
-    for (const entry of cachedGroupIterable) {
-      if (entry === activeEntry) break;
-      if (entry.characters.length > 0) {
-        prevEntry = entry;
+    // element isn't the most descriptive name, but having three variants of the
+    // word "entry" made it harder to follow the code
+    for (const element of cachedGroupIterable) {
+      if (element === activeEntry) break;
+      if (element.characters.length > 0) {
+        targetEntry = element;
       }
     }
-
-    if (prevEntry === undefined || prevEntry === activeEntry) {
-      return null;
-    }
-
-    const prevClassList = prevEntry.characters;
-    const newIndex = Math.min(activeCharIndex, prevClassList.length - 1);
-    return prevClassList[newIndex] ?? null;
-  }
-
-  if (arrowKey === "ArrowDown") {
-    let nextEntry = cachedGroupIterable.at(-1);
-
+  } else {
     for (let i = cachedGroupIterable.length - 1; i >= 0; i--) {
-      const entry = cachedGroupIterable[i];
-      if (entry === undefined || entry === activeEntry) break;
+      const element = cachedGroupIterable[i];
+      if (element === undefined || element === activeEntry) {
+        break;
+      }
 
-      if (entry.characters.length > 0) {
-        nextEntry = entry;
+      if (element.characters.length > 0) {
+        targetEntry = element;
       }
     }
-
-    if (nextEntry === undefined || nextEntry === activeEntry) {
-      return null;
-    }
-
-    const nextClassList = nextEntry.characters;
-    const newIndex = Math.min(activeCharIndex, nextClassList.length - 1);
-    return nextClassList[newIndex] ?? null;
   }
 
-  return null;
+  if (targetEntry === undefined) return null;
+  const classList = targetEntry.characters;
+  const newIndex = Math.min(activeCharIndex, classList.length - 1);
+  return classList[newIndex] ?? null;
 }
 
 export default function useKeyboardNavigation(
   characterGroups: GroupData,
-  character: Character,
+  currentCharacter: Character,
   onCharacterChange: (newCharacter: Character) => void
 ) {
   const elementRef = useRef<HTMLDivElement>(null);
 
   const groupRef = useRef(characterGroups);
-  const characterRef = useRef(character);
+  const currentCharacterRef = useRef(currentCharacter);
   const charChangeRef = useRef(onCharacterChange);
 
   useEffect(() => {
     groupRef.current = characterGroups;
-    characterRef.current = character;
+    currentCharacterRef.current = currentCharacter;
     charChangeRef.current = onCharacterChange;
-  }, [characterGroups, character, onCharacterChange]);
+  }, [characterGroups, currentCharacter, onCharacterChange]);
 
   useEffect(() => {
     const element = elementRef.current;
@@ -118,7 +104,7 @@ export default function useKeyboardNavigation(
       event.preventDefault();
       const newCharacter = findNewCharacterFromInput(
         groupRef.current,
-        characterRef.current,
+        currentCharacterRef.current,
         key
       );
 
