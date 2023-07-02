@@ -28,7 +28,7 @@ export default function Editor() {
         {editorController.initialized && (
           <div className="mx-auto mb-6 flex h-full w-full max-w-[1700px] flex-grow flex-row items-center justify-between gap-x-8">
             <CharacterMenus
-              selectedCharacterId={editorController.editor.selectedId}
+              selectedCharacter={editorController.derived.selectedCharacter}
               characters={editorController.server.characters}
               classOrderings={editorController.server.classOrderings}
               onCharacterChange={editorController.editor.changeCharacter}

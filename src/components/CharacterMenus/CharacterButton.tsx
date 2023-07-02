@@ -11,7 +11,7 @@ const buttonStyles = cva(
   {
     variants: {
       selected: {
-        true: "cursor-not-allowed bg-teal-200 text-teal-800",
+        true: "cursor-default bg-teal-200 text-teal-800",
         false:
           "bg-teal-700 text-teal-100 hover:bg-teal-200 hover:text-teal-800",
       },
@@ -29,7 +29,7 @@ export default function CharacterButton({
       type="button"
       className={buttonStyles({ selected })}
       onClick={onClick}
-      disabled={selected}
+      tabIndex={selected ? 0 : -1}
     >
       {children}
     </button>

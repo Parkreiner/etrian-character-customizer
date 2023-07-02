@@ -14,11 +14,12 @@ import { useLazyImageLoader } from "@/hooks/useBitmapManager";
 import HeaderProvider, { useCurrentHeader } from "@/contexts/HeaderLevels";
 
 import CharacterClassSection from "./CharacterClassPanel";
+import useKeyboardNavigation from "./useKeyboardNavigation";
 
 type Props = {
+  selectedCharacter: Character;
   characters: readonly Character[];
   classOrderings: ClassOrderings;
-  selectedCharacterId: string;
   onCharacterChange: (newCharacter: Character) => void;
   randomizeCharacter: () => void;
 };
@@ -30,7 +31,7 @@ const nameAliases = {
 } as const satisfies Record<GameOrigin, string>;
 
 export default function CharacterMenus({
-  selectedCharacterId,
+  selectedCharacter,
   characters,
   classOrderings,
   onCharacterChange,
@@ -42,6 +43,12 @@ export default function CharacterMenus({
   const grouped = useMemo(
     () => groupCharacters(characters, classOrderings),
     [characters, classOrderings]
+  );
+
+  const containerRef = useKeyboardNavigation(
+    grouped,
+    selectedCharacter,
+    onCharacterChange
   );
 
   const loadAllImagesFromSameClass = (requestedCharacter: Character) => {
@@ -74,13 +81,7 @@ export default function CharacterMenus({
   // satisfy the dependency arrays while making sure that the on-mount effect
   // only ever runs once
   const veryHackyOnMountRef = useRef(() => {
-    const initialCharacter = characters.find(
-      (char) => char.id === selectedCharacterId
-    );
-
-    if (initialCharacter !== undefined) {
-      return loadAllImagesFromSameClass(initialCharacter);
-    }
+    return loadAllImagesFromSameClass(selectedCharacter);
   });
 
   useEffect(() => {
@@ -89,7 +90,7 @@ export default function CharacterMenus({
   }, []);
 
   return (
-    <OverflowContainer.Root inputGroup>
+    <OverflowContainer.Root ref={containerRef}>
       <OverflowContainer.Header>
         <HeaderTag className="mx-auto flex h-[32px] w-fit flex-col flex-nowrap justify-center rounded-full bg-teal-900 px-5 py-1 text-sm font-normal italic text-teal-100">
           Etrian Character Customizer
@@ -98,28 +99,30 @@ export default function CharacterMenus({
 
       <HeaderProvider>
         <OverflowContainer.FlexContent>
-          <legend>
-            <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
-          </legend>
+          <fieldset>
+            <legend>
+              <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
+            </legend>
 
-          {Array.from(grouped, ([game, gameEntries]) => (
-            <div key={game} className="mt-3 [&:nth-child(2)]:mt-0">
-              <Card title={nameAliases[game]} striped gapSize="small">
-                {gameEntries.map((entry) => (
-                  <CharacterClassSection
-                    key={entry.class}
-                    gameClass={entry.class}
-                    selectedCharacterId={selectedCharacterId}
-                    characters={entry.characters}
-                    onCharacterChange={(char) => {
-                      loadAllImagesFromSameClass(char);
-                      onCharacterChange(char);
-                    }}
-                  />
-                ))}
-              </Card>
-            </div>
-          ))}
+            {Array.from(grouped, ([game, gameEntries]) => (
+              <div key={game} className="mt-3 [&:nth-child(2)]:mt-0">
+                <Card title={nameAliases[game]} striped gapSize="small">
+                  {gameEntries.map((entry) => (
+                    <CharacterClassSection
+                      key={entry.class}
+                      gameClass={entry.class}
+                      selectedCharacterId={selectedCharacter.id}
+                      characters={entry.characters}
+                      onCharacterChange={(char) => {
+                        loadAllImagesFromSameClass(char);
+                        onCharacterChange(char);
+                      }}
+                    />
+                  ))}
+                </Card>
+              </div>
+            ))}
+          </fieldset>
         </OverflowContainer.FlexContent>
 
         <OverflowContainer.FooterButton onClick={randomizeCharacter}>

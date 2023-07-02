@@ -166,6 +166,11 @@ class ImageCache {
 
 const cache = new ImageCache();
 
+/**
+ * Note: The reason why this function is available as a separate hook is so that
+ * components can access it without having to go through useBitmapManager, which
+ * requires an image URL as input
+ */
 export function useLazyImageLoader() {
   return useCallback((imgUrl: string, notifyAfterLoad = true) => {
     const info: NotificationInfo = {
