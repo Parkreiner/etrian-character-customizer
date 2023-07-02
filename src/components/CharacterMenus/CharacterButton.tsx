@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, forwardRef } from "react";
 import { cva } from "class-variance-authority";
 
 type Props = PropsWithChildren<{
@@ -11,7 +11,7 @@ const buttonStyles = cva(
   {
     variants: {
       selected: {
-        true: "cursor-not-allowed bg-teal-200 text-teal-800",
+        true: "cursor-default bg-teal-200 text-teal-800",
         false:
           "bg-teal-700 text-teal-100 hover:bg-teal-200 hover:text-teal-800",
       },
@@ -19,19 +19,21 @@ const buttonStyles = cva(
   }
 );
 
-export default function CharacterButton({
-  selected,
-  onClick,
-  children,
-}: Props) {
+const CharacterButton = forwardRef(function CharacterButton(
+  { selected, onClick, children }: Props,
+  ref?: React.ForwardedRef<HTMLButtonElement>
+) {
   return (
     <button
+      ref={ref}
       type="button"
       className={buttonStyles({ selected })}
       onClick={onClick}
-      disabled={selected}
+      tabIndex={selected ? 0 : -1}
     >
       {children}
     </button>
   );
-}
+});
+
+export default CharacterButton;

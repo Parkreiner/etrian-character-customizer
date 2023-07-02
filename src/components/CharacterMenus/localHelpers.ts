@@ -4,12 +4,13 @@ import {
   ClassOrderings,
 } from "@/typesConstants/gameData";
 
-type GroupEntry = { class: string; characters: readonly Character[] };
+export type GroupEntry = { class: string; characters: readonly Character[] };
+export type GroupData = Map<GameOrigin, readonly GroupEntry[]>;
 
 export function groupCharacters(
   characters: readonly Character[],
   classOrderings: ClassOrderings
-): Map<GameOrigin, readonly GroupEntry[]> {
+): GroupData {
   const sortedChars = [...characters].sort((char1, char2) => {
     if (char1.displayId === char2.displayId) return 0;
     return char1.displayId < char2.displayId ? -1 : 1;

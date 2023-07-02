@@ -11,6 +11,7 @@ type Props = {
   characters: readonly Character[];
   selectedCharacterId: string;
   onCharacterChange: (newCharacter: Character) => void;
+  activeButtonRef?: React.ForwardedRef<HTMLButtonElement>;
 };
 
 export default function CharacterClassSection({
@@ -18,6 +19,7 @@ export default function CharacterClassSection({
   characters,
   selectedCharacterId,
   onCharacterChange,
+  activeButtonRef,
 }: Props) {
   const HeaderTag = useCurrentHeader();
   const placeholderSlotsToRender = Math.abs((5 - characters.length) % 5);
@@ -36,24 +38,24 @@ export default function CharacterClassSection({
             </div>
           ) : (
             <ul className="grid h-full w-full grid-cols-5 gap-x-2">
-              {characters.map((char) => (
-                // Could make the images load on hover, but because the UI is
-                // going to be so dense and have so many buttons, each of which
-                // has a big image associated with it (whether that loads on
-                // hover or click), it felt like it'd be way too easy to clog
-                // things with network requests with the hover approach
-                <li key={char.id}>
-                  <CharacterButton
-                    selected={char.id === selectedCharacterId}
-                    onClick={() => onCharacterChange(char)}
-                  >
-                    <VisuallyHidden.Root>
-                      Select {char.class}{" "}
-                    </VisuallyHidden.Root>
-                    {char.displayId}
-                  </CharacterButton>
-                </li>
-              ))}
+              {characters.map((char) => {
+                const selected = char.id === selectedCharacterId;
+
+                return (
+                  <li key={char.id}>
+                    <CharacterButton
+                      selected={selected}
+                      onClick={() => onCharacterChange(char)}
+                      ref={selected ? activeButtonRef : undefined}
+                    >
+                      <VisuallyHidden.Root>
+                        Select {char.class}{" "}
+                      </VisuallyHidden.Root>
+                      {char.displayId}
+                    </CharacterButton>
+                  </li>
+                );
+              })}
 
               {range(placeholderSlotsToRender).map((num) => (
                 <li

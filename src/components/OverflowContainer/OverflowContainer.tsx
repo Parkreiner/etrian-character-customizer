@@ -1,19 +1,19 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, forwardRef } from "react";
 import styles from "./scrollbar.module.css";
 
-type ContainerProps = PropsWithChildren<{
-  inputGroup?: boolean;
-}>;
-
-function OverflowContainer({ children, inputGroup }: ContainerProps) {
-  const MainContainerElement = inputGroup ? "fieldset" : "section";
-
+const OverflowContainer = forwardRef(function OverflowContainer(
+  { children }: PropsWithChildren,
+  ref?: React.ForwardedRef<HTMLDivElement>
+) {
   return (
-    <MainContainerElement className="flex h-full w-[430px] shrink-0 flex-col flex-nowrap">
+    <div
+      ref={ref}
+      className="flex h-full w-[430px] shrink-0 flex-col flex-nowrap"
+    >
       {children}
-    </MainContainerElement>
+    </div>
   );
-}
+});
 
 export function OverflowContainerHeader({ children }: PropsWithChildren) {
   return (
@@ -23,7 +23,7 @@ export function OverflowContainerHeader({ children }: PropsWithChildren) {
   );
 }
 
-export function OverflowContainerContent({ children }: PropsWithChildren) {
+export function OverflowContainerFlexContent({ children }: PropsWithChildren) {
   /*
    * 2023-06-09 - This is a really weird trick to avoid a strange CSS bug
    * specific to Chrome. (Firefox did not have this issue.)
@@ -75,8 +75,15 @@ export function OverflowContainerFooterButton({
   );
 }
 
-OverflowContainer.Root = OverflowContainer;
-OverflowContainer.Header = OverflowContainerHeader;
-OverflowContainer.FlexContent = OverflowContainerContent;
-OverflowContainer.FooterButton = OverflowContainerFooterButton;
-export default OverflowContainer;
+const ContainerRecast = OverflowContainer as typeof OverflowContainer & {
+  Root: typeof OverflowContainer;
+  Header: typeof OverflowContainerHeader;
+  FlexContent: typeof OverflowContainerFlexContent;
+  FooterButton: typeof OverflowContainerFooterButton;
+};
+
+ContainerRecast.Root = OverflowContainer;
+ContainerRecast.Header = OverflowContainerHeader;
+ContainerRecast.FlexContent = OverflowContainerFlexContent;
+ContainerRecast.FooterButton = OverflowContainerFooterButton;
+export default ContainerRecast;
