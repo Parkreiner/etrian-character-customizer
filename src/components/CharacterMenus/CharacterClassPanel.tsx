@@ -58,11 +58,9 @@ export default function CharacterClassSection({
               })}
 
               {range(placeholderSlotsToRender).map((num) => (
-                <li
-                  key={num}
-                  className="rounded-md bg-teal-950 opacity-60"
-                  role="presentation"
-                />
+                <li key={num} className="rounded-md bg-teal-950 opacity-60">
+                  <span role="presentation" />
+                </li>
               ))}
             </ul>
           )}

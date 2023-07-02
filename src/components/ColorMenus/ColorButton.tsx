@@ -1,3 +1,4 @@
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import classNames from "classnames";
 
 type Props = React.ComponentPropsWithoutRef<"button"> & {
@@ -28,7 +29,7 @@ export default function ColorButton({
         style={{ backgroundColor: primaryHex }}
         {...delegated}
       >
-        {secondaryHex && (
+        {secondaryHex !== undefined && (
           <div
             className="absolute right-0 top-0 h-full w-[50%]"
             style={{ backgroundColor: secondaryHex }}
@@ -40,6 +41,11 @@ export default function ColorButton({
             {children}
           </div>
         )}
+
+        <VisuallyHidden.Root>
+          Click to get color{secondaryHex === undefined ? "" : "s"} {primaryHex}{" "}
+          {secondaryHex === undefined ? "" : `with ${secondaryHex}`}
+        </VisuallyHidden.Root>
       </button>
     </div>
   );
