@@ -1,5 +1,9 @@
 import { Character } from "@/typesConstants/gameData";
-import { GroupData, GroupEntry } from "./localHelpers";
+import {
+  GroupData,
+  GroupEntry,
+  findGroupEntryFromCharacter,
+} from "./localHelpers";
 import { useEffect, useRef } from "react";
 
 const arrowKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"] as const;
@@ -17,9 +21,10 @@ export function findNewCharacterFromInput(
   currentCharacter: Character,
   arrowKey: ArrowKey
 ): Character | null {
-  const activeEntry = characterGroups
-    .get(currentCharacter.game)
-    ?.find((entry) => entry.class === currentCharacter.class);
+  const activeEntry = findGroupEntryFromCharacter(
+    currentCharacter,
+    characterGroups
+  );
 
   if (activeEntry === undefined) {
     return null;

@@ -57,3 +57,12 @@ export function moveToFront<T extends { id: string }>(
 
   return copy;
 }
+
+export function findGroupEntryFromCharacter(
+  character: Character,
+  characterGroups: GroupData
+): GroupEntry | undefined {
+  return characterGroups
+    .get(character.game)
+    ?.find((entry) => entry.class === character.class);
+}
