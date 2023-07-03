@@ -7,7 +7,11 @@ import {
   GameOrigin,
 } from "@/typesConstants/gameData";
 
-import { groupCharacters, moveToFront } from "./localHelpers";
+import {
+  findGroupEntryFromCharacter,
+  groupCharacters,
+  moveToFront,
+} from "./localHelpers";
 import Card from "@/components/Card";
 import OverflowContainer from "@/components/OverflowContainer";
 import { useLazyImageLoader } from "@/hooks/useBitmapManager";
@@ -61,20 +65,18 @@ const CharacterMenus = memo(function CharacterMenus({
   }, [selectedCharacter]);
 
   // Code assumes that if you click a button for one class, you're more likely
-  // to want to see the characters from the same class.
+  // to want to see all the characters from the same class, so this not only
+  // loads the main selected character, but prefetches adjacent images
   const loadAllImagesFromSameClass = (requestedCharacter: Character) => {
-    const characterList = grouped
-      .get(requestedCharacter.game)
-      ?.find((entry) => entry.class === requestedCharacter.class)?.characters;
-
-    if (characterList === undefined) {
+    const found = findGroupEntryFromCharacter(requestedCharacter, grouped);
+    if (found === undefined) {
       return;
     }
 
     // Reordering here is a hack because most browsers don't support the
     // fetchPriority property for images. For those browsers, the best you can
     // do is make sure your main image is the very first one processed
-    const reordered = moveToFront(characterList, requestedCharacter.id);
+    const reordered = moveToFront(found.characters, requestedCharacter.id);
 
     const abortControllers = reordered.map((char) => {
       const updateAfterLoad = char.id === requestedCharacter.id;
@@ -84,6 +86,12 @@ const CharacterMenus = memo(function CharacterMenus({
     return function abortAll() {
       abortControllers.forEach((abort) => abort());
     };
+  };
+
+  // Exact same function can be reused for all .map calls in render output
+  const onCharacterChangeWithPrefetch = (char: Character) => {
+    loadAllImagesFromSameClass(char);
+    onCharacterChange(char);
   };
 
   // From here to the return statement, there's some screwy stuff happening to
@@ -118,26 +126,24 @@ const CharacterMenus = memo(function CharacterMenus({
                 <Card title={nameAliases[game]} striped gapSize="small">
                   {gameEntries.map((entry) => (
                     <CharacterClassSection
+                      key={entry.class}
+                      gameClass={entry.class}
+                      selectedCharacterId={selectedCharacter.id}
+                      characters={entry.characters}
+                      onCharacterChange={onCharacterChangeWithPrefetch}
                       /**
                        * This is a little chaotic, but even though I'm passing
                        * the same ref into every single CharacterClassSection,
                        * when only one instance should ever use the ref at a
                        * time, the logic further down the subtree will make sure
                        * the ref doesn't get reused in multiple spots per
-                       * render. The best other alternative was putting an
-                       * effect on each individual character button, which
+                       * render. The best alternative was adding useEffect to
+                       * every single button that gets rendered, and having the
+                       * selected button focus itself when needed, but that
                        * seemed disastrous if the UI ever hits its goal of 200+
                        * characters
                        */
                       activeButtonRef={activeButtonRef}
-                      key={entry.class}
-                      gameClass={entry.class}
-                      selectedCharacterId={selectedCharacter.id}
-                      characters={entry.characters}
-                      onCharacterChange={(char) => {
-                        loadAllImagesFromSameClass(char);
-                        onCharacterChange(char);
-                      }}
                     />
                   ))}
                 </Card>
