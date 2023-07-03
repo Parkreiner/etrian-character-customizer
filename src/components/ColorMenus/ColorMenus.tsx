@@ -3,9 +3,7 @@
  * character.
  */
 import { Fragment } from "react";
-import { cva } from "class-variance-authority";
 import { CharacterColors, MISC_COLOR_PRESETS } from "@/typesConstants/colors";
-import { toTitleCase } from "@/utils/strings";
 import {
   ColorTuple,
   HAIR_EYE_COLOR_PRESETS,
@@ -16,7 +14,7 @@ import { UiTab, uiTabs } from "./localTypes";
 import useColorMenusState from "./useColorMenusState";
 import ColorButton from "./ColorButton";
 import LinkToggle from "./LinkToggle";
-import TabIconWrapper from "./TabIconWrapper";
+import TabButton from "./TabButton";
 
 import * as Tabs from "@/components/Tabs";
 import Card from "@/components/Card";
@@ -49,18 +47,6 @@ const colorPresets = {
   skin: SKIN_COLOR_PRESETS,
   misc: MISC_COLOR_PRESETS,
 } as const satisfies Record<UiTab, readonly ColorTuple[]>;
-
-const tabButtonStyles = cva(
-  "px-3.5 py-1 rounded-full text-sm flex flex-row flex-nowrap gap-x-1 items-center first:pl-4 last:pr-4",
-  {
-    variants: {
-      active: {
-        true: "text-opacity-100 text-teal-950 bg-teal-100 font-medium",
-        false: "text-opacity-95 text-teal-50 bg-teal-900",
-      } as const satisfies Record<`${boolean}`, string>,
-    },
-  }
-);
 
 function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
   const { state, updaters } = useColorMenusState(colors);
@@ -165,15 +151,10 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
               return (
                 <Fragment key={tabValue}>
                   {colors[aliasedKey].length > 0 && (
-                    <Tabs.Trigger<UiTab>
-                      value={tabValue}
-                      className={tabButtonStyles({
-                        active: tabValue === state.activeTab,
-                      })}
-                    >
-                      <TabIconWrapper tab={tabValue} />
-                      <span>{toTitleCase(tabValue)}</span>
-                    </Tabs.Trigger>
+                    <TabButton
+                      tabValue={tabValue}
+                      active={tabValue === state.activeTab}
+                    />
                   )}
                 </Fragment>
               );
