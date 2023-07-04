@@ -3,12 +3,7 @@
  * character.
  */
 import { Fragment } from "react";
-import { CharacterColors, MISC_COLOR_PRESETS } from "@/typesConstants/colors";
-import {
-  ColorTuple,
-  HAIR_EYE_COLOR_PRESETS,
-  SKIN_COLOR_PRESETS,
-} from "@/typesConstants/colors";
+import { CharacterColors } from "@/typesConstants/colors";
 
 import { UiTab, uiTabs } from "./localTypes";
 import useColorMenusState from "./useColorMenusState";
@@ -20,6 +15,7 @@ import * as Tabs from "@/components/Tabs";
 import Card from "@/components/Card";
 import ColorPicker from "@/components/ColorPicker";
 import OverflowContainer from "../OverflowContainer/OverflowContainer";
+import ColorPresets from "./ColorPresets";
 
 type ExternalProps = {
   /**
@@ -40,13 +36,6 @@ type CoreProps = Omit<ExternalProps, "characterKey">;
 
 // Using super bright magenta to make visual errors more obvious
 const fallbackColor = "#ff00ff";
-
-const colorPresets = {
-  eyes: HAIR_EYE_COLOR_PRESETS,
-  hair: HAIR_EYE_COLOR_PRESETS,
-  skin: SKIN_COLOR_PRESETS,
-  misc: MISC_COLOR_PRESETS,
-} as const satisfies Record<UiTab, readonly ColorTuple[]>;
 
 function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
   const { state, updaters } = useColorMenusState(colors);
@@ -252,28 +241,10 @@ function ColorMenusCore({ colors, onColorChange, onColorsReset }: CoreProps) {
             <ColorPicker hexColor={activeHexColor} onHexChange={onHexChange} />
           </div>
 
-          {/* All the color presets associated with each tab */}
-          {colorPresets[state.activeTab].length > 0 && (
-            <div>
-              <Card
-                title={`Presets (${state.activeTab})`}
-                striped
-                gapSize="small"
-              >
-                <ul className="mt-1 grid w-full max-w-[400px] grid-cols-3 justify-between gap-3">
-                  {colorPresets[state.activeTab].map(([hex1, hex2], index) => (
-                    <li key={index} className="mx-auto block">
-                      <ColorButton
-                        primaryHex={hex1}
-                        secondaryHex={hex2}
-                        onClick={() => selectHexPreset(hex1, hex2)}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            </div>
-          )}
+          <ColorPresets
+            activeTab={state.activeTab}
+            onHexPresetChange={selectHexPreset}
+          />
         </OverflowContainer.FlexContent>
 
         <OverflowContainer.FooterButton onClick={onColorsReset}>
