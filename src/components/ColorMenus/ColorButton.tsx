@@ -1,5 +1,6 @@
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import classNames from "classnames";
+import { forwardRef } from "react";
 
 type Props = React.ComponentPropsWithoutRef<"button"> & {
   primaryHex: string;
@@ -10,13 +11,10 @@ type Props = React.ComponentPropsWithoutRef<"button"> & {
   selected?: boolean;
 };
 
-export default function ColorButton({
-  primaryHex,
-  secondaryHex,
-  children,
-  selected = false,
-  ...delegated
-}: Props) {
+const ColorButton = forwardRef(function ColorButton(
+  { primaryHex, secondaryHex, children, selected = false, ...delegated }: Props,
+  ref?: React.ForwardedRef<HTMLButtonElement>
+) {
   return (
     <div
       className={classNames(
@@ -25,6 +23,7 @@ export default function ColorButton({
       )}
     >
       <button
+        ref={ref}
         className="relative h-10 min-w-[80px] basis-[80px] overflow-y-hidden rounded-md border-2 border-black"
         style={{ backgroundColor: primaryHex }}
         {...delegated}
@@ -49,4 +48,6 @@ export default function ColorButton({
       </button>
     </div>
   );
-}
+});
+
+export default ColorButton;

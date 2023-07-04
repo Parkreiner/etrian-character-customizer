@@ -18,7 +18,7 @@ import { useLazyImageLoader } from "@/hooks/useBitmapManager";
 import HeaderProvider, { useCurrentHeader } from "@/contexts/HeaderLevels";
 
 import CharacterClassSection from "./CharacterClassPanel";
-import useKeyboardNavigation from "./useKeyboardNavigation";
+import useCharacterKeyboardNav from "./useCharacterKeyboardNav";
 
 type Props = {
   selectedCharacter: Character;
@@ -49,7 +49,7 @@ const CharacterMenus = memo(function CharacterMenus({
     [characters, classOrderings]
   );
 
-  const containerRef = useKeyboardNavigation(
+  const containerRef = useCharacterKeyboardNav(
     grouped,
     selectedCharacter,
     onCharacterChange

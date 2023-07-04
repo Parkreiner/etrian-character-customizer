@@ -1,17 +1,11 @@
+import { useEffect, useRef } from "react";
 import { Character } from "@/typesConstants/gameData";
+import { ArrowKey, isArrowKey } from "@/utils/keyboard";
 import {
   GroupData,
   GroupEntry,
   findGroupEntryFromCharacter,
 } from "./localHelpers";
-import { useEffect, useRef } from "react";
-
-const arrowKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"] as const;
-type ArrowKey = (typeof arrowKeys)[number];
-
-function isArrowKey(value: unknown): value is ArrowKey {
-  return typeof value === "string" && arrowKeys.includes(value as ArrowKey);
-}
 
 let lastGroup: GroupData | null = null;
 let cachedGroupIterable: readonly GroupEntry[] = [];
