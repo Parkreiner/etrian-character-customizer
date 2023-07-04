@@ -31,13 +31,13 @@ export function findNewCharacterFromInput(
 
   // Handles left and right inputs; really straightforward
   if (arrowKey === "ArrowLeft") {
-    const newCharacter = activeClassList[activeCharIndex - 1];
-    return newCharacter ?? null;
+    const newIndex = activeCharIndex === 0 ? -1 : activeCharIndex - 1;
+    return activeClassList.at(newIndex) ?? null;
   }
 
   if (arrowKey === "ArrowRight") {
-    const newCharacter = activeClassList[activeCharIndex + 1];
-    return newCharacter ?? null;
+    const newIndex = (activeCharIndex + 1) % activeClassList.length;
+    return activeClassList.at(newIndex) ?? null;
   }
 
   // Rest of the function handles up/down inputs; much more involved
