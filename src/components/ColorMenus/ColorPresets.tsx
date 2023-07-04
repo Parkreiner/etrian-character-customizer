@@ -1,28 +1,71 @@
+/**
+ * @todo This file is getting big and involved enough that it probably makes
+ * sense to split it off into a separate top-level directory once I'm done
+ */
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import {
   ColorTuple,
   HAIR_EYE_COLOR_PRESETS,
   SKIN_COLOR_PRESETS,
   MISC_COLOR_PRESETS,
 } from "@/typesConstants/colors";
-
-import Card from "../Card/";
-import ColorButton from "./ColorButton";
-import { UiTab } from "./localTypes";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowKey, isArrowKey } from "@/utils/keyboard";
 import { clamp } from "@/utils/math";
+
+import Card from "@/components/Card/";
+import ColorButton from "./ColorButton";
+import { UiTab } from "./localTypes";
 
 type Props = {
   activeTab: UiTab;
   onHexPresetChange: (hex1: string, hex2: string) => void;
 };
 
-function mapKeyToNewIndex(
-  colorCount: number,
+export function mapKeyToGridIndex(
+  itemCount: number,
   gridCount: number,
+  currentIndex: number,
   arrowKey: ArrowKey
 ): number {
-  return 0;
+  const rowIndex = Math.floor(currentIndex / gridCount);
+  const colIndex = currentIndex % gridCount;
+  const lastRowIndex = Math.floor(itemCount / gridCount);
+  const lastColIndex = Math.floor(itemCount / lastRowIndex);
+  const lastItemIndex = itemCount - 1;
+
+  // Only ArrowLeft seems to be 100% working right now
+  switch (arrowKey) {
+    case "ArrowLeft": {
+      const offsetColIndex = colIndex === 0 ? gridCount - 1 : colIndex - 1;
+      const newRawIndex = lastColIndex * rowIndex + offsetColIndex;
+      return Math.min(newRawIndex, lastItemIndex);
+    }
+
+    case "ArrowRight": {
+      // Current bug: the logic is not able to wrap around correctly if on a row
+      // that is not fully filled out
+      const offsetColIndex = colIndex === gridCount - 1 ? 0 : colIndex + 1;
+      const newRawIndex = lastColIndex * rowIndex + offsetColIndex;
+      return Math.min(newRawIndex, lastItemIndex);
+    }
+
+    case "ArrowUp": {
+      const offsetRowIndex = rowIndex === 0 ? lastRowIndex : rowIndex - 1;
+      const newRawIndex = lastColIndex * offsetRowIndex + colIndex;
+      return Math.min(newRawIndex, lastItemIndex);
+    }
+
+    case "ArrowDown": {
+      const offsetRowIndex = rowIndex === lastRowIndex ? 0 : rowIndex + 1;
+      const newRawIndex = lastColIndex * offsetRowIndex + colIndex;
+      return Math.min(newRawIndex, lastItemIndex);
+    }
+
+    default: {
+      throw new Error("Unknown input received.");
+    }
+  }
 }
 
 function usePresetsKeyboardNav<Element extends HTMLElement>(
@@ -34,11 +77,7 @@ function usePresetsKeyboardNav<Element extends HTMLElement>(
   // count, since the value will only ever be used within effects
   const gridColumnCountRef = useRef(0);
   const gridContainerRef = useRef<Element>(null);
-  const numPresetsRef = useRef(numPresets);
-
-  useEffect(() => {
-    numPresetsRef.current = numPresets;
-  }, [numPresets]);
+  const updateInfoRef = useRef({ activePresetIndex, numPresets });
 
   // Effect for updating the number of columns as the element resizes
   useEffect(() => {
@@ -59,6 +98,10 @@ function usePresetsKeyboardNav<Element extends HTMLElement>(
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    updateInfoRef.current = { activePresetIndex, numPresets };
+  }, [numPresets, activePresetIndex]);
+
   // Effect for listening to keyboard input; must run after column resize effect
   useEffect(() => {
     const gridContainer = gridContainerRef.current;
@@ -69,13 +112,16 @@ function usePresetsKeyboardNav<Element extends HTMLElement>(
       if (!isArrowKey(key)) return;
 
       event.preventDefault();
-      if (numPresetsRef.current === 0) {
+      const { activePresetIndex, numPresets } = updateInfoRef.current;
+
+      if (numPresets === 0) {
         return;
       }
 
-      const newIndex = mapKeyToNewIndex(
-        numPresetsRef.current,
+      const newIndex = mapKeyToGridIndex(
+        numPresets,
         gridColumnCountRef.current,
+        activePresetIndex,
         key
       );
 
@@ -86,11 +132,27 @@ function usePresetsKeyboardNav<Element extends HTMLElement>(
     return () => gridContainer.removeEventListener("keydown", handleKeyInput);
   }, []);
 
+  /**
+   * @todo Effect is only for debugging - delete once fully done (and tested!)
+   */
+  useEffect(() => {
+    const gridContainer = gridContainerRef.current;
+    if (gridContainer === null) return;
+
+    const intervalId = window.setInterval(() => {
+      gridContainer.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowRight" })
+      );
+    }, 500);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   const safeSetActivePresetIndex = useCallback(
     (newIndex: number) => {
       setActivePresetIndex((current) => {
         if (!Number.isInteger(newIndex) || newIndex < 0) return current;
-        return clamp(newIndex, 0, numPresets);
+        return clamp(newIndex, 0, numPresets - 1);
       });
     },
     [numPresets]
@@ -129,19 +191,24 @@ function ColorPresetList({ colorTuples, onHexPresetChange }: PresetsListProps) {
       ref={gridContainerRef}
       className="mt-1 grid w-full max-w-[400px] grid-cols-3 justify-between gap-3"
     >
-      {colorTuples.map(([hex1, hex2], index) => (
-        <li key={`${hex1}-${hex2}`} className="mx-auto block">
-          <ColorButton
-            primaryHex={hex1}
-            secondaryHex={hex2}
-            selected={index === activePresetIndex}
-            onClick={() => {
-              onHexPresetChange(hex1, hex2);
-              setActivePresetIndex(index);
-            }}
-          />
-        </li>
-      ))}
+      {colorTuples.map(([hex1, hex2], index) => {
+        const selected = index === activePresetIndex;
+
+        return (
+          <li key={`${hex1}-${hex2}`} className="mx-auto block">
+            <ColorButton
+              primaryHex={hex1}
+              secondaryHex={hex2}
+              selected={selected}
+              tabIndex={selected ? 0 : -1}
+              onClick={() => {
+                onHexPresetChange(hex1, hex2);
+                setActivePresetIndex(index);
+              }}
+            />
+          </li>
+        );
+      })}
     </ul>
   );
 }
