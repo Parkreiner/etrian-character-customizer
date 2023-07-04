@@ -78,9 +78,17 @@ export function findNewCharacterFromInput(
 
   // Not defined as else in the off chance that unexpected input slips in
   else if (arrowKey === "ArrowDown") {
-    const lastGroupWithChars = cachedGroupIterable.findLast(
-      (char) => char.characters.length > 0
-    );
+    // Even with ESNext build option, Vercel complained about using
+    // Array.findLast. Have to swap out for manual loop
+    let lastGroupWithChars: GroupEntry | undefined = undefined;
+    for (let i = cachedGroupIterable.length - 1; i >= 0; i--) {
+      const entry = cachedGroupIterable[i];
+      if (entry === undefined) break;
+      if (entry.characters.length > 0) {
+        lastGroupWithChars = entry;
+        break;
+      }
+    }
 
     const needWrap = activeEntry === lastGroupWithChars;
     if (needWrap) {
