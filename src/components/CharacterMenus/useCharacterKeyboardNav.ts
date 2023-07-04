@@ -31,13 +31,12 @@ export function findNewCharacterFromInput(
 
   // Handles left and right inputs; really straightforward
   if (arrowKey === "ArrowLeft") {
-    const newCharacter = activeClassList[activeCharIndex - 1];
-    return newCharacter ?? null;
+    return activeClassList.at(activeCharIndex - 1) ?? null;
   }
 
   if (arrowKey === "ArrowRight") {
-    const newCharacter = activeClassList[activeCharIndex + 1];
-    return newCharacter ?? null;
+    const newIndex = (activeCharIndex + 1) % activeClassList.length;
+    return activeClassList.at(newIndex) ?? null;
   }
 
   // Rest of the function handles up/down inputs; much more involved
@@ -46,31 +45,75 @@ export function findNewCharacterFromInput(
     cachedGroupIterable = [...characterGroups.values()].flat();
   }
 
-  let targetEntry: GroupEntry | undefined;
+  // Each arrow key has two cases to deal with (to wrap around or not). Each
+  // case *superficially* looks similar, but trying to force everything into
+  // one abstraction is just going to make the code harder to maintain. A lil'
+  // copy-pasting never hurt nobody, as long as it's in controlled doses
+  let target: GroupEntry | undefined = undefined;
   if (arrowKey === "ArrowUp") {
-    // element isn't the most descriptive name, but having three variants of the
-    // word "entry" made it harder to follow the code
-    for (const element of cachedGroupIterable) {
-      if (element === activeEntry) break;
-      if (element.characters.length > 0) {
-        targetEntry = element;
-      }
-    }
-  } else {
-    for (let i = cachedGroupIterable.length - 1; i >= 0; i--) {
-      const element = cachedGroupIterable[i];
-      if (element === undefined || element === activeEntry) {
-        break;
-      }
+    const firstGroupWithChars = cachedGroupIterable.find(
+      (group) => group.characters.length > 0
+    );
 
-      if (element.characters.length > 0) {
-        targetEntry = element;
+    const needWrap = activeEntry === firstGroupWithChars;
+    if (needWrap) {
+      for (let i = cachedGroupIterable.length - 1; i >= 0; i--) {
+        const entry = cachedGroupIterable[i];
+        if (entry === undefined) break;
+
+        if (entry.characters.length > 0) {
+          target = entry;
+          break;
+        }
+      }
+    } else {
+      for (const entry of cachedGroupIterable) {
+        if (entry === activeEntry) break;
+        if (entry.characters.length > 0) {
+          target = entry;
+        }
       }
     }
   }
 
-  if (targetEntry === undefined) return null;
-  const classList = targetEntry.characters;
+  // Not defined as else in the off chance that unexpected input slips in
+  else if (arrowKey === "ArrowDown") {
+    // Even with ESNext build option, Vercel complained about using
+    // Array.findLast. Have to swap out for manual loop
+    let lastGroupWithChars: GroupEntry | undefined = undefined;
+    for (let i = cachedGroupIterable.length - 1; i >= 0; i--) {
+      const entry = cachedGroupIterable[i];
+      if (entry === undefined) break;
+      if (entry.characters.length > 0) {
+        lastGroupWithChars = entry;
+        break;
+      }
+    }
+
+    const needWrap = activeEntry === lastGroupWithChars;
+    if (needWrap) {
+      for (const entry of cachedGroupIterable) {
+        if (entry.characters.length > 0) {
+          target = entry;
+          break;
+        }
+      }
+    } else {
+      for (let i = cachedGroupIterable.length - 1; i >= 0; i--) {
+        const iterableEntry = cachedGroupIterable[i];
+        if (iterableEntry === undefined || iterableEntry === activeEntry) {
+          break;
+        }
+
+        if (iterableEntry.characters.length > 0) {
+          target = iterableEntry;
+        }
+      }
+    }
+  }
+
+  if (target === undefined) return null;
+  const classList = target.characters;
   const newIndex = Math.min(activeCharIndex, classList.length - 1);
   return classList[newIndex] ?? null;
 }
