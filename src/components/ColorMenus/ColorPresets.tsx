@@ -27,8 +27,12 @@ const colorPresets = {
 } as const satisfies Record<UiTab, readonly ColorTuple[]>;
 
 function ColorPresetsCore({ colorTuples, onHexPresetChange }: CoreProps) {
-  const { gridContainerRef, activePresetIndex, setActivePresetIndex } =
-    usePresetsKeyboardNav<HTMLUListElement>(colorTuples.length);
+  const {
+    gridContainerRef,
+    activeButtonRef,
+    activePresetIndex,
+    setActivePresetIndex,
+  } = usePresetsKeyboardNav<HTMLUListElement>(colorTuples.length);
 
   return (
     <ul
@@ -41,6 +45,7 @@ function ColorPresetsCore({ colorTuples, onHexPresetChange }: CoreProps) {
         return (
           <li key={`${hex1}-${hex2}`} className="mx-auto block">
             <ColorButton
+              ref={selected ? activeButtonRef : undefined}
               primaryHex={hex1}
               secondaryHex={hex2}
               selected={selected}
