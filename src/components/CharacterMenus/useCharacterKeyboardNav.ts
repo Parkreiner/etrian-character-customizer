@@ -46,9 +46,9 @@ export function findNewCharacterFromInput(
   }
 
   // Each arrow key has two cases to deal with (to wrap around or not). Each
-  // case *superficially* looks similar, but waiting to see if there's actually
-  // a good pattern that can be used, before bringing in a bad abstraction A lil
-  // copy-pasting never hurt nobody, esp. with the code so closely co-located
+  // case *superficially* looks similar, but trying to force everything into
+  // one abstraction is just going to make the code harder to maintain. A lil'
+  // copy-pasting never hurt nobody, as long as it's in controlled doses
   let target: GroupEntry | undefined = undefined;
   if (arrowKey === "ArrowUp") {
     const firstGroupWithChars = cachedGroupIterable.find(
