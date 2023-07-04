@@ -31,8 +31,7 @@ export function findNewCharacterFromInput(
 
   // Handles left and right inputs; really straightforward
   if (arrowKey === "ArrowLeft") {
-    const newIndex = activeCharIndex === 0 ? -1 : activeCharIndex - 1;
-    return activeClassList.at(newIndex) ?? null;
+    return activeClassList.at(activeCharIndex - 1) ?? null;
   }
 
   if (arrowKey === "ArrowRight") {
@@ -46,31 +45,67 @@ export function findNewCharacterFromInput(
     cachedGroupIterable = [...characterGroups.values()].flat();
   }
 
-  let targetEntry: GroupEntry | undefined;
+  // Each arrow key has two cases to deal with (to wrap around or not). Each
+  // case *superficially* looks similar, but waiting to see if there's actually
+  // a good pattern that can be used, before bringing in a bad abstraction A lil
+  // copy-pasting never hurt nobody, esp. with the code so closely co-located
+  let target: GroupEntry | undefined = undefined;
   if (arrowKey === "ArrowUp") {
-    // element isn't the most descriptive name, but having three variants of the
-    // word "entry" made it harder to follow the code
-    for (const element of cachedGroupIterable) {
-      if (element === activeEntry) break;
-      if (element.characters.length > 0) {
-        targetEntry = element;
-      }
-    }
-  } else {
-    for (let i = cachedGroupIterable.length - 1; i >= 0; i--) {
-      const element = cachedGroupIterable[i];
-      if (element === undefined || element === activeEntry) {
-        break;
-      }
+    const firstGroupWithChars = cachedGroupIterable.find(
+      (group) => group.characters.length > 0
+    );
 
-      if (element.characters.length > 0) {
-        targetEntry = element;
+    const needWrap = activeEntry === firstGroupWithChars;
+    if (needWrap) {
+      for (let i = cachedGroupIterable.length - 1; i >= 0; i--) {
+        const entry = cachedGroupIterable[i];
+        if (entry === undefined) break;
+
+        if (entry.characters.length > 0) {
+          target = entry;
+          break;
+        }
+      }
+    } else {
+      for (const entry of cachedGroupIterable) {
+        if (entry === activeEntry) break;
+        if (entry.characters.length > 0) {
+          target = entry;
+        }
       }
     }
   }
 
-  if (targetEntry === undefined) return null;
-  const classList = targetEntry.characters;
+  // Not defined as else in the off chance that unexpected input slips in
+  else if (arrowKey === "ArrowDown") {
+    const lastGroupWithChars = cachedGroupIterable.findLast(
+      (char) => char.characters.length > 0
+    );
+
+    const needWrap = activeEntry === lastGroupWithChars;
+    if (needWrap) {
+      for (const entry of cachedGroupIterable) {
+        if (entry.characters.length > 0) {
+          target = entry;
+          break;
+        }
+      }
+    } else {
+      for (let i = cachedGroupIterable.length - 1; i >= 0; i--) {
+        const iterableEntry = cachedGroupIterable[i];
+        if (iterableEntry === undefined || iterableEntry === activeEntry) {
+          break;
+        }
+
+        if (iterableEntry.characters.length > 0) {
+          target = iterableEntry;
+        }
+      }
+    }
+  }
+
+  if (target === undefined) return null;
+  const classList = target.characters;
   const newIndex = Math.min(activeCharIndex, classList.length - 1);
   return classList[newIndex] ?? null;
 }
