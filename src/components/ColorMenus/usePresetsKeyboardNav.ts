@@ -65,6 +65,7 @@ export default function usePresetsKeyboardNav<Element extends HTMLElement>(
   // count, since the value will only ever be used within effects
   const gridColumnCountRef = useRef(0);
   const gridContainerRef = useRef<Element>(null);
+  const activeButtonRef = useRef<HTMLButtonElement>(null);
   const updateInfoRef = useRef({ activePresetIndex, numPresets });
 
   // Effect for updating the number of columns as the element resizes
@@ -120,6 +121,15 @@ export default function usePresetsKeyboardNav<Element extends HTMLElement>(
     return () => gridContainer.removeEventListener("keydown", handleKeyInput);
   }, []);
 
+  useEffect(() => {
+    const gridContainer = gridContainerRef.current;
+    if (gridContainer === null) return;
+
+    if (gridContainer.contains(document.activeElement)) {
+      activeButtonRef.current?.focus();
+    }
+  }, [activePresetIndex]);
+
   /**
    * @todo Effect is only for debugging - delete once fully done (and tested!)
    */
@@ -147,7 +157,10 @@ export default function usePresetsKeyboardNav<Element extends HTMLElement>(
 
   return {
     gridContainerRef,
+    activeButtonRef,
     activePresetIndex,
+
+    // Not exposing the raw state dispatch because that spells trouble
     setActivePresetIndex: safeSetActivePresetIndex,
   } as const;
 }
