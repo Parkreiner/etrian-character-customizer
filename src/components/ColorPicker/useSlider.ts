@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
+import { ArrowKey, isArrowKey } from "@/utils/keyboard";
 
 import useSquareDimensions from "./useSquareDimensions";
 import { wrapHue } from "./colorHelpers";
@@ -11,14 +12,7 @@ const cardinalDirections = {
   ArrowUp: 90,
   ArrowLeft: 180,
   ArrowDown: 270,
-} as const satisfies Record<string, number>;
-
-function isArrowKey(value: unknown): value is keyof typeof cardinalDirections {
-  return (
-    typeof value === "string" &&
-    (value as keyof typeof cardinalDirections) in cardinalDirections
-  );
-}
+} as const satisfies Record<ArrowKey, number>;
 
 export default function useSlider(
   hue: number,
