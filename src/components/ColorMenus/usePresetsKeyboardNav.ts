@@ -50,10 +50,9 @@ export function mapKeyToGridIndex(
     }
   }
 
-  // Just using Math.min as an extra precaution to prevent out-of-bounds errors
   const lastItemIndex = itemCount - 1;
   const computedIndex = lastColIndex * offsetRowIndex + offsetColIndex;
-  return Math.min(computedIndex, lastItemIndex);
+  return clamp(computedIndex, 0, lastItemIndex);
 }
 
 export default function usePresetsKeyboardNav<Element extends HTMLElement>(
