@@ -8,19 +8,26 @@ export function mapKeyToGridIndex(
   currentIndex: number,
   arrowKey: ArrowKey
 ): number {
+  /**
+   * Guard clause serves two purposes here:
+   * 1. It spares us all the calculations if there are no items somehow
+   * 2. You can safely tack on (|| gridCount) to itemsOnLastRow, because the
+   *    clause ensures that if the remainder operation produces zero, that's
+   *    because the last row definitely has (gridCount) number of items
+   */
   if (itemCount === 0) {
     return 0;
   }
 
   const rowIndex = Math.floor(currentIndex / gridCount);
   const colIndex = currentIndex % gridCount;
-  const lastRowIndex = Math.floor(itemCount / gridCount);
-  const lastColIndex = Math.floor(itemCount / lastRowIndex);
+  const maxRowIndex = Math.floor(itemCount / gridCount);
+  const maxColIndex = Math.floor(itemCount / maxRowIndex);
 
-  /**
-   * @todo Still need to fix logic for ArrowUp/ArrowDown so that they can deal
-   * with grids that have blanks
-   */
+  const itemsOnLastRow = (itemCount % gridCount) % gridCount;
+  const itemsInCurrentColumn =
+    maxRowIndex + 1 - (colIndex > itemsOnLastRow - 1 ? 1 : 0);
+
   // Have to do some funky logic for some branches to account for when the grid
   // has blanks
   let offsetRowIndex = rowIndex;
@@ -32,26 +39,24 @@ export function mapKeyToGridIndex(
     }
 
     case "ArrowRight": {
-      const itemsOnLastRow = itemCount % gridCount || gridCount;
-      const base = rowIndex === lastRowIndex ? itemsOnLastRow : gridCount;
+      const base = rowIndex === maxRowIndex ? itemsOnLastRow : gridCount;
       offsetColIndex = colIndex === base - 1 ? 0 : colIndex + 1;
       break;
     }
 
     case "ArrowUp": {
-      const itemsInColumn = null;
-      offsetRowIndex = rowIndex === 0 ? lastRowIndex : rowIndex - 1;
+      offsetRowIndex = rowIndex === 0 ? itemsInCurrentColumn - 1 : rowIndex - 1;
       break;
     }
 
     case "ArrowDown": {
-      offsetRowIndex = rowIndex === lastRowIndex ? 0 : rowIndex + 1;
+      offsetRowIndex = rowIndex === itemsInCurrentColumn - 1 ? 0 : rowIndex + 1;
       break;
     }
   }
 
   const lastItemIndex = itemCount - 1;
-  const computedIndex = lastColIndex * offsetRowIndex + offsetColIndex;
+  const computedIndex = maxColIndex * offsetRowIndex + offsetColIndex;
   return clamp(computedIndex, 0, lastItemIndex);
 }
 
@@ -60,12 +65,17 @@ export default function usePresetsKeyboardNav<Element extends HTMLElement>(
 ) {
   const [activePresetIndex, setActivePresetIndex] = useState(0);
 
-  // Pretty sure I can get away with just using a ref value for the column
-  // count, since the value will only ever be used within effects
+  // gridColumnCount does not need to be accessed in render logic
   const gridColumnCountRef = useRef(0);
   const gridContainerRef = useRef<Element>(null);
   const activeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Since I have to move the render state to mutable state, I figured I'd just
+  // use one object
   const updateInfoRef = useRef({ activePresetIndex, numPresets });
+  useEffect(() => {
+    updateInfoRef.current = { activePresetIndex, numPresets };
+  }, [numPresets, activePresetIndex]);
 
   // Effect for updating the number of columns as the element resizes
   useEffect(() => {
@@ -85,10 +95,6 @@ export default function usePresetsKeyboardNav<Element extends HTMLElement>(
     observer.observe(gridContainer);
     return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    updateInfoRef.current = { activePresetIndex, numPresets };
-  }, [numPresets, activePresetIndex]);
 
   // Effect for listening to keyboard input; must run after column resize effect
   useEffect(() => {
@@ -120,6 +126,8 @@ export default function usePresetsKeyboardNav<Element extends HTMLElement>(
     return () => gridContainer.removeEventListener("keydown", handleKeyInput);
   }, []);
 
+  // Makes sure that the selected element scrolls into view (but only if the
+  // parent has focus)
   useEffect(() => {
     const gridContainer = gridContainerRef.current;
     if (gridContainer === null) return;
@@ -129,21 +137,7 @@ export default function usePresetsKeyboardNav<Element extends HTMLElement>(
     }
   }, [activePresetIndex]);
 
-  /**
-   * @todo Effect is only for debugging - delete once fully done (and tested!)
-   */
-  useEffect(() => {
-    const gridContainer = gridContainerRef.current;
-    if (gridContainer === null) return;
-
-    const intervalId = window.setInterval(() => {
-      const newEvent = new KeyboardEvent("keydown", { key: "ArrowUp" });
-      gridContainer.dispatchEvent(newEvent);
-    }, 500);
-
-    return () => window.clearInterval(intervalId);
-  }, []);
-
+  // Not exposing the raw state dispatch because that spells trouble
   const safeSetActivePresetIndex = useCallback(
     (newIndex: number) => {
       setActivePresetIndex((current) => {
@@ -158,8 +152,6 @@ export default function usePresetsKeyboardNav<Element extends HTMLElement>(
     gridContainerRef,
     activeButtonRef,
     activePresetIndex,
-
-    // Not exposing the raw state dispatch because that spells trouble
     setActivePresetIndex: safeSetActivePresetIndex,
   } as const;
 }
