@@ -21,6 +21,8 @@ export function mapKeyToGridIndex(
    * @todo Still need to fix logic for ArrowUp/ArrowDown so that they can deal
    * with grids that have blanks
    */
+  // Have to do some funky logic for some branches to account for when the grid
+  // has blanks
   let offsetRowIndex = rowIndex;
   let offsetColIndex = colIndex;
   switch (arrowKey) {
@@ -30,17 +32,14 @@ export function mapKeyToGridIndex(
     }
 
     case "ArrowRight": {
-      if (rowIndex === lastRowIndex) {
-        const itemsOnLastRow = itemCount % gridCount || gridCount;
-        offsetColIndex = colIndex === itemsOnLastRow - 1 ? 0 : colIndex + 1;
-      } else {
-        offsetColIndex = colIndex === gridCount - 1 ? 0 : colIndex + 1;
-      }
-
+      const itemsOnLastRow = itemCount % gridCount || gridCount;
+      const base = rowIndex === lastRowIndex ? itemsOnLastRow : gridCount;
+      offsetColIndex = colIndex === base - 1 ? 0 : colIndex + 1;
       break;
     }
 
     case "ArrowUp": {
+      const itemsInColumn = null;
       offsetRowIndex = rowIndex === 0 ? lastRowIndex : rowIndex - 1;
       break;
     }
@@ -51,6 +50,7 @@ export function mapKeyToGridIndex(
     }
   }
 
+  // Just using Math.min as an extra precaution to prevent out-of-bounds errors
   const lastItemIndex = itemCount - 1;
   const computedIndex = lastColIndex * offsetRowIndex + offsetColIndex;
   return Math.min(computedIndex, lastItemIndex);
@@ -128,9 +128,8 @@ export default function usePresetsKeyboardNav<Element extends HTMLElement>(
     if (gridContainer === null) return;
 
     const intervalId = window.setInterval(() => {
-      gridContainer.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "ArrowRight" })
-      );
+      const newEvent = new KeyboardEvent("keydown", { key: "ArrowUp" });
+      gridContainer.dispatchEvent(newEvent);
     }, 500);
 
     return () => window.clearInterval(intervalId);
