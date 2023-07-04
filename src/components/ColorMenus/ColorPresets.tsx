@@ -32,40 +32,40 @@ export function mapKeyToGridIndex(
   const colIndex = currentIndex % gridCount;
   const lastRowIndex = Math.floor(itemCount / gridCount);
   const lastColIndex = Math.floor(itemCount / lastRowIndex);
-  const lastItemIndex = itemCount - 1;
 
-  // Only ArrowLeft seems to be 100% working right now
+  let offsetRowIndex = rowIndex;
+  let offsetColIndex = colIndex;
   switch (arrowKey) {
+    // Only ArrowLeft seems to be 100% working right now; all other arrows have
+    // issues if you're dealing with a grid that has blanks
     case "ArrowLeft": {
-      const offsetColIndex = colIndex === 0 ? gridCount - 1 : colIndex - 1;
-      const newRawIndex = lastColIndex * rowIndex + offsetColIndex;
-      return Math.min(newRawIndex, lastItemIndex);
+      offsetColIndex = colIndex === 0 ? gridCount - 1 : colIndex - 1;
+      break;
     }
 
     case "ArrowRight": {
-      // Current bug: the logic is not able to wrap around correctly if on a row
-      // that is not fully filled out
-      const offsetColIndex = colIndex === gridCount - 1 ? 0 : colIndex + 1;
-      const newRawIndex = lastColIndex * rowIndex + offsetColIndex;
-      return Math.min(newRawIndex, lastItemIndex);
+      offsetColIndex = colIndex === gridCount - 1 ? 0 : colIndex + 1;
+      break;
     }
 
     case "ArrowUp": {
-      const offsetRowIndex = rowIndex === 0 ? lastRowIndex : rowIndex - 1;
-      const newRawIndex = lastColIndex * offsetRowIndex + colIndex;
-      return Math.min(newRawIndex, lastItemIndex);
+      offsetRowIndex = rowIndex === 0 ? lastRowIndex : rowIndex - 1;
+      break;
     }
 
     case "ArrowDown": {
-      const offsetRowIndex = rowIndex === lastRowIndex ? 0 : rowIndex + 1;
-      const newRawIndex = lastColIndex * offsetRowIndex + colIndex;
-      return Math.min(newRawIndex, lastItemIndex);
+      offsetRowIndex = rowIndex === lastRowIndex ? 0 : rowIndex + 1;
+      break;
     }
 
     default: {
       throw new Error("Unknown input received.");
     }
   }
+
+  const lastItemIndex = itemCount - 1;
+  const computedIndex = lastColIndex * offsetRowIndex + offsetColIndex;
+  return Math.min(computedIndex, lastItemIndex);
 }
 
 function usePresetsKeyboardNav<Element extends HTMLElement>(
