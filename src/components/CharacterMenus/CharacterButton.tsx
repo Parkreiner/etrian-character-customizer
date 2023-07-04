@@ -1,10 +1,11 @@
-import { PropsWithChildren, forwardRef } from "react";
+import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { cva } from "class-variance-authority";
 
-type Props = PropsWithChildren<{
+type ButtonProps = ComponentPropsWithoutRef<"button">;
+type Props = Omit<ButtonProps, "type" | "className" | "tabIndex"> & {
+  type?: ButtonProps["type"];
   selected: boolean;
-  onClick: () => void;
-}>;
+};
 
 const buttonStyles = cva(
   "h-full w-full rounded-md text-center font-bold text-teal-50 text-sm transition-colors duration-150 ease-in-out",
@@ -14,25 +15,23 @@ const buttonStyles = cva(
         true: "cursor-default bg-teal-200 text-teal-800",
         false:
           "bg-teal-700 text-teal-100 hover:bg-teal-200 hover:text-teal-800",
-      },
+      } as const satisfies Record<`${boolean}`, string>,
     },
   }
 );
 
 const CharacterButton = forwardRef(function CharacterButton(
-  { selected, onClick, children }: Props,
+  { selected, type = "button", ...delegated }: Props,
   ref?: React.ForwardedRef<HTMLButtonElement>
 ) {
   return (
     <button
       ref={ref}
-      type="button"
+      type={type}
       className={buttonStyles({ selected })}
-      onClick={onClick}
       tabIndex={selected ? 0 : -1}
-    >
-      {children}
-    </button>
+      {...delegated}
+    />
   );
 });
 
