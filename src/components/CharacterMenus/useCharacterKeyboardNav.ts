@@ -118,12 +118,13 @@ export function findNewCharacterFromInput(
   return classList[newIndex] ?? null;
 }
 
-export default function useKeyboardNavigation(
+export default function useCharacterKeyboardNav(
   characterGroups: GroupData,
   currentCharacter: Character,
   onCharacterChange: (newCharacter: Character) => void
 ) {
-  const elementRef = useRef<HTMLDivElement>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
+  const activeButtonRef = useRef<HTMLButtonElement>(null);
 
   const groupRef = useRef(characterGroups);
   const currentCharacterRef = useRef(currentCharacter);
@@ -136,7 +137,7 @@ export default function useKeyboardNavigation(
   }, [characterGroups, currentCharacter, onCharacterChange]);
 
   useEffect(() => {
-    const element = elementRef.current;
+    const element = parentRef.current;
     if (!element) return;
 
     const handleKeyboardInput = (event: KeyboardEvent) => {
@@ -159,5 +160,22 @@ export default function useKeyboardNavigation(
     return () => element.removeEventListener("keydown", handleKeyboardInput);
   }, []);
 
-  return elementRef;
+  // Main logic for focus management - only shifts focus for character buttons
+  // if the parent already has inner focus
+  useEffect(() => {
+    const parent = parentRef.current;
+    if (parent === null) return;
+
+    if (parent.contains(document.activeElement)) {
+      activeButtonRef.current?.focus();
+    }
+  }, [currentCharacter]);
+
+  // On mount, just make the focus happen unconditionally to spare the user
+  // some extra tabbing
+  useEffect(() => {
+    activeButtonRef.current?.focus();
+  }, []);
+
+  return { parentRef, activeButtonRef } as const;
 }
