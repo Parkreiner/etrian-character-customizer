@@ -1,19 +1,13 @@
 import { PropsWithChildren, forwardRef } from "react";
 import styles from "./scrollbar.module.css";
 
-const OverflowContainer = forwardRef(function OverflowContainer(
-  { children }: PropsWithChildren,
-  ref?: React.ForwardedRef<HTMLDivElement>
-) {
+function OverflowContainer({ children }: PropsWithChildren) {
   return (
-    <div
-      ref={ref}
-      className="flex h-full w-[430px] shrink-0 flex-col flex-nowrap"
-    >
+    <div className="flex h-full w-[430px] shrink-0 flex-col flex-nowrap">
       {children}
     </div>
   );
-});
+}
 
 export function OverflowContainerHeader({ children }: PropsWithChildren) {
   return (
@@ -23,36 +17,41 @@ export function OverflowContainerHeader({ children }: PropsWithChildren) {
   );
 }
 
-export function OverflowContainerFlexContent({ children }: PropsWithChildren) {
-  /*
-   * 2023-06-09 - This is a really weird trick to avoid a strange CSS bug
-   * specific to Chrome. (Firefox did not have this issue.)
-   *
-   * You would hope that the relative/absolute positioning, along with the
-   * overflows, wouldn't be necessary, but alas.
-   *
-   * Basically, Chrome would freak out whenever you would try to have
-   * overflow on a container with interactive elements (like the buttons).
-   * The content would be *visually* clipped wherever it should be, but
-   * Chrome would still act as if though it were taking up space in the
-   * layout and would cause weird element stretching.
-   *
-   * The weird thing is, it would behave normally as long as you were only
-   * hiding non-interactive elements (like plain text).
-   *
-   * The most surefire way to fix this was by removing the container from
-   * the flow altogether.
-   */
-  return (
-    <div className="relative flex-grow rounded-lg bg-teal-600">
-      <div className="absolute h-full w-full overflow-y-hidden p-3">
-        <div className={`${styles.scrollbar} h-full overflow-y-scroll pr-3`}>
-          {children}
+export const OverflowContainerFlexContent = forwardRef(
+  function OverflowContainerFlexContent(
+    { children }: PropsWithChildren,
+    ref?: React.ForwardedRef<HTMLDivElement>
+  ) {
+    /*
+     * 2023-06-09 - This is a really weird trick to avoid a strange CSS bug
+     * specific to Chrome. (Firefox did not have this issue.)
+     *
+     * You would hope that the relative/absolute positioning, along with the
+     * overflows, wouldn't be necessary, but alas.
+     *
+     * Basically, Chrome would freak out whenever you would try to have
+     * overflow on a container with interactive elements (like the buttons).
+     * The content would be *visually* clipped wherever it should be, but
+     * Chrome would still act as if though it were taking up space in the
+     * layout and would cause weird element stretching.
+     *
+     * The weird thing is, it would behave normally as long as you were only
+     * hiding non-interactive elements (like plain text).
+     *
+     * The most surefire way to fix this was by removing the container from
+     * the flow altogether.
+     */
+    return (
+      <div ref={ref} className="relative flex-grow rounded-lg bg-teal-600">
+        <div className="absolute h-full w-full overflow-y-hidden p-3">
+          <div className={`${styles.scrollbar} h-full overflow-y-scroll pr-3`}>
+            {children}
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
+);
 
 type FooterButtonProps = {
   children: string;
@@ -75,15 +74,8 @@ export function OverflowContainerFooterButton({
   );
 }
 
-const ContainerRecast = OverflowContainer as typeof OverflowContainer & {
-  Root: typeof OverflowContainer;
-  Header: typeof OverflowContainerHeader;
-  FlexContent: typeof OverflowContainerFlexContent;
-  FooterButton: typeof OverflowContainerFooterButton;
-};
-
-ContainerRecast.Root = OverflowContainer;
-ContainerRecast.Header = OverflowContainerHeader;
-ContainerRecast.FlexContent = OverflowContainerFlexContent;
-ContainerRecast.FooterButton = OverflowContainerFooterButton;
-export default ContainerRecast;
+OverflowContainer.Root = OverflowContainer;
+OverflowContainer.Header = OverflowContainerHeader;
+OverflowContainer.FlexContent = OverflowContainerFlexContent;
+OverflowContainer.FooterButton = OverflowContainerFooterButton;
+export default OverflowContainer;

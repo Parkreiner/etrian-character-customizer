@@ -49,24 +49,14 @@ const CharacterMenus = memo(function CharacterMenus({
     [characters, classOrderings]
   );
 
-  const containerRef = useCharacterKeyboardNav(
+  const { parentRef, activeButtonRef } = useCharacterKeyboardNav(
     grouped,
     selectedCharacter,
     onCharacterChange
   );
 
-  // Makes sure that if a character is selected off-screen, the UI scrolls into
-  // view so that you can still see it. scrollIntoView doesn't work, because it
-  // always tries to scroll the focused element all the way to the top of the
-  // UI, even if that means breaking parts of the container's overflow behavior
-  const activeButtonRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    activeButtonRef.current?.focus();
-  }, [selectedCharacter]);
-
   // Code assumes that if you click a button for one class, you're more likely
-  // to want to see all the characters from the same class, so this not only
-  // loads the main selected character, but prefetches adjacent images
+  // to want to see all the characters from the same class
   const loadAllImagesFromSameClass = (requestedCharacter: Character) => {
     const found = findGroupEntryFromCharacter(requestedCharacter, grouped);
     if (found === undefined) {
@@ -88,15 +78,9 @@ const CharacterMenus = memo(function CharacterMenus({
     };
   };
 
-  // Exact same function can be reused for all .map calls in render output
-  const onCharacterChangeWithPrefetch = (char: Character) => {
-    loadAllImagesFromSameClass(char);
-    onCharacterChange(char);
-  };
-
   // From here to the return statement, there's some screwy stuff happening to
   // satisfy the dependency arrays while making sure that the on-mount effect
-  // only ever runs once
+  // only ever runs once. useCallback would've been even jankier
   const veryHackyOnMountRef = useRef(() => {
     return loadAllImagesFromSameClass(selectedCharacter);
   });
@@ -106,8 +90,14 @@ const CharacterMenus = memo(function CharacterMenus({
     return () => abortAll?.();
   }, []);
 
+  // Exact same function can be reused for all .map calls in render output
+  const onCharacterChangeWithPrefetch = (char: Character) => {
+    loadAllImagesFromSameClass(char);
+    onCharacterChange(char);
+  };
+
   return (
-    <OverflowContainer.Root ref={containerRef}>
+    <OverflowContainer.Root>
       <OverflowContainer.Header>
         <HeaderTag className="mx-auto flex h-[32px] w-fit flex-col flex-nowrap justify-center rounded-full bg-teal-900 px-5 py-1 text-sm font-normal italic text-teal-100">
           Etrian Character Customizer
@@ -115,7 +105,7 @@ const CharacterMenus = memo(function CharacterMenus({
       </OverflowContainer.Header>
 
       <HeaderProvider>
-        <OverflowContainer.FlexContent>
+        <OverflowContainer.FlexContent ref={parentRef}>
           <fieldset>
             <legend>
               <VisuallyHidden.Root>Select a character</VisuallyHidden.Root>
