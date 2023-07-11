@@ -11,7 +11,6 @@ type Props = React.ComponentPropsWithoutRef<"button"> & {
   children?: string | React.ReactNode;
   secondaryHex?: string;
   selected?: boolean;
-  type?: React.ButtonHTMLAttributes<"type">;
 };
 
 const outlineStyles = cva(
