@@ -39,25 +39,25 @@ function ColorPresetsCore({ colorTuples, onHexPresetChange }: CoreProps) {
       ref={gridContainerRef}
       className="mt-1 grid w-full max-w-[400px] grid-cols-3 justify-between gap-3"
     >
-      {colorTuples.map(([hex1, hex2], index) => {
-        const selected = index === activePresetIndex;
-
-        return (
-          <li key={`${hex1}-${hex2}`} className="mx-auto block">
-            <ColorButton
-              ref={selected ? activeButtonRef : undefined}
-              primaryHex={hex1}
-              secondaryHex={hex2}
-              selected={selected}
-              tabIndex={selected ? 0 : -1}
-              onClick={() => {
-                onHexPresetChange(hex1, hex2);
-                setActivePresetIndex(index);
-              }}
-            />
-          </li>
-        );
-      })}
+      {colorTuples.map(([hex1, hex2], index) => (
+        <li key={`${hex1}-${hex2}`} className="mx-auto block">
+          {/*
+           * Not passing in selected prop because while the buttons should be
+           * able to have focus, they're never going to be the main inputs from
+           * the user's perspective
+           */}
+          <ColorButton
+            ref={index === activePresetIndex ? activeButtonRef : undefined}
+            primaryHex={hex1}
+            secondaryHex={hex2}
+            tabIndex={index === activePresetIndex ? 0 : -1}
+            onClick={() => {
+              onHexPresetChange(hex1, hex2);
+              setActivePresetIndex(index);
+            }}
+          />
+        </li>
+      ))}
     </ul>
   );
 }
