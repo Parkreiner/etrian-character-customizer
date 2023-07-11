@@ -8,12 +8,18 @@ type Props = PropsWithChildren<{
   title: string;
   striped?: boolean;
   gapSize?: GapSize;
+
+  /**
+   * Makes it easier to implement full-bleed layouts for elements that need them
+   */
+  disableContentPaddingX?: boolean;
 }>;
 
 export default function Card({
   title,
   children,
   striped = false,
+  disableContentPaddingX = false,
   gapSize = "medium",
 }: Props) {
   const HeaderTag = useCurrentHeader();
@@ -38,7 +44,9 @@ export default function Card({
       </div>
 
       <HeaderProvider>
-        <div className="grow">{children}</div>
+        <div className={classNames("grow", disableContentPaddingX && "-mx-4")}>
+          {children}
+        </div>
       </HeaderProvider>
     </section>
   );
