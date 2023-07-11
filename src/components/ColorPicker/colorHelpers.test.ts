@@ -281,7 +281,11 @@ describe(wrapHue.name, () => {
 
   it("should wrap integers that fall below 0 degrees (multiple times if necessary)", () => {
     expect(wrapHue(-1)).toBe(359);
-    expect(wrapHue(-720)).toBe(0);
+
+    // Have to use toBeCloseTo and not toBe/toEqual because those use Object.is,
+    // which treats -0 and +0 as separate values. 0 literals are always +0, but
+    // wrapHue(-720) produces -0.
+    expect(wrapHue(-720)).toBeCloseTo(0);
   });
 
   it("should wrap decimal values, but not truncate them into integers", () => {
