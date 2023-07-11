@@ -1,14 +1,17 @@
 import { forwardRef } from "react";
 import { cva } from "class-variance-authority";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import classNames from "classnames";
 
 type Props = React.ComponentPropsWithoutRef<"button"> & {
   primaryHex: string;
   onClick: () => void;
 
+  // Main reason for making this allow React nodes is to support <abbr> elements
   children?: string | React.ReactNode;
   secondaryHex?: string;
   selected?: boolean;
+  type?: React.ButtonHTMLAttributes<"type">;
 };
 
 const outlineStyles = cva(
@@ -24,15 +27,27 @@ const outlineStyles = cva(
 );
 
 const ColorButton = forwardRef(function ColorButton(
-  { primaryHex, secondaryHex, children, selected = false, ...delegated }: Props,
+  {
+    primaryHex,
+    secondaryHex,
+    children,
+    className,
+    selected = false,
+    type = "button",
+    ...delegated
+  }: Props,
   ref?: React.ForwardedRef<HTMLButtonElement>
 ) {
   return (
     <div className={outlineStyles({ selected })}>
       <button
         ref={ref}
-        className="relative h-10 min-w-[80px] basis-[80px] overflow-y-hidden rounded-md border-2 border-black"
+        type={type}
         style={{ backgroundColor: primaryHex }}
+        className={classNames(
+          "relative h-10 min-w-[80px] basis-[80px] overflow-y-hidden rounded-md border-2 border-black",
+          className
+        )}
         {...delegated}
       >
         {secondaryHex !== undefined && (
@@ -49,9 +64,9 @@ const ColorButton = forwardRef(function ColorButton(
         )}
 
         <VisuallyHidden.Root>
-          {secondaryHex === undefined && `Click to get color ${primaryHex}`}
-          {secondaryHex !== undefined &&
-            `Click to get colors ${primaryHex} with ${secondaryHex}`}
+          {secondaryHex === undefined
+            ? `Click to get color ${primaryHex}`
+            : `Click to get colors ${primaryHex} with ${secondaryHex}`}
         </VisuallyHidden.Root>
       </button>
     </div>
