@@ -115,7 +115,7 @@ function Modal({ buttonText, ...delegated }: ModalProps) {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <button className="w-24 rounded-full border-[1px] border-teal-900/70 px-4 py-1 text-sm font-medium text-teal-950 transition-colors hover:bg-teal-200">
+        <button className="w-24 rounded-full border-[1px] border-teal-900/70 px-4 py-1 text-sm font-medium text-teal-950 transition-colors duration-150 hover:bg-teal-200">
           {buttonText}
         </button>
       </Dialog.Trigger>

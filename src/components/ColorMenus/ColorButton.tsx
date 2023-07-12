@@ -13,17 +13,14 @@ type Props = React.ComponentPropsWithoutRef<"button"> & {
   selected?: boolean;
 };
 
-const outlineStyles = cva(
-  "w-fit rounded-lg border-2 transition-colors duration-150 hover:border-teal-300/60",
-  {
-    variants: {
-      selected: {
-        true: "border-teal-200 hover:border-teal-200/100",
-        false: "border-teal-900",
-      } as const satisfies Record<`${boolean}`, string>,
-    },
-  }
-);
+const outlineStyles = cva("w-fit rounded-lg border-2 transition-colors", {
+  variants: {
+    selected: {
+      true: "border-teal-200 duration-0",
+      false: "border-teal-900 hover:border-teal-300/60 duration-150",
+    } as const satisfies Record<`${boolean}`, string>,
+  },
+});
 
 const ColorButton = forwardRef(function ColorButton(
   {
