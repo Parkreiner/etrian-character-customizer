@@ -10,7 +10,9 @@
     "test": "vitest",
     "lint": "eslint --ext js,jsx,ts,tsx src",
     "typecheck": "tsc --noEmit",
-    "new": "new-component -l 'ts'"
+    "new": "new-component -l 'ts'",
+    "format:check": "prettier . --check --ignore-path .gitignore",
+    "format:fix": "prettier . --check --ignore-path .gitignore"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.3",
